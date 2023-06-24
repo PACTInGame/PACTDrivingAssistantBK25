@@ -2,18 +2,17 @@ import math
 
 
 class OwnVehicle:
-    def __init__(self, x, y, z, heading, direction, steer_forces, speed, player_id, distance, dynamic, cname):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.heading = heading
-        self.direction = direction
-        self.steer_forces = steer_forces
-        self.speed = speed
-        self.player_id = player_id
-        self.distance = distance
-        self.dynamic = dynamic
-        self.cname = cname
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.heading = 0
+        self.direction = 0
+        self.steer_forces = 0
+        self.speed = 0
+        self.player_id = 0
+        self.dynamic = 0
+        self.cname = ""
         self.indicator_left = False
         self.indicator_right = False
         self.indicator_hazard = False
@@ -24,6 +23,7 @@ class OwnVehicle:
         self.throttle = 0
         self.clutch = 0
         self.fuel = 0
+        self.turbo = 0
         self.eng_type = "combutstion"  # combustion, electric
         self.battery_light = False
         self.oil_light = False
@@ -32,7 +32,13 @@ class OwnVehicle:
         self.tc_light = False
         self.full_beam_light = False
 
-
+    def update_lights(self, batt, oil, abs, handbrake, tc, full_beam):
+        self.battery_light = batt
+        self.oil_light = oil
+        self.abs_light = abs
+        self.handbrake_light = handbrake
+        self.tc_light = tc
+        self.full_beam_light = full_beam
 
     def update_dynamic(self, dynamic):
         self.dynamic = dynamic
@@ -55,4 +61,3 @@ class OwnVehicle:
 
     def update_cname(self, cn):
         self.cname = cn
-       
