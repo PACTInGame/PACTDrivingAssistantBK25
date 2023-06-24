@@ -12,10 +12,6 @@ class OwnVehicle:
         self.speed = 0
         self.player_id = 0
         self.dynamic = 0
-        self.cname = ""
-        self.indicator_left = False
-        self.indicator_right = False
-        self.indicator_hazard = False
         self.collision_warning_multiplier = 1
         self.gear = 0
         self.rpm = 0
@@ -24,13 +20,24 @@ class OwnVehicle:
         self.clutch = 0
         self.fuel = 0
         self.turbo = 0
-        self.eng_type = "combutstion"  # combustion, electric
+        self.control_mode = 0  # 0 = Mouse, 1 = Keyboard, 2 = Joystick
+        self.gearbox_mode = 0  # 0 = Auto, 1 = Shifter, 2 = Sequential
+
+        self.indicator_left = False
+        self.indicator_right = False
+        self.indicator_hazard = False
+        self.auto_clutch = False
         self.battery_light = False
         self.oil_light = False
         self.abs_light = False
         self.handbrake_light = False
         self.tc_light = False
         self.full_beam_light = False
+
+        self.player_name = ""
+        self.cname = ""
+        self.roleplay = "civil"
+        self.eng_type = "combutstion"  # combustion, electric
 
     def update_lights(self, batt, oil, abs, handbrake, tc, full_beam):
         self.battery_light = batt

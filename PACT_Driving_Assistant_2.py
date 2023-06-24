@@ -3,6 +3,7 @@ import sys
 import pygame
 
 from LfsConnection import LFSConnection
+from threading import Thread
 
 
 class PACTDrivingAssistant2:
@@ -17,6 +18,7 @@ class PACTDrivingAssistant2:
         self.running = True
         self.icon = pygame.image.load('data\\images\\icon.png')
         pygame.display.set_icon(self.icon)
+        self.clock = pygame.time.Clock()
         self.colors = {
             "WHITE": (255, 255, 255),
             "RED": (255, 204, 204),
@@ -46,14 +48,21 @@ class PACTDrivingAssistant2:
 
     def run(self):
         lfs_connection = LFSConnection()
-        lfs_connection.run()
+        thread2 = Thread(target=lfs_connection.run)
+        thread2.start()
         while self.running:
             self.screen.fill(self.colors['GREY'])
+            self.clock.tick(30)
             for event in pygame.event.get():
                 self.handle_event(event)
             pygame.display.update()
 
 
+
 if __name__ == "__main__":
     pda = PACTDrivingAssistant2()
     pda.run()
+
+
+
+
