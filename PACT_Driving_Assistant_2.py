@@ -2,6 +2,8 @@ import sys
 
 import pygame
 
+from LfsConnection import LFSConnection
+
 
 class PACTDrivingAssistant2:
 
@@ -43,10 +45,11 @@ class PACTDrivingAssistant2:
         sys.exit()
 
     def run(self):
+        lfs_connection = LFSConnection()
+        lfs_connection.run()
         while self.running:
             self.screen.fill(self.colors['GREY'])
             for event in pygame.event.get():
-                pos = pygame.mouse.get_pos()
                 self.handle_event(event)
             pygame.display.update()
 

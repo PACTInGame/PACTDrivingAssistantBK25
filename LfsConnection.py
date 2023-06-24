@@ -34,13 +34,13 @@ class LFSConnection:
         self.own_vehicle.indicator_left = pyinsim.DL_SIGNAL_L & packet.ShowLights
         self.own_vehicle.indicator_right = pyinsim.DL_SIGNAL_R & packet.ShowLights
         self.own_vehicle.hazard_lights = self.own_vehicle.indicator_left and self.own_vehicle.indicator_right
-        self.own_vehicle.full_beam_light = pyinsim.DL_FULLBEAM & packet.ShowLights
-        self.own_vehicle.tc_light = pyinsim.DL_TC & packet.ShowLights
-        self.own_vehicle.abs_light = pyinsim.DL_ABS & packet.ShowLights
-        self.own_vehicle.handbrake_light = pyinsim.DL_HANDBRAKE & packet.ShowLights
-        self.own_vehicle.battery_light = pyinsim.DL_BATTERY & packet.ShowLights
-        self.own_vehicle.oil_light = pyinsim.DL_OILWARN & packet.ShowLights
-
+        self.own_vehicle.full_beam_light = pyinsim.DL_FULLBEAM & packet.ShowLights > 0
+        self.own_vehicle.tc_light = pyinsim.DL_TC & packet.ShowLights > 0
+        self.own_vehicle.abs_light = pyinsim.DL_ABS & packet.ShowLights > 0
+        self.own_vehicle.handbrake_light = pyinsim.DL_HANDBRAKE & packet.ShowLights > 0
+        self.own_vehicle.battery_light = pyinsim.DL_BATTERY & packet.ShowLights > 0
+        self.own_vehicle.oil_light = pyinsim.DL_OILWARN & packet.ShowLights > 0
+        print(self.own_vehicle.full_beam_light)
     def start_outgauge(self):
         print("outgauge_started")
         self.outgauge = pyinsim.outgauge('127.0.0.1', 30000, self.outgauge_packet, 30.0)
@@ -74,7 +74,7 @@ class LFSConnection:
         self.insim.bind(pyinsim.ISP_PLP, self.player_pits)
         self.insim.bind(pyinsim.ISP_BTC, self.on_click)
         self.insim.bind(pyinsim.ISP_AXM, self.object_detection)
-        lfs_connection.start_outgauge()
+        self.start_outgauge()
         pyinsim.run()
 
 
