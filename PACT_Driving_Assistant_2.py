@@ -31,6 +31,9 @@ class PACTDrivingAssistant2:
             "PINK": (212, 92, 114),
         }
 
+        self.background = pygame.image.load('data\\images\\background.png')
+
+
     def handle_event(self, event):
         if event.type == pygame.QUIT:
             self.quit_game()
