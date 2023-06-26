@@ -89,18 +89,16 @@ class PACTDrivingAssistant2:
         if self.animation_counter > 31 and 1 <= self.animation_num <= 2:
             self.reset_anim()
 
-
     def reinit_buttons(self):
         self.start_button = Button(self.colors['GREEN'], self.width / 2, self.height / 2, self.btn_width,
                                    self.btn_height, 'Settings')
         self.close_button = Button(self.colors['RED'], self.width / 2, self.height / 2 + self.btn_height + 15,
                                    self.btn_width, self.btn_height, 'Quit')
-        self.fwd_col_button = Button(self.colors['BLUE'], self.width / 2,
-                                     self.height / 2 + self.btn_height,
-                                     self.btn_width, self.btn_height, 'Collision Warning')
+        self.fwd_col_button = Button(self.colors['BLUE'], self.width / 2, self.height / 2, self.btn_width_opt,
+                                     self.btn_height, 'Collision Warning')
         self.light_ass_button = Button(self.colors['BLUE'], self.width / 2,
                                        self.height / 2 + self.btn_height + 15,
-                                       self.btn_width, self.btn_height, 'Light Assist')
+                                       self.btn_width_opt, self.btn_height, 'Light Assist')
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -120,6 +118,7 @@ class PACTDrivingAssistant2:
                     elif self.mode == 1:
                         if button.text == 'Collision Warning':
                             self.animation_num = 2
+                            self.animation_counter = 0
                             self.collision_warning_distance = self.collision_warning_distance + 1 if self.collision_warning_distance < 2 else 0
                             break
         elif event.type == pygame.KEYDOWN:
