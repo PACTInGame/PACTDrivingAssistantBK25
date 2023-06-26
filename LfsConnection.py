@@ -1,3 +1,4 @@
+import sys
 import time
 
 import pyinsim
@@ -10,9 +11,10 @@ from Vehicle import Vehicle
 # 1-10 Head up Display
 class LFSConnection:
     def __init__(self):
+
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
-
+        self.running = True
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
@@ -191,6 +193,8 @@ class LFSConnection:
                 self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
 
     def get_car_data(self, insim, MCI):
+        if not self.running:
+            sys.exit()
         if time.time() - self.time_MCI > 0.1:
             self.timers_decr()
         # DATA RECEIVING ---------------
