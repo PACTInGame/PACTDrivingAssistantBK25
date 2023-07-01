@@ -61,7 +61,7 @@ class PACTDrivingAssistant2:
         self.collision_1 = pygame.image.load('data\\images\\col_1.png')
         self.collision_2 = pygame.image.load('data\\images\\col_2.png')
         self.collision_3 = pygame.image.load('data\\images\\col_3.png')
-        self.animation1 = [pygame.image.load('data\\images\\Anim2\\Start' + str(x) + '.png') for x in range(0, 32)]
+        self.animation1 = [pygame.image.load('data\\images\\Anim2\\settings' + str(x) + '.png') for x in range(0, 32)]
         tmp1 = [pygame.image.load('data\\images\\Anim1\\cross' + str(x) + '.png') for x in range(0, 10)]
         tmp2 = [pygame.image.load('data\\images\\Anim1\\cross0' + str(x) + '.png') for x in range(11, 99)]
         tmp3 = [pygame.image.load('data\\images\\Anim1\\cross' + str(x) + '.png') for x in range(100, 140)]
