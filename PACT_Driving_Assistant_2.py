@@ -57,12 +57,14 @@ class PACTDrivingAssistant2:
         # Backgrounds
         self.background_start = pygame.image.load('data\\images\\background_start.png')
         self.background_settings = pygame.image.load('data\\images\\background.png')
-        self.background_cross = pygame.image.load('data\\images\\background_2.png')
+        self.background_bus = pygame.image.load('data\\images\\background_bus.png')
+        self.background_pdc = pygame.image.load('data\\images\\background_pdc.png')
         self.collision_1 = pygame.image.load('data\\images\\col_1.png')
         self.collision_2 = pygame.image.load('data\\images\\col_2.png')
         self.collision_3 = pygame.image.load('data\\images\\col_3.png')
         self.animation1 = [pygame.image.load('data\\images\\Anim1\\settings' + str(x) + '.png') for x in range(0, 26)]
-        self.animation2 = [pygame.image.load('data\\images\\Anim2\\bus' + str(x) + '.png') for x in range(0, 10)]
+        self.animation2 = [pygame.image.load('data\\images\\Anim2\\bus' + str(x) + '.png') for x in range(0, 26)]
+        self.animation3 = [pygame.image.load('data\\images\\Anim3\\pdc' + str(x) + '.png') for x in range(0, 30)]
         self.animation_counter = 0
         self.animation_num = 0
 
@@ -77,12 +79,13 @@ class PACTDrivingAssistant2:
         self.clutch_button = None
         self.pdc_button = None
         self.lane_departure_button = None
-        self.more_button = None
+        self.cross_traffic_button = None
+        self.bus_button = None
 
         self.reinit_buttons()
         self.buttons = [self.start_button, self.close_button, self.fwd_col_button, self.light_ass_button,
                         self.hud_button, self.clutch_button, self.pdc_button, self.lane_departure_button,
-                        self.more_button]
+                        self.cross_traffic_button, self.bus_button]
 
         # Last: LFSConnection
         self.lfs_connection = LFSConnection()
@@ -112,37 +115,40 @@ class PACTDrivingAssistant2:
 
         if self.animation_counter > 25 and 1 <= self.animation_num <= 3:
             self.reset_anim()
-        elif self.animation_counter > 137 and self.animation_num == 4:
+        elif self.animation_counter > 29 and self.animation_num == 4:
             self.reset_anim()
 
     def reinit_buttons(self):
-        x_opt = self.width / 2 + 100
-        y_opt = self.height / 2 - 50
+        x_opt = self.width / 2 - 375
+        y_opt = self.height / 2
         gap = 10
-        self.start_button = Button(self.colors['GREEN'], self.width / 2, self.height / 2, self.btn_width,
+        self.start_button = Button(self.colors['GREEN'], self.width / 2 +100, self.height / 2, self.btn_width,
                                    self.btn_height, 'Settings')
-        self.close_button = Button(self.colors['RED'], self.width / 2, self.height / 2 + self.btn_height + 15,
+        self.close_button = Button(self.colors['RED'], self.width / 2+100, self.height / 2 + self.btn_height + 15,
                                    self.btn_width, self.btn_height, 'Quit')
-        self.fwd_col_button = Button(self.colors['BLUE'], x_opt, y_opt, self.btn_width_opt,
-                                     self.btn_height, 'Collision Warning')
-        self.hud_button = Button(self.colors['BLUE'], x_opt,
+        self.hud_button = Button(self.colors['BLUE'], x_opt, y_opt, self.btn_width_opt,
+                                     self.btn_height, 'Head Up Display')
+        self.fwd_col_button = Button(self.colors['BLUE'], x_opt,
                                  y_opt + self.btn_height + gap,
-                                 self.btn_width_opt, self.btn_height, 'Head Up Display')
-        self.lane_departure_button = Button(self.colors['BLUE'], x_opt,
+                                 self.btn_width_opt, self.btn_height, 'Collision Warning')
+        self.cross_traffic_button = Button(self.colors['BLUE'], x_opt,
                                             y_opt + self.btn_height * 2 + gap * 2,
-                                            self.btn_width_opt, self.btn_height, 'Lane Dep. Warning')
-        self.pdc_button = Button(self.colors['BLUE'], x_opt,
+                                            self.btn_width_opt, self.btn_height, 'Cross Traffic Warning')
+        self.lane_departure_button = Button(self.colors['BLUE'], x_opt,
                                  y_opt + self.btn_height * 3 + gap * 3,
-                                 self.btn_width_opt, self.btn_height, 'Parking Aid')
+                                 self.btn_width_opt, self.btn_height, 'Lane Dep. Warning')
         self.clutch_button = Button(self.colors['BLUE'], x_opt,
                                     y_opt + self.btn_height * 4 + gap * 4,
                                     self.btn_width_opt, self.btn_height, 'Realistic Clutch')
         self.light_ass_button = Button(self.colors['BLUE'], x_opt,
                                        y_opt + self.btn_height * 5 + gap * 5,
                                        self.btn_width_opt, self.btn_height, 'Light Assist')
-        self.more_button = Button(self.colors['BLUE'], x_opt,
+        self.bus_button = Button(self.colors['BLUE'], x_opt,
                                   y_opt + self.btn_height * 6 + gap * 6,
-                                  self.btn_width_opt, self.btn_height, 'More...')
+                                  self.btn_width_opt, self.btn_height, 'Bus Simulation ->')
+        self.pdc_button = Button(self.colors['BLUE'], x_opt + self.btn_width_opt + 15,
+                                  y_opt + self.btn_height * 6 + gap * 6,
+                                  self.btn_width_opt, self.btn_height, 'Parking Aid ->')
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -173,11 +179,10 @@ class PACTDrivingAssistant2:
                                 self.light_assist = 0
                                 self.background_settings = pygame.image.load('data\\images\\background.png')
                             break
-                        elif button.text == 'More...':
+                        elif button.text == 'Bus Simulation ->':
                             self.animation_num = 3
                             self.animation_counter = 0
                             self.mode = 2
-                            print("Mode 2")
                             break
 
         elif event.type == pygame.KEYDOWN:
@@ -202,7 +207,9 @@ class PACTDrivingAssistant2:
         elif self.mode == 1:
             self.screen.blit(self.background_settings, self.image_position)
         elif self.mode == 2:
-            self.screen.blit(self.background_cross, self.image_position)
+            self.screen.blit(self.background_bus, self.image_position)
+        elif self.mode == 3:
+            self.screen.blit(self.background_pdc, self.image_position)
 
     def draw_buttons(self):
         if self.mode == 0:
@@ -215,7 +222,8 @@ class PACTDrivingAssistant2:
             self.pdc_button.draw(self.screen)
             self.clutch_button.draw(self.screen)
             self.lane_departure_button.draw(self.screen)
-            self.more_button.draw(self.screen)
+            self.bus_button.draw(self.screen)
+            self.cross_traffic_button.draw(self.screen)
         elif self.mode == 2:
             pass
 
