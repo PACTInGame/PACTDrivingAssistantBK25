@@ -94,7 +94,7 @@ class PACTDrivingAssistant2:
         self.animation_num = 0
 
     def animation(self):
-        if self.animation_num == 1:  # 0 = off, 1 = to settings, 2 = forward col, 3 = to bus
+        if self.animation_num == 1:  # 0 = off, 1 = to settings, 2 = forward col, 3 = to bus, 4 = to pdc
             self.screen.blit(self.animation1[self.animation_counter], self.image_position)
 
         elif self.animation_num == 2:
@@ -110,9 +110,9 @@ class PACTDrivingAssistant2:
 
         self.animation_counter += 1
 
-        if self.animation_counter > 25 and 1 <= self.animation_num <= 2:
+        if self.animation_counter > 25 and 1 <= self.animation_num <= 3:
             self.reset_anim()
-        elif self.animation_counter > 137 and self.animation_num == 3:
+        elif self.animation_counter > 137 and self.animation_num == 4:
             self.reset_anim()
 
     def reinit_buttons(self):
