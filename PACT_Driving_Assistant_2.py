@@ -55,17 +55,14 @@ class PACTDrivingAssistant2:
         self.head_up_display = 0
 
         # Backgrounds
-        self.background_start = pygame.image.load('data\\images\\background_3.png')
+        self.background_start = pygame.image.load('data\\images\\background_start.png')
         self.background_settings = pygame.image.load('data\\images\\background.png')
         self.background_cross = pygame.image.load('data\\images\\background_2.png')
         self.collision_1 = pygame.image.load('data\\images\\col_1.png')
         self.collision_2 = pygame.image.load('data\\images\\col_2.png')
         self.collision_3 = pygame.image.load('data\\images\\col_3.png')
-        self.animation1 = [pygame.image.load('data\\images\\Anim2\\settings' + str(x) + '.png') for x in range(0, 32)]
-        tmp1 = [pygame.image.load('data\\images\\Anim1\\cross' + str(x) + '.png') for x in range(0, 10)]
-        tmp2 = [pygame.image.load('data\\images\\Anim1\\cross0' + str(x) + '.png') for x in range(11, 99)]
-        tmp3 = [pygame.image.load('data\\images\\Anim1\\cross' + str(x) + '.png') for x in range(100, 140)]
-        self.animation2 = tmp1 + tmp2 + tmp3
+        self.animation1 = [pygame.image.load('data\\images\\Anim1\\settings' + str(x) + '.png') for x in range(0, 26)]
+        self.animation2 = [pygame.image.load('data\\images\\Anim2\\bus' + str(x) + '.png') for x in range(0, 10)]
         self.animation_counter = 0
         self.animation_num = 0
 
@@ -97,7 +94,7 @@ class PACTDrivingAssistant2:
         self.animation_num = 0
 
     def animation(self):
-        if self.animation_num == 1:  # 0 = off, 1 = to settings, 2 = forward col, 3 = to cross
+        if self.animation_num == 1:  # 0 = off, 1 = to settings, 2 = forward col, 3 = to bus
             self.screen.blit(self.animation1[self.animation_counter], self.image_position)
 
         elif self.animation_num == 2:
@@ -113,7 +110,7 @@ class PACTDrivingAssistant2:
 
         self.animation_counter += 1
 
-        if self.animation_counter > 31 and 1 <= self.animation_num <= 2:
+        if self.animation_counter > 25 and 1 <= self.animation_num <= 2:
             self.reset_anim()
         elif self.animation_counter > 137 and self.animation_num == 3:
             self.reset_anim()
