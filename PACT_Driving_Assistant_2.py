@@ -55,7 +55,6 @@ class PACTDrivingAssistant2:
         self.lane_departure_warning = 0
         self.real_clutch = 0
 
-
         # Backgrounds
         self.background_start = pygame.image.load('data\\images\\background_start.png')
         self.background_settings = pygame.image.load('data\\images\\background.png')
@@ -69,6 +68,9 @@ class PACTDrivingAssistant2:
         self.cross_1 = pygame.image.load('data\\images\\cross_1.png')
         self.cross_2 = pygame.image.load('data\\images\\cross_2.png')
         self.cross_3 = pygame.image.load('data\\images\\cross_3.png')
+        self.lane_0 = pygame.image.load('data\\images\\lane_0.png')
+        self.lane_1 = pygame.image.load('data\\images\\lane_1.png')
+        self.lane_2 = pygame.image.load('data\\images\\lane_2.png')
         self.head_up_on = pygame.image.load('data\\images\\hud_1.png')
         self.head_up_off = pygame.image.load('data\\images\\hud_0.png')
         self.animation1 = [pygame.image.load('data\\images\\Anim1\\settings' + str(x) + '.png') for x in range(0, 26)]
@@ -134,12 +136,10 @@ class PACTDrivingAssistant2:
         elif self.animation_num == -1:
             if self.head_up_display == 1:
                 self.screen.blit(self.head_up_on, self.image_position)
-
             elif self.head_up_display == 0:
                 self.screen.blit(self.head_up_off, self.image_position)
 
         elif self.animation_num == -2:
-
             if self.cross_warning_distance == 0:
                 self.screen.blit(self.cross_0, self.image_position)
             elif self.cross_warning_distance == 1:
@@ -148,6 +148,14 @@ class PACTDrivingAssistant2:
                 self.screen.blit(self.cross_2, self.image_position)
             elif self.cross_warning_distance == 3:
                 self.screen.blit(self.cross_3, self.image_position)
+
+        elif self.animation_num == -3:
+            if self.lane_departure_warning == 0:
+                self.screen.blit(self.lane_0, self.image_position)
+            elif self.lane_departure_warning == 1:
+                self.screen.blit(self.lane_1, self.image_position)
+            elif self.lane_departure_warning == 2:
+                self.screen.blit(self.lane_2, self.image_position)
 
         if self.animation_num > 4:
             self.animation_counter -= 1
@@ -169,7 +177,8 @@ class PACTDrivingAssistant2:
                                    self.btn_height, 'Settings')
         self.close_button = Button(self.colors['RED'], self.width / 2 + 200, self.height / 2 + self.btn_height + 15,
                                    self.btn_width, self.btn_height, 'Quit')
-        self.hud_button = Button(self.colors['GREEN' if self.head_up_display else 'RED'], x_opt, y_opt, self.btn_width_opt,
+        self.hud_button = Button(self.colors['GREEN' if self.head_up_display else 'RED'], x_opt, y_opt,
+                                 self.btn_width_opt,
                                  self.btn_height, 'Head Up Display')
         self.fwd_col_button = Button(self.colors['GREEN' if self.collision_warning_distance > 0 else 'RED'], x_opt,
                                      y_opt + self.btn_height + gap,
@@ -234,6 +243,12 @@ class PACTDrivingAssistant2:
                         elif button.text == 'Cross Traffic Warning':
                             self.animation_num = -2
                             self.cross_warning_distance = self.cross_warning_distance + 1 if self.cross_warning_distance < 3 else 0
+                            self.animation_counter = 0
+                            break
+
+                        elif button.text == 'Lane Dep. Warning':
+                            self.animation_num = -3
+                            self.lane_departure_warning = self.lane_departure_warning + 1 if self.lane_departure_warning < 2 else 0
                             self.animation_counter = 0
                             break
 
