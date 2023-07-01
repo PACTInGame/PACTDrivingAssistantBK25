@@ -27,6 +27,7 @@ class LFSConnection:
         self.settings = Setting()
         self.timers = []
         self.time_MCI = 0
+        self.is_connected = False
 
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data
@@ -192,6 +193,10 @@ class LFSConnection:
                 self.timers[i][0] = 20
                 self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
 
+            elif self.timers[i][1] == "PING" and self.timers[i][0] == 0:
+                self.timers[i][0] = 20
+                self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_PING)
+
     def get_car_data(self, insim, MCI):
         if not self.running:
             sys.exit()
@@ -205,6 +210,9 @@ class LFSConnection:
          in MCI.Info for car in self.cars_on_track if car.player_id == data.PLID]
         [updated_this_packet.append(data.PLID) for data in MCI.Info]
 
+    def get_pings(self, insim, ping):
+        self.is_connected = True
+
     def run(self):
         self.insim.bind(pyinsim.ISP_MCI, self.get_car_data)
         self.insim.bind(pyinsim.ISP_MSO, self.message_handling)
@@ -214,9 +222,11 @@ class LFSConnection:
         self.insim.bind(pyinsim.ISP_PLP, self.player_pits)
         self.insim.bind(pyinsim.ISP_BTC, self.on_click)
         self.insim.bind(pyinsim.ISP_AXM, self.object_detection)
+        self.insim.bind(pyinsim.TINY_PING, self.get_pings)
         self.start_outgauge()
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
         self.timers.append([20, "NPL"])
+        self.timers.append([20, "PING"])
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_AXM)
         pyinsim.run()
 

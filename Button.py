@@ -40,7 +40,7 @@ class Button:
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
         if self.text != '':
-            font = pygame.font.SysFont('Arial', 40)
+            font = pygame.font.SysFont('Arial', 22)
             text = font.render(self.text, True, PINK)
             screen.blit(text, (
                 self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
