@@ -30,9 +30,15 @@ class LFSConnection:
         self.time_MCI = 0
         self.is_connected = False
 
+        # Game Infos
+        self.text_entry = False
+        self.on_track = False
+        self.in_pits = False
+
         # for checking the previous state
         self.indicator_right_sound = False
         self.indicator_left_sound = False
+        self.time_menu_open = 0
 
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data
@@ -63,12 +69,15 @@ class LFSConnection:
         self.own_vehicle.eng_light = pyinsim.DL_SPARE & packet.ShowLights > 0
 
         # Function calls
-        self.head_up_display()
-        self.sound_effects()
+        if self.on_track:
+            self.head_up_display()
+            self.sound_effects()
 
     def start_outgauge(self):
-        print("outgauge_started")
-        self.outgauge = pyinsim.outgauge('127.0.0.1', 30000, self.outgauge_packet, 30.0)
+        try:
+            self.outgauge = pyinsim.outgauge('127.0.0.1', 30000, self.outgauge_packet, 30.0)
+        except:
+            print("Failed to connect to OutGauge. Maybe it was still active.")
 
     def sound_effects(self):
         if self.own_vehicle.roleplay == "civil":
@@ -89,7 +98,39 @@ class LFSConnection:
         pass
 
     def insim_state(self, insim, sta):
-        pass
+        def start_game_insim():
+            self.on_track = True
+            self.in_pits = False
+            if time.time() - self.time_menu_open >= 30:
+                self.start_outgauge()
+            insim.bind(pyinsim.ISP_MCI, self.get_car_data)
+            insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
+            self.del_button(31)
+
+        def start_menu_insim():
+            self.time_menu_open = time.time()
+            self.on_track = False
+            self.in_pits = False
+            insim.unbind(pyinsim.ISP_MCI, self.get_car_data)
+            [self.del_button(i) for i in range(200)]
+            self.send_button(31, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
+                             "Waiting for you to hit the road.")
+
+        flags = [int(i) for i in str("{0:b}".format(sta.Flags))]
+
+        if len(flags) >= 15:
+            game = flags[-1] == 1 and flags[-15] == 1
+
+            if not self.on_track and game:
+                start_game_insim()
+
+            elif self.on_track and not game:
+                start_menu_insim()
+
+        elif self.on_track:
+            start_menu_insim()
+
+        self.text_entry = len(flags) >= 16 and flags[-16] == 1
 
     def new_player(self, insim, npl):
         cars_already_known = [car.player_id for car in self.cars_on_track]
@@ -175,20 +216,23 @@ class LFSConnection:
             self.buttons_on_screen[click_id] = 0
 
     def head_up_display(self):
+        x = self.own_vehicle.offset_hud_x
+        y = self.own_vehicle.offset_hud_y
+
         def send_speed_button(color_code, speed_unit, speed):
             speed = int(speed)
-            self.send_button(1, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 119, 90, 13, 8,
+            self.send_button(1, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 119 + x, 90 + y, 13, 8,
                              f'{color_code}{speed} {speed_unit}')
 
         def send_rpm_button(color_code, rpm):
-            self.send_button(2, pyinsim.ISB_DARK, 119, 103, 13, 8, f'{color_code}%.1f RPM' % (rpm / 1000))
+            self.send_button(2, pyinsim.ISB_DARK, 119+x, 103+y, 13, 8, f'{color_code}%.1f RPM' % (rpm / 1000))
 
         def send_warning_button(intensity):
-            self.send_button(3, pyinsim.ISB_DARK + 10 * (intensity == 2), 119, 90, 13, 8, '^1<< ---')
-            self.send_button(4, pyinsim.ISB_DARK + 10 * (intensity == 2), 119, 103, 13, 8, '^1--- >>')
+            self.send_button(3, pyinsim.ISB_DARK + 10 * (intensity == 2), 119 + x, 90 + y, 13, 8, '^1<< ---')
+            self.send_button(4, pyinsim.ISB_DARK + 10 * (intensity == 2), 119+x, 103+y, 13, 8, '^1--- >>')
 
         def send_gear_button(gear_mode):
-            self.send_button(5, pyinsim.ISB_DARK, 123, 116, 4, 4, '^7' + gear_mode)
+            self.send_button(5, pyinsim.ISB_DARK, 123+x, 116+y, 4, 4, '^7' + gear_mode)
 
         if self.settings.head_up_display:
             if self.own_vehicle.gear > 1:
@@ -250,6 +294,7 @@ class LFSConnection:
         self.timers.append([20, "NPL"])
         self.timers.append([20, "PING"])
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_AXM)
+        self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.ISP_STA)
         pyinsim.run()
 
 

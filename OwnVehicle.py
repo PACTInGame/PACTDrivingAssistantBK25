@@ -40,6 +40,9 @@ class OwnVehicle:
         self.roleplay = "civil"
         self.eng_type = "combutstion"  # combustion, electric
 
+        self.offset_hud_x = 0
+        self.offset_hud_y = 0
+
     def update_dynamic(self, dynamic):
         self.dynamic = dynamic
 
