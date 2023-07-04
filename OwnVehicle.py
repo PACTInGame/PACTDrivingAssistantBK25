@@ -10,18 +10,23 @@ class OwnVehicle:
         self.direction = 0
         self.steer_forces = 0
         self.speed = 0
+        self.speed_mci = 0
         self.player_id = 0
         self.dynamic = 0
-        self.collision_warning_multiplier = 1
+        self.collision_warning_multiplier = (0, 1)
         self.gear = 0
         self.rpm = 0
-        self.brake_pressure = 0
+        self.brake = 0
         self.throttle = 0
         self.clutch = 0
         self.fuel = 0
         self.turbo = 0
         self.control_mode = 0  # 0 = Mouse, 1 = Keyboard, 2 = Joystick
         self.gearbox_mode = 0  # 0 = Auto, 1 = Shifter, 2 = Sequential
+        # Database Data
+        self.fuel_capacity = -1
+        self.redline = -1
+        self.max_gears = -1
 
         self.indicator_left = False
         self.indicator_right = False
@@ -40,8 +45,10 @@ class OwnVehicle:
         self.roleplay = "civil"
         self.eng_type = "combutstion"  # combustion, electric
 
-        self.offset_hud_x = 0
-        self.offset_hud_y = 0
+        self.acc_active = False
+        self.siren_active = False
+        self.siren_fast = False
+
 
     def update_dynamic(self, dynamic):
         self.dynamic = dynamic
@@ -59,7 +66,7 @@ class OwnVehicle:
         self.heading = heading
         self.direction = direction
         self.steer_forces = steer_forces
-        self.speed = speed
+        self.speed_mci = speed
         self.player_id = player_id
 
     def update_cname(self, cn):

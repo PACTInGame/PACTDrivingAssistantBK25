@@ -1,6 +1,10 @@
 import sys
 import time
+from threading import Thread
 
+import Calculations
+import CarDataBase
+import ForwardCollisionWarning
 import Sounds
 import pyinsim
 from OwnVehicle import OwnVehicle
@@ -20,6 +24,7 @@ class LFSConnection:
         self.cars_on_track = []
         self.cars_relevant = []
         self.own_vehicle = OwnVehicle()
+        self.settings = Setting()
         self.outgauge = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
@@ -39,24 +44,23 @@ class LFSConnection:
         self.indicator_right_sound = False
         self.indicator_left_sound = False
         self.time_menu_open = 0
+        self.cars_previous_speed = []
+        self.cars_previous_speed_buffer = []
+        self.collision_warning_sound_played = False
 
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data
         self.game_time = packet.Time
         self.own_vehicle.fuel = packet.Fuel
-        self.own_vehicle.speed = packet.Speed
+        self.own_vehicle.speed = packet.Speed * 3.6 if self.settings.unit == 0 else packet.Speed * 2.236
         self.own_vehicle.rpm = packet.RPM
         self.own_vehicle.gear = packet.Gear
-        self.own_vehicle.cname = packet.Car
         self.own_vehicle.player_id = packet.PLID
-        self.own_vehicle.brake_pressure = packet.Brake
+        self.own_vehicle.brake = packet.Brake
         self.own_vehicle.throttle = packet.Throttle
         self.own_vehicle.clutch = packet.Clutch
         self.own_vehicle.turbo = packet.Turbo
-        if b"Batt" in packet.Display1:
-            self.own_vehicle.eng_type = "electric"
-        else:
-            self.own_vehicle.eng_type = "combustion"
+
         self.own_vehicle.indicator_left = pyinsim.DL_SIGNAL_L & packet.ShowLights
         self.own_vehicle.indicator_right = pyinsim.DL_SIGNAL_R & packet.ShowLights
         self.own_vehicle.hazard_lights = self.own_vehicle.indicator_left and self.own_vehicle.indicator_right
@@ -67,6 +71,18 @@ class LFSConnection:
         self.own_vehicle.battery_light = pyinsim.DL_BATTERY & packet.ShowLights > 0
         self.own_vehicle.oil_light = pyinsim.DL_OILWARN & packet.ShowLights > 0
         self.own_vehicle.eng_light = pyinsim.DL_SPARE & packet.ShowLights > 0
+
+        if self.own_vehicle.cname != packet.Car:
+            self.own_vehicle.cname = packet.Car
+            if b"Batt" in packet.Display1:
+                self.own_vehicle.eng_type = "electric"
+            else:
+                self.own_vehicle.eng_type = "combustion"
+
+            self.own_vehicle.fuel_capacity = CarDataBase.get_fuel_capa(self.own_vehicle.cname)
+            self.own_vehicle.redline = CarDataBase.get_vehicle_redline(self.own_vehicle.cname)
+            self.own_vehicle.collision_warning_multiplier = CarDataBase.get_vehicle_length(self.own_vehicle.cname)
+            self.own_vehicle.max_gears = CarDataBase.get_max_gears(self.own_vehicle.cname)
 
         # Function calls
         if self.on_track:
@@ -133,16 +149,6 @@ class LFSConnection:
         self.text_entry = len(flags) >= 16 and flags[-16] == 1
 
     def new_player(self, insim, npl):
-        cars_already_known = [car.player_id for car in self.cars_on_track]
-
-        if npl.PLID not in cars_already_known:
-            self.cars_on_track.append(Vehicle(0, 0, 0, 0, 0, 0, 0, npl.PLID, 0, 0, npl.CName))
-        for car in self.cars_on_track:
-            if npl.PLID == car.player_id:
-                if car.cname != npl.CName:
-                    car.update_cname(npl.CName)
-        print("new_player")
-
         def remove_control_chars(player_name):
             for i in range(10):
                 player_name = player_name.replace(bytes(f"^{i}", 'utf-8'), b"")
@@ -156,6 +162,15 @@ class LFSConnection:
             else:
                 return 2  # wheel
 
+        cars_already_known = [car.player_id for car in self.cars_on_track]
+
+        if npl.PLID not in cars_already_known:
+            self.cars_on_track.append(Vehicle(0, 0, 0, 0, 0, 0, 0, npl.PLID, 0, 0, npl.CName))
+
+        for car in self.cars_on_track:
+            if npl.PLID == car.player_id:
+                if car.cname != npl.CName:
+                    car.update_cname(npl.CName)
         if npl.PLID == self.own_vehicle.player_id:
             flags = [int(i) for i in bin(npl.Flags)[2:]]
 
@@ -216,8 +231,8 @@ class LFSConnection:
             self.buttons_on_screen[click_id] = 0
 
     def head_up_display(self):
-        x = self.own_vehicle.offset_hud_x
-        y = self.own_vehicle.offset_hud_y
+        x = self.settings.offset_w
+        y = self.settings.offset_h
 
         def send_speed_button(color_code, speed_unit, speed):
             speed = int(speed)
@@ -225,14 +240,15 @@ class LFSConnection:
                              f'{color_code}{speed} {speed_unit}')
 
         def send_rpm_button(color_code, rpm):
-            self.send_button(2, pyinsim.ISB_DARK, 119+x, 103+y, 13, 8, f'{color_code}%.1f RPM' % (rpm / 1000))
+            self.send_button(2, pyinsim.ISB_DARK, 119 + x, 103 + y, 13, 8, f'{color_code}%.1f RPM' % (rpm / 1000))
 
         def send_warning_button(intensity):
-            self.send_button(3, pyinsim.ISB_DARK + 10 * (intensity == 2), 119 + x, 90 + y, 13, 8, '^1<< ---')
-            self.send_button(4, pyinsim.ISB_DARK + 10 * (intensity == 2), 119+x, 103+y, 13, 8, '^1--- >>')
+            self.send_button(1, 32 if intensity < 3 else 16, 119 + x, 90 + y, 13, 8, '^1<< ---')
+            self.send_button(2, 32 if intensity < 3 else 16, 119 + x, 103 + y, 13, 8, '^1--- >>')
+
 
         def send_gear_button(gear_mode):
-            self.send_button(5, pyinsim.ISB_DARK, 123+x, 116+y, 4, 4, '^7' + gear_mode)
+            self.send_button(5, pyinsim.ISB_DARK, 123 + x, 116 + y, 4, 4, '^7' + gear_mode)
 
         if self.settings.head_up_display:
             if self.own_vehicle.gear > 1:
@@ -248,7 +264,7 @@ class LFSConnection:
             if self.collision_warning_intensity > 0:
                 send_warning_button(self.collision_warning_intensity)
             else:
-                send_speed_button('^7', 'km/h', self.own_vehicle.speed * 3.6)
+                send_speed_button('^7', 'km/h', self.own_vehicle.speed)
                 send_rpm_button('^7', self.own_vehicle.rpm)
 
     def timers_decr(self):
@@ -263,11 +279,73 @@ class LFSConnection:
                 self.timers[i][0] = 20
                 self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_PING)
 
+    def start_assistants(self):
+        self.get_relevant_cars()
+        # Collision_Warning
+        if 12 < self.own_vehicle.speed or (
+                self.collision_warning_intensity > 0 and self.own_vehicle.speed > 0.5) and self.own_vehicle.gear > 1:
+            ForwardCollisionWarning.forward_collision_warning(self)
+        else:
+            self.collision_warning_intensity = 0
+        if self.collision_warning_intensity > 1 and not self.collision_warning_sound_played:
+            Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+            self.collision_warning_sound_played = True
+        if self.collision_warning_sound_played and self.collision_warning_intensity == 0:
+            self.collision_warning_sound_played = False
+
+    def get_relevant_cars(self):
+        relevant_cars = []
+
+        for car in self.cars_on_track:
+            if 0 < car.distance < 130:
+                angle = Calculations.calculate_angle(self.own_vehicle.x, car.x, self.own_vehicle.y, car.y,
+                                                     self.own_vehicle.heading)
+                relevant_cars.append([car, angle])
+
+        relevant_cars = sorted(relevant_cars, key=lambda x: Calculations.get_distance(x))
+
+        many_cars = False
+        while len(relevant_cars) > 8:
+            del relevant_cars[-1]
+            if self.own_vehicle.siren_active and not self.own_vehicle.siren_fast and self.settings.cop_aid_system:
+                self.insim.send(pyinsim.ISP_MST, Msg=b"/siren fast")
+            many_cars = True
+
+        if self.own_vehicle.siren_active and not many_cars and self.own_vehicle.siren_fast and self.settings.cop_aid_system:
+            self.insim.send(pyinsim.ISP_MST, Msg=b"/siren slow")
+
+        self.cars_relevant = relevant_cars
+
     def get_car_data(self, insim, MCI):
         if not self.running:
             sys.exit()
-        if time.time() - self.time_MCI > 0.1:
+        curr_time = time.time()
+
+        if curr_time - self.time_MCI > 0.1:
+            self.time_MCI = curr_time
             self.timers_decr()
+            warnings_thread = Thread(target=self.start_assistants)
+            warnings_thread.start()
+            self.cars_previous_speed = self.cars_previous_speed_buffer
+            self.cars_previous_speed_buffer = []
+
+            for i, j in enumerate(self.cars_on_track):
+                if j.player_id == self.own_vehicle.player_id:
+                    self.own_vehicle.speed_mci = j.speed
+                    self.own_vehicle.x = j.x
+                    self.own_vehicle.y = j.y
+                    self.own_vehicle.z = j.z
+                    self.own_vehicle.heading = j.heading
+                    self.own_vehicle.direction = j.direction
+                    self.own_vehicle.steer_forces = j.steer_forces
+                self.cars_previous_speed_buffer.append((j.speed, j.player_id))
+
+            [car.update_distance(self.own_vehicle.x, self.own_vehicle.y, self.own_vehicle.z) for car in
+             self.cars_on_track]
+            [car.update_dynamic(speed[0] - car.speed) for speed in self.cars_previous_speed for car in
+             self.cars_on_track if
+             speed[1] == car.player_id and speed[0] - car.speed != 0.0]
+
         # DATA RECEIVING ---------------
         updated_this_packet = []
         [car.update_data(data.X, data.Y, data.Z, data.Heading, data.Direction, data.AngVel, data.Speed / 91.02,
@@ -291,8 +369,8 @@ class LFSConnection:
         self.insim.bind(pyinsim.TINY_PING, self.get_pings)
         self.start_outgauge()
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
-        self.timers.append([20, "NPL"])
-        self.timers.append([20, "PING"])
+        self.timers.append([20, "NPL"])  # Timer 1
+        self.timers.append([20, "PING"])  # Timer 2
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_AXM)
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.ISP_STA)
         pyinsim.run()

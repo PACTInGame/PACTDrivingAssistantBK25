@@ -19,5 +19,6 @@ class Setting:
         self.collision_warning_sound = 1
         self.bc = 0
         self.unit = 0
-        self.offseth = 0
-        self.offsetw = 0
+        self.offset_h = 0
+        self.offset_w = 0
+
