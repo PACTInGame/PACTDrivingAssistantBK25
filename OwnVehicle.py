@@ -33,19 +33,12 @@ class OwnVehicle:
         self.handbrake_light = False
         self.tc_light = False
         self.full_beam_light = False
+        self.engine_light = False
 
         self.player_name = ""
         self.cname = ""
         self.roleplay = "civil"
         self.eng_type = "combutstion"  # combustion, electric
-
-    def update_lights(self, batt, oil, abs, handbrake, tc, full_beam):
-        self.battery_light = batt
-        self.oil_light = oil
-        self.abs_light = abs
-        self.handbrake_light = handbrake
-        self.tc_light = tc
-        self.full_beam_light = full_beam
 
     def update_dynamic(self, dynamic):
         self.dynamic = dynamic

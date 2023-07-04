@@ -1,6 +1,7 @@
 import sys
 import time
 
+import Sounds
 import pyinsim
 from OwnVehicle import OwnVehicle
 from Setting import Setting
@@ -29,6 +30,10 @@ class LFSConnection:
         self.time_MCI = 0
         self.is_connected = False
 
+        # for checking the previous state
+        self.indicator_right_sound = False
+        self.indicator_left_sound = False
+
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data
         self.game_time = packet.Time
@@ -55,13 +60,30 @@ class LFSConnection:
         self.own_vehicle.handbrake_light = pyinsim.DL_HANDBRAKE & packet.ShowLights > 0
         self.own_vehicle.battery_light = pyinsim.DL_BATTERY & packet.ShowLights > 0
         self.own_vehicle.oil_light = pyinsim.DL_OILWARN & packet.ShowLights > 0
+        self.own_vehicle.eng_light = pyinsim.DL_SPARE & packet.ShowLights > 0
 
         # Function calls
         self.head_up_display()
+        self.sound_effects()
 
     def start_outgauge(self):
         print("outgauge_started")
         self.outgauge = pyinsim.outgauge('127.0.0.1', 30000, self.outgauge_packet, 30.0)
+
+    def sound_effects(self):
+        if self.own_vehicle.roleplay == "civil":
+            if self.own_vehicle.indicator_right != self.indicator_right_sound:
+                self.indicator_right_sound = self.own_vehicle.indicator_right
+                if self.own_vehicle.indicator_right:
+                    Sounds.playsound_indicator_on()
+                else:
+                    Sounds.playsound_indicator_off()
+            elif self.own_vehicle.indicator_left != self.indicator_left_sound:
+                self.indicator_left_sound = self.own_vehicle.indicator_left
+                if self.own_vehicle.indicator_left:
+                    Sounds.playsound_indicator_on()
+                else:
+                    Sounds.playsound_indicator_off()
 
     def message_handling(self, insim, mso):
         pass
