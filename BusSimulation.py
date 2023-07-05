@@ -82,7 +82,9 @@ class BusSimulation:
         self.stop_index = 0
         self.at_stop = False
         self.stationary_at_stop = False
+        self.was_stopped = False
         self.passengers_added_at_stop = 0
+        self.max_passengers_added_this_stop = 0
 
         self.next_stop_sound_played = False
         self.game_obj = game_obj
@@ -106,7 +108,6 @@ class BusSimulation:
 
         # Check_Timetable
         self.next_stop_countdown = (time.time() - self.start_time) - self.route[self.stop_index]["time"] * 60
-        print(self.next_stop_countdown)
 
         # Check at stop
         self.at_stop = x - 5 <= self.route[self.stop_index]["coordinates"][0] <= x + 5 and y - 5 <= \
@@ -114,26 +115,39 @@ class BusSimulation:
 
         # Check stationary at stop
         self.stationary_at_stop = self.at_stop and speed < 0.1
-
+        #TODO MAKE PASSENGERS GOOD
         # update if stationary at stop
         if self.stationary_at_stop:
-            self.stop_index = self.stop_index + 1
-            self.current_stop = self.route[self.stop_index]["name"]
-            self.next_stop = self.route[self.stop_index]["next_stop"]
-
+            self.was_stopped = True
+            if self.max_passengers_added_this_stop == 0:
+                self.max_passengers_added_this_stop = random.randint(1, 10)
             if self.doors_open:
+                print(self.max_passengers_added_this_stop)
+                print(self.passengers_added_at_stop, "added")
                 # Check if its last stop on route
                 if self.stop_index == len(self.route) - 1:
                     self.passengers = self.passengers - 1 if self.passengers > 0 else 0
                     self.active = False if self.passengers == 0 else True
-                elif self.passengers_added_at_stop < random.randint(1, 10):
+                elif self.passengers_added_at_stop == 0:
                     # Randomly add or decrease passengers
-                    self.passengers = self.passengers + random.randint(-1, 1)
-                    self.passengers_added_at_stop += 1
+                    self.passengers_added_at_stop += random.randint(-self.max_passengers_added_this_stop,
+                                                                    self.max_passengers_added_this_stop)
+
                     if self.passengers < 0:
-                        self.passengers = 0
-                    if self.passengers > self.passengers_max:
-                        self.passengers = self.passengers_max
+                        self.passengers_added_at_stop = 0
+                    elif self.passengers > self.passengers_max:
+                        self.passengers_added_at_stop = 0
+                    else:
+                        self.passengers = self.passengers + self.passengers_added_at_stop
+
+        # stationary completed
+        if not self.stationary_at_stop and self.was_stopped:
+            self.max_passengers_added_this_stop = 0
+            self.passengers_added_at_stop = 0
+            self.stop_index = self.stop_index + 1
+            self.current_stop = self.route[self.stop_index]["name"]
+            self.next_stop = self.route[self.stop_index]["next_stop"]
+            self.was_stopped = False
 
         # update buttons
         self.update_buttons()
@@ -144,15 +158,25 @@ class BusSimulation:
             next_stop_string = f'Next Stop: {self.route[self.stop_index]["dn"]}'
             time_string = f'^1Time: {self.next_stop_countdown:.0f}' if self.next_stop_countdown > 0 else f'^2Time: {self.next_stop_countdown:.0f}'
             passengers_string = f'Passengers: {self.passengers}/{self.passengers_max}'
-
+            passengers_added_string = f'{self.passengers_added_at_stop} passengers boarded or left.'
             self.game_obj.send_button(11, pyinsim.ISB_DARK, 100, 175, 20, 5, route_string)
             self.game_obj.send_button(12, pyinsim.ISB_DARK, 105, 175, 20, 5, next_stop_string)
             self.game_obj.send_button(13, pyinsim.ISB_DARK, 110, 175, 20, 5, time_string)
             self.game_obj.send_button(14, pyinsim.ISB_DARK, 115, 175, 20, 5, passengers_string)
             if self.stationary_at_stop and not self.doors_open:
                 self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "Open Doors")
-            else:
+            elif self.stationary_at_stop and self.doors_open:
                 self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "Close Doors")
+            else:
+                self.game_obj.del_button(15)
+            if self.doors_open and self.game_obj.own_vehicle.speed > 2:
+                self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "^1Close Doors")
+                Sounds.beep_intense()
+            if self.doors_open and self.stationary_at_stop:
+                self.game_obj.send_button(16, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 125, 175, 20, 5,
+                                          passengers_added_string)
+            else:
+                self.game_obj.del_button(16)
         else:
             self.game_obj.del_button(11)
             self.game_obj.del_button(12)
@@ -162,4 +186,6 @@ class BusSimulation:
     def open_bus_doors(self):
         self.doors_open = True if not self.doors_open else False
         if self.doors_open:
-            Sounds.(self.settings.collision_warning_sound)
+            Sounds.play_bus_door_open()
+        else:
+            Sounds.play_bus_door_close()
