@@ -49,6 +49,7 @@ class OwnVehicle:
         self.siren_active = False
         self.siren_fast = False
 
+        self.is_bus = False
 
     def update_dynamic(self, dynamic):
         self.dynamic = dynamic

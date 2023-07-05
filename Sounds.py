@@ -31,3 +31,7 @@ def playsound_indicator_on():
 def playsound_indicator_off():
     mixer.music.load('data\\sounds\\indicatorOff.wav')
     mixer.music.play()
+
+def play_bus_door_open():
+    mixer.music.load('data\\sounds\\indicatorOff.wav')
+    mixer.music.play()

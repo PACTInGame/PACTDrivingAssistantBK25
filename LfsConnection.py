@@ -7,13 +7,16 @@ import CarDataBase
 import ForwardCollisionWarning
 import Sounds
 import pyinsim
+from BusSimulation import BusSimulation
 from OwnVehicle import OwnVehicle
 from Setting import Setting
 from Vehicle import Vehicle
 
 
 # Button IDs
-# 1-10 Head up Display
+# 1-10 Head up Display and "Waiting for you to hit the road"
+# 11-20 Bus Simulation
+
 class LFSConnection:
     def __init__(self):
 
@@ -23,14 +26,16 @@ class LFSConnection:
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
+
         self.own_vehicle = OwnVehicle()
         self.settings = Setting()
+        self.bus_simulation = BusSimulation(self)
+
         self.outgauge = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 10)}
+        self.valid_ids = {*range(1, 20)}
         self.collision_warning_intensity = 0
-        self.settings = Setting()
         self.timers = []
         self.time_MCI = 0
         self.is_connected = False
@@ -129,7 +134,7 @@ class LFSConnection:
             self.in_pits = False
             insim.unbind(pyinsim.ISP_MCI, self.get_car_data)
             [self.del_button(i) for i in range(200)]
-            self.send_button(31, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
+            self.send_button(3, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
                              "Waiting for you to hit the road.")
 
         flags = [int(i) for i in str("{0:b}".format(sta.Flags))]
@@ -203,7 +208,13 @@ class LFSConnection:
         pass
 
     def on_click(self, insim, btc):
-        pass
+        click_actions = {
+            15: self.bus_simulation.open_bus_doors
+        }
+
+        action = click_actions.get(btc.ClickID)
+        if action:
+            action()
 
     def object_detection(self, insim, axm):
         pass
@@ -245,7 +256,6 @@ class LFSConnection:
         def send_warning_button(intensity):
             self.send_button(1, 32 if intensity < 3 else 16, 119 + x, 90 + y, 13, 8, '^1<< ---')
             self.send_button(2, 32 if intensity < 3 else 16, 119 + x, 103 + y, 13, 8, '^1--- >>')
-
 
         def send_gear_button(gear_mode):
             self.send_button(5, pyinsim.ISB_DARK, 123 + x, 116 + y, 4, 4, '^7' + gear_mode)
@@ -292,6 +302,12 @@ class LFSConnection:
             self.collision_warning_sound_played = True
         if self.collision_warning_sound_played and self.collision_warning_intensity == 0:
             self.collision_warning_sound_played = False
+
+        # Bus Simulation
+        if self.bus_simulation.active:
+            self.bus_simulation.check_bus_simulation()
+        else:  # testing
+            self.bus_simulation.start_route(1)
 
     def get_relevant_cars(self):
         relevant_cars = []

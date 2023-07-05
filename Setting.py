@@ -15,6 +15,7 @@ class Setting:
         self.lane_dep_intensity = 0
         self.image_hud = True
         self.PSC = True
+        self.bus_simulation = True
         self.resolution = 1920, 1080
         self.collision_warning_sound = 1
         self.bc = 0
