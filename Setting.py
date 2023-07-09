@@ -22,4 +22,5 @@ class Setting:
         self.unit = 0
         self.offset_h = 0
         self.offset_w = 0
+        self.language = 'de'
 

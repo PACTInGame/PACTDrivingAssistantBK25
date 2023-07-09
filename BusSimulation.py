@@ -85,9 +85,11 @@ class BusSimulation:
         self.was_stopped = False
         self.passengers_added_at_stop = 0
         self.max_passengers_added_this_stop = 0
+        self.passengers_before_stop = 0
 
         self.next_stop_sound_played = False
         self.game_obj = game_obj
+        self.bus_speed = 0
 
     def start_route(self, route):
         self.active = True
@@ -104,7 +106,7 @@ class BusSimulation:
     def check_bus_simulation(self):
         x = self.game_obj.own_vehicle.x / 65536
         y = self.game_obj.own_vehicle.y / 65536
-        speed = self.game_obj.own_vehicle.speed
+        self.bus_speed = self.game_obj.own_vehicle.speed
 
         # Check_Timetable
         self.next_stop_countdown = (time.time() - self.start_time) - self.route[self.stop_index]["time"] * 60
@@ -114,34 +116,35 @@ class BusSimulation:
                        self.route[self.stop_index]["coordinates"][1] <= y + 5
 
         # Check stationary at stop
-        self.stationary_at_stop = self.at_stop and speed < 0.1
-        #TODO MAKE PASSENGERS GOOD
+        self.stationary_at_stop = self.at_stop and self.bus_speed < 0.1
+        # TODO MAKE PASSENGERS GOOD
         # update if stationary at stop
         if self.stationary_at_stop:
-            self.was_stopped = True
             if self.max_passengers_added_this_stop == 0:
-                self.max_passengers_added_this_stop = random.randint(1, 10)
+                max_pass = self.passengers_max - self.passengers
+                min_pass = 0 - self.passengers
+                min_pass = -15 if min_pass < -15 else min_pass
+                max_pass = 15 if max_pass > 15 else max_pass
+                self.max_passengers_added_this_stop = random.randint(min_pass, max_pass)
+
             if self.doors_open:
-                print(self.max_passengers_added_this_stop)
-                print(self.passengers_added_at_stop, "added")
+                self.was_stopped = True
                 # Check if its last stop on route
                 if self.stop_index == len(self.route) - 1:
                     self.passengers = self.passengers - 1 if self.passengers > 0 else 0
                     self.active = False if self.passengers == 0 else True
-                elif self.passengers_added_at_stop == 0:
+                elif self.max_passengers_added_this_stop != self.passengers_added_at_stop:
                     # Randomly add or decrease passengers
-                    self.passengers_added_at_stop += random.randint(-self.max_passengers_added_this_stop,
-                                                                    self.max_passengers_added_this_stop)
-
-                    if self.passengers < 0:
-                        self.passengers_added_at_stop = 0
-                    elif self.passengers > self.passengers_max:
-                        self.passengers_added_at_stop = 0
+                    if self.max_passengers_added_this_stop > self.passengers_added_at_stop:
+                        add = 1
                     else:
-                        self.passengers = self.passengers + self.passengers_added_at_stop
+                        add = -1
+
+                    self.passengers = self.passengers + add
+                    self.passengers_added_at_stop += add
 
         # stationary completed
-        if not self.stationary_at_stop and self.was_stopped:
+        if not self.stationary_at_stop and self.was_stopped and not self.doors_open:
             self.max_passengers_added_this_stop = 0
             self.passengers_added_at_stop = 0
             self.stop_index = self.stop_index + 1
@@ -158,25 +161,32 @@ class BusSimulation:
             next_stop_string = f'Next Stop: {self.route[self.stop_index]["dn"]}'
             time_string = f'^1Time: {self.next_stop_countdown:.0f}' if self.next_stop_countdown > 0 else f'^2Time: {self.next_stop_countdown:.0f}'
             passengers_string = f'Passengers: {self.passengers}/{self.passengers_max}'
-            passengers_added_string = f'{self.passengers_added_at_stop} passengers boarded or left.'
+            passengers_added_string = f'{self.max_passengers_added_this_stop} passengers boarded or left.'
             self.game_obj.send_button(11, pyinsim.ISB_DARK, 100, 175, 20, 5, route_string)
             self.game_obj.send_button(12, pyinsim.ISB_DARK, 105, 175, 20, 5, next_stop_string)
             self.game_obj.send_button(13, pyinsim.ISB_DARK, 110, 175, 20, 5, time_string)
             self.game_obj.send_button(14, pyinsim.ISB_DARK, 115, 175, 20, 5, passengers_string)
-            if self.stationary_at_stop and not self.doors_open:
+            if self.bus_speed < 2 and not self.doors_open:
                 self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "Open Doors")
-            elif self.stationary_at_stop and self.doors_open:
+            elif self.bus_speed < 2 and self.doors_open:
                 self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "Close Doors")
             else:
                 self.game_obj.del_button(15)
-            if self.doors_open and self.game_obj.own_vehicle.speed > 2:
+            if self.doors_open and self.game_obj.own_vehicle.speed >= 2:
                 self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "^1Close Doors")
                 Sounds.beep_intense()
+            elif self.doors_open and not self.bus_speed < 2:
+                self.game_obj.send_button(15, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 175, 20, 5, "^1Close Doors")
+
             if self.doors_open and self.stationary_at_stop:
                 self.game_obj.send_button(16, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 125, 175, 20, 5,
                                           passengers_added_string)
             else:
                 self.game_obj.del_button(16)
+            if self.stationary_at_stop:
+                self.game_obj.send_button(17, pyinsim.ISB_DARK, 95, 175, 20, 5, "^2Arrived at Stop")
+            else:
+                self.game_obj.del_button(17)
         else:
             self.game_obj.del_button(11)
             self.game_obj.del_button(12)

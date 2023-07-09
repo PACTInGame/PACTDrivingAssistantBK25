@@ -5,9 +5,11 @@ from threading import Thread
 import Calculations
 import CarDataBase
 import ForwardCollisionWarning
+import Menu
 import Sounds
 import pyinsim
 from BusSimulation import BusSimulation
+from Language import Language
 from OwnVehicle import OwnVehicle
 from Setting import Setting
 from Vehicle import Vehicle
@@ -16,6 +18,7 @@ from Vehicle import Vehicle
 # Button IDs
 # 1-10 Head up Display and "Waiting for you to hit the road"
 # 11-20 Bus Simulation
+# 20-40 Settings (Menu)
 
 class LFSConnection:
     def __init__(self):
@@ -30,6 +33,7 @@ class LFSConnection:
         self.own_vehicle = OwnVehicle()
         self.settings = Setting()
         self.bus_simulation = BusSimulation(self)
+        self.language = Language()
 
         self.outgauge = None
         self.game_time = 0
@@ -127,6 +131,8 @@ class LFSConnection:
             insim.bind(pyinsim.ISP_MCI, self.get_car_data)
             insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
             self.del_button(31)
+            self.del_button(3)
+            self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
 
         def start_menu_insim():
             self.time_menu_open = time.time()
@@ -209,7 +215,8 @@ class LFSConnection:
 
     def on_click(self, insim, btc):
         click_actions = {
-            15: self.bus_simulation.open_bus_doors
+            15: self.bus_simulation.open_bus_doors,
+            21: Menu.open_menu(self),
         }
 
         action = click_actions.get(btc.ClickID)
