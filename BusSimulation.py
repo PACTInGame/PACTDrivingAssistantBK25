@@ -91,6 +91,8 @@ class BusSimulation:
         self.game_obj = game_obj
         self.bus_speed = 0
 
+        self.new_route_offer = 0
+
     def start_route(self, route):
         self.active = True
         self.route = get_routes_blackwood()[route]
@@ -102,6 +104,10 @@ class BusSimulation:
         self.doors_open = False
         self.next_stop_sound_played = False
         self.start_time = time.time()
+
+    def stop_route(self):
+        self.active = False
+        self.route = None
 
     def check_bus_simulation(self):
         x = self.game_obj.own_vehicle.x / 65536
@@ -193,9 +199,23 @@ class BusSimulation:
             self.game_obj.del_button(13)
             self.game_obj.del_button(14)
 
+    def route_offer(self):
+        x = self.game_obj.settings.offset_w
+        y = self.game_obj.settings.offset_h
+        if self.new_route_offer:
+            route_string = f'^2Accept Route: {self.new_route_offer}?'
+            self.game_obj.send_button(18, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 127 + x, 90 + y, 25, 5, route_string)
+        else:
+            self.game_obj.del_button(18)
+
     def open_bus_doors(self):
         self.doors_open = True if not self.doors_open else False
         if self.doors_open:
             Sounds.play_bus_door_open()
         else:
             Sounds.play_bus_door_close()
+
+    def accept_route(self):
+        self.start_route(self.new_route_offer)
+        self.new_route_offer = 0
+        self.game_obj.del_button(18)

@@ -41,3 +41,7 @@ def play_bus_door_open():
 def play_bus_door_close():
     mixer.music.load('data\\sounds\\door_close.wav')
     mixer.music.play()
+
+def new_route():
+    mixer.music.load('data\\sounds\\bus_radio\\bl_new_route.wav')
+    mixer.music.play()

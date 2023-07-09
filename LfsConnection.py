@@ -8,6 +8,7 @@ import ForwardCollisionWarning
 import Menu
 import Sounds
 import pyinsim
+from BusHQ import BusHQ
 from BusSimulation import BusSimulation
 from Language import Language
 from OwnVehicle import OwnVehicle
@@ -31,14 +32,15 @@ class LFSConnection:
         self.cars_relevant = []
 
         self.own_vehicle = OwnVehicle()
-        self.settings = Setting()
+        self.settings = Setting(self)
         self.bus_simulation = BusSimulation(self)
-        self.language = Language()
+        self.language = Language(self)
+        self.bus_hq = BusHQ(self)
 
         self.outgauge = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 20)}
+        self.valid_ids = {*range(1, 41)}
         self.collision_warning_intensity = 0
         self.timers = []
         self.time_MCI = 0
@@ -48,6 +50,7 @@ class LFSConnection:
         self.text_entry = False
         self.on_track = False
         self.in_pits = False
+        self.track = ""
 
         # for checking the previous state
         self.indicator_right_sound = False
@@ -158,6 +161,7 @@ class LFSConnection:
             start_menu_insim()
 
         self.text_entry = len(flags) >= 16 and flags[-16] == 1
+        self.track = sta.Track
 
     def new_player(self, insim, npl):
         def remove_control_chars(player_name):
@@ -216,12 +220,20 @@ class LFSConnection:
     def on_click(self, insim, btc):
         click_actions = {
             15: self.bus_simulation.open_bus_doors,
-            21: Menu.open_menu(self),
-        }
+            18: self.bus_simulation.accept_route,
+            21: Menu.open_menu,
+            24: Menu.open_bus_menu,
+            25: self.settings.change_language,
+            26: self.settings.activate_bus_offline,
+            40: Menu.close_menu,
 
+        }
         action = click_actions.get(btc.ClickID)
         if action:
-            action()
+            try:
+                action()
+            except:
+                action(self)
 
     def object_detection(self, insim, axm):
         pass
@@ -229,6 +241,8 @@ class LFSConnection:
     def send_button(self, click_id, style, t, l, w, h, text):
         if self.buttons_on_screen[click_id] == 0 or click_id in self.valid_ids:
             self.buttons_on_screen[click_id] = 1
+            if type(text) == str:
+                text = text.encode()
             self.insim.send(
                 pyinsim.ISP_BTN,
                 ReqI=255,
@@ -238,7 +252,7 @@ class LFSConnection:
                 L=l,
                 W=w,
                 H=h,
-                Text=text.encode())
+                Text=text)
 
     def del_button(self, click_id):
         if self.buttons_on_screen[click_id] == 1:
@@ -313,8 +327,10 @@ class LFSConnection:
         # Bus Simulation
         if self.bus_simulation.active:
             self.bus_simulation.check_bus_simulation()
-        else:  # testing
-            self.bus_simulation.start_route(1)
+        if self.settings.bus_offline_sim:
+            self.bus_hq.check_bus_radio()
+        if self.bus_simulation.new_route_offer != 0:
+            self.bus_simulation.route_offer()
 
     def get_relevant_cars(self):
         relevant_cars = []

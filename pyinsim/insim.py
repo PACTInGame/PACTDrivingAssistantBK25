@@ -304,7 +304,7 @@ HOSTF_CRUISE = 512
 # Bit flags for CompCar Info
 CCI_BLUE = 1
 CCI_YELLOW = 2
-CCI_LAG    = 32
+CCI_LAG = 32
 CCI_FIRST = 64
 CCI_LAST = 128
 
