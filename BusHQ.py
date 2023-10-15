@@ -16,6 +16,9 @@ class BusHQ:
 
     def check_bus_radio(self):
         time_now = time.time()
+        print(time_now - self.sim_started)
+        print(self.route_active)
+        print(time_now-self.last_radio)
         if time_now - self.sim_started > 7 and not self.route_active and time_now - self.last_radio > 30 and self.game_obj.settings.bus_offline_sim:
             self.last_radio = time.time()
             Sounds.new_route()

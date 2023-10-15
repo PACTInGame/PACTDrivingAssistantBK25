@@ -8,6 +8,7 @@ import ForwardCollisionWarning
 import Menu
 import Sounds
 import pyinsim
+import wheel
 from BusHQ import BusHQ
 from BusSimulation import BusSimulation
 from Language import Language
@@ -36,6 +37,7 @@ class LFSConnection:
         self.bus_simulation = BusSimulation(self)
         self.language = Language(self)
         self.bus_hq = BusHQ(self)
+        self.wheel_support = wheel.WheelSupport(self)
 
         self.outgauge = None
         self.game_time = 0
@@ -310,27 +312,45 @@ class LFSConnection:
                 self.timers[i][0] = 20
                 self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_PING)
 
+
+
     def start_assistants(self):
         self.get_relevant_cars()
-        # Collision_Warning
-        if 12 < self.own_vehicle.speed or (
-                self.collision_warning_intensity > 0 and self.own_vehicle.speed > 0.5) and self.own_vehicle.gear > 1:
-            ForwardCollisionWarning.forward_collision_warning(self)
-        else:
-            self.collision_warning_intensity = 0
-        if self.collision_warning_intensity > 1 and not self.collision_warning_sound_played:
-            Sounds.collision_warning_sound(self.settings.collision_warning_sound)
-            self.collision_warning_sound_played = True
-        if self.collision_warning_sound_played and self.collision_warning_intensity == 0:
-            self.collision_warning_sound_played = False
 
-        # Bus Simulation
-        if self.bus_simulation.active:
-            self.bus_simulation.check_bus_simulation()
-        if self.settings.bus_offline_sim:
-            self.bus_hq.check_bus_radio()
-        if self.bus_simulation.new_route_offer != 0:
-            self.bus_simulation.route_offer()
+        def start_collision_warning():
+            if 12 < self.own_vehicle.speed or (
+                    self.collision_warning_intensity > 0 and self.own_vehicle.speed > 0.5) and self.own_vehicle.gear > 1:
+                ForwardCollisionWarning.forward_collision_warning(self)
+            else:
+                self.collision_warning_intensity = 0
+            if self.collision_warning_intensity > 2:
+                self.wheel_support.use_wheel_collision_warning(self)
+            else:
+                self.wheel_support.use_wheel_stop(self)
+            if self.collision_warning_intensity > 1 and not self.collision_warning_sound_played:
+                Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+                self.collision_warning_sound_played = True
+            if self.collision_warning_sound_played and self.collision_warning_intensity == 0:
+                self.collision_warning_sound_played = False
+
+        def start_bus_sim():
+            if self.bus_simulation.active:
+                self.bus_simulation.check_bus_simulation()
+            if self.settings.bus_offline_sim:
+                self.bus_hq.check_bus_radio()
+            if self.bus_simulation.new_route_offer != 0:
+                self.bus_simulation.route_offer()
+            else:
+                self.del_button(18)
+            if not self.bus_simulation.active:
+                for i in range(11, 18):
+                    self.del_button(i)
+                self.bus_simulation.route = None
+
+        start_collision_warning()
+
+        bus_thread = Thread(target=start_bus_sim)
+        bus_thread.start()
 
     def get_relevant_cars(self):
         relevant_cars = []
@@ -394,7 +414,10 @@ class LFSConnection:
         [updated_this_packet.append(data.PLID) for data in MCI.Info]
 
     def get_pings(self, insim, ping):
-        self.is_connected = True
+        if not self.is_connected:
+            self.is_connected = True
+            print("connection to LFS successful")
+            self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_SST)
 
     def run(self):
         self.insim.bind(pyinsim.ISP_MCI, self.get_car_data)
@@ -411,7 +434,7 @@ class LFSConnection:
         self.timers.append([20, "NPL"])  # Timer 1
         self.timers.append([20, "PING"])  # Timer 2
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_AXM)
-        self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.ISP_STA)
+        self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_SST)
         pyinsim.run()
 
 

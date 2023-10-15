@@ -117,7 +117,6 @@ TINY_NCI = 23
 TINY_ALC = 24
 TINY_AXM = 25
 TINY_SLC = 26
-
 # Enum for IS_SMALL sub-type
 SMALL_NONE = 0
 SMALL_SSP = 1

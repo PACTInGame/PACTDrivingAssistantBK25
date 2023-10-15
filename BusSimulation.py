@@ -35,7 +35,7 @@ def get_routes_westhill():
 def get_routes_blackwood():
     routes = {
         1: [
-            {"name": "main_station", "next_stop": "forest_hill", "coordinates": (-219.19, 215.00), "time": 0.5,
+            {"name": "main_station", "next_stop": "forest_hill", "coordinates": (-166.38, 254.69), "time": 0.5,
              "dn": "Main Station"},
             {"name": "forest_hill", "next_stop": "velocity_ave", "coordinates": (-347.81, 344.75), "time": 1.5,
              "dn": "Forest Hill"},
@@ -49,7 +49,7 @@ def get_routes_blackwood():
              "dn": "Forest"},
             {"name": "forest_hill", "next_stop": "main_station_a", "coordinates": (-310.38, 344.13), "time": 6.5,
              "dn": "Forest Hill"},
-            {"name": "main_station_a", "next_stop": "none", "coordinates": (-219.19, 215.00), "time": 7.5,
+            {"name": "main_station_a", "next_stop": "none", "coordinates": (-166.38, 254.69), "time": 7.5,
              "dn": "Main Station"}
         ],
         2: [
@@ -110,56 +110,58 @@ class BusSimulation:
         self.route = None
 
     def check_bus_simulation(self):
-        x = self.game_obj.own_vehicle.x / 65536
-        y = self.game_obj.own_vehicle.y / 65536
-        self.bus_speed = self.game_obj.own_vehicle.speed
+        if self.active:
+            x = self.game_obj.own_vehicle.x / 65536
+            y = self.game_obj.own_vehicle.y / 65536
+            self.bus_speed = self.game_obj.own_vehicle.speed
 
-        # Check_Timetable
-        self.next_stop_countdown = (time.time() - self.start_time) - self.route[self.stop_index]["time"] * 60
+            # Check_Timetable
+            self.next_stop_countdown = (time.time() - self.start_time) - self.route[self.stop_index]["time"] * 60
 
-        # Check at stop
-        self.at_stop = x - 5 <= self.route[self.stop_index]["coordinates"][0] <= x + 5 and y - 5 <= \
-                       self.route[self.stop_index]["coordinates"][1] <= y + 5
+            # Check at stop
+            self.at_stop = x - 5 <= self.route[self.stop_index]["coordinates"][0] <= x + 5 and y - 5 <= \
+                           self.route[self.stop_index]["coordinates"][1] <= y + 5
 
-        # Check stationary at stop
-        self.stationary_at_stop = self.at_stop and self.bus_speed < 0.1
-        # TODO MAKE PASSENGERS GOOD
-        # update if stationary at stop
-        if self.stationary_at_stop:
-            if self.max_passengers_added_this_stop == 0:
-                max_pass = self.passengers_max - self.passengers
-                min_pass = 0 - self.passengers
-                min_pass = -15 if min_pass < -15 else min_pass
-                max_pass = 15 if max_pass > 15 else max_pass
-                self.max_passengers_added_this_stop = random.randint(min_pass, max_pass)
+            # Check stationary at stop
+            self.stationary_at_stop = self.at_stop and self.bus_speed < 0.1
+            # update if stationary at stop
+            if self.stationary_at_stop:
+                if self.max_passengers_added_this_stop == 0:
+                    max_pass = self.passengers_max - self.passengers
+                    min_pass = 0 - self.passengers
+                    min_pass = -15 if min_pass < -15 else min_pass
+                    max_pass = 15 if max_pass > 15 else max_pass
+                    self.max_passengers_added_this_stop = random.randint(min_pass, max_pass)
 
-            if self.doors_open:
-                self.was_stopped = True
-                # Check if its last stop on route
-                if self.stop_index == len(self.route) - 1:
-                    self.passengers = self.passengers - 1 if self.passengers > 0 else 0
-                    self.active = False if self.passengers == 0 else True
-                elif self.max_passengers_added_this_stop != self.passengers_added_at_stop:
-                    # Randomly add or decrease passengers
-                    if self.max_passengers_added_this_stop > self.passengers_added_at_stop:
-                        add = 1
-                    else:
-                        add = -1
+                if self.doors_open:
+                    self.was_stopped = True
+                    # Check if its last stop on route
+                    if self.stop_index == len(self.route) - 1:
+                        self.passengers = self.passengers - 1 if self.passengers > 0 else 0
+                        self.active = False if self.passengers == 0 else True
+                    elif self.max_passengers_added_this_stop != self.passengers_added_at_stop:
+                        # Randomly add or decrease passengers
+                        if self.max_passengers_added_this_stop > self.passengers_added_at_stop:
+                            add = 1
+                        else:
+                            add = -1
 
-                    self.passengers = self.passengers + add
-                    self.passengers_added_at_stop += add
+                        self.passengers = self.passengers + add
+                        self.passengers_added_at_stop += add
 
-        # stationary completed
-        if not self.stationary_at_stop and self.was_stopped and not self.doors_open:
-            self.max_passengers_added_this_stop = 0
-            self.passengers_added_at_stop = 0
-            self.stop_index = self.stop_index + 1
-            self.current_stop = self.route[self.stop_index]["name"]
-            self.next_stop = self.route[self.stop_index]["next_stop"]
-            self.was_stopped = False
+            # stationary completed
+            if not self.stationary_at_stop and self.was_stopped and not self.doors_open:
+                self.max_passengers_added_this_stop = 0
+                self.passengers_added_at_stop = 0
+                self.stop_index = self.stop_index + 1
+                self.current_stop = self.route[self.stop_index]["name"]
+                self.next_stop = self.route[self.stop_index]["next_stop"]
+                self.was_stopped = False
 
-        # update buttons
-        self.update_buttons()
+            # update buttons
+            self.update_buttons()
+        else:
+            self.route = None
 
     def update_buttons(self):
         if not self.online and self.active:

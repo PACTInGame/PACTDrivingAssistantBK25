@@ -36,6 +36,7 @@ def open_bus_menu(game_object):
                             game_object.language.translation(lang, "Sound_effects"))
     game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                             game_object.language.translation(lang, "Start_offline_sim"))
+    print(game_object.settings.bus_offline_sim)
     game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 

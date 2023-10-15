@@ -1,7 +1,11 @@
 class Language:
     def __init__(self, game_obj):
         self.game_obj = game_obj
-        self.translations = {
+        self.translations = self.get_states()
+        # Add more languages and translations as needed
+
+    def get_states(self):
+        translations = {
             'en': {
                 'Menu': 'Menu',
                 'OutGauge_fail': 'Failed to connect to OutGauge. Maybe it was still active.',
@@ -18,7 +22,7 @@ class Language:
                 'Route_Sound': f'{"^2" if self.game_obj.settings.bus_route_sound else "^1"}Route Sound',
                 'Announcements': f'{"^2" if self.game_obj.settings.bus_announce_sound else "^1"}Announcements',
                 'Sound_effects': f'{"^2" if self.game_obj.settings.bus_sound_effects else "^1"}Sound effects',
-                'Start_offline_sim': f'{"^1Stop Simulation" if self.game_obj.settings.bus_offline_sim else "^2Start Simulation"}',
+                'Start_offline_sim': "^1Stop Simulation" if self.game_obj.settings.bus_offline_sim else "^2Start Simulation",
 
             },
             'de': {
@@ -37,9 +41,7 @@ class Language:
                 'Route_Sound': f'{"^2" if self.game_obj.settings.bus_route_sound else "^1"}Linien Ansage',
                 'Announcements': f'{"^2" if self.game_obj.settings.bus_announce_sound else "^1"}Halt Ansagen',
                 'Sound_effects': f'{"^2" if self.game_obj.settings.bus_sound_effects else "^1"}Soundeffekte',
-                'Start_offline_sim': f'{"^1Simulation stoppen" if self.game_obj.settings.bus_offline_sim else "^2Simulation starten"}',
-
-
+                'Start_offline_sim': "^1Simulation stoppen" if self.game_obj.settings.bus_offline_sim else "^2Simulation starten",
 
             },
             'fr': {
@@ -116,14 +118,15 @@ class Language:
                 'Sound_effects': b"^2" if self.game_obj.settings.bus_sound_effects else b"^1" + b'Ses efektleri',
                 'Start_offline_sim': b"^1Sim\xfclasyonu durdur" if self.game_obj.settings.bus_offline_sim else b"^2Sim\xfclasyonu ba\xfelat",
 
-                },
-            # Add more languages and translations as needed
+            },
         }
+        return translations
 
     def translation(self, language, key):
+        self.translations = self.get_states()
+
         if language in self.translations and key in self.translations[language]:
             return self.translations[language][key]
         # Return the key itself if no translation is found
+
         return key
-
-
