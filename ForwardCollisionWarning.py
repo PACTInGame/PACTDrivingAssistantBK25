@@ -28,7 +28,7 @@ def calc_brake_distance(rel_speed, acc, br, dynamic, cname):
     rel_speed3 = rel_speed2 * rel_speed
     rel_speed4 = rel_speed3 * rel_speed
     if rel_speed > 0:
-        new_brake_distance = 0.0000003303 * rel_speed4 - 0.00002877 * rel_speed3 + 0.003215 * rel_speed2 + 0.07473 * rel_speed - 0.6175 + rel_speed * 0.05 + acc * 2 - br * 4 + dynamic + l / 2 + 2
+        new_brake_distance = 0.0000003303 * rel_speed4 - 0.00002877 * rel_speed3 + 0.003215 * rel_speed2 + 0.07473 * rel_speed - 0.6175 + rel_speed * 0.05 + acc * 2 - br * 4 + dynamic + l / 2 + 4
     else:
         new_brake_distance = 0
     # brake_distance = ((
@@ -59,9 +59,9 @@ def check_warning_needed(cars, own_x, own_y, own_heading, own_speed, accelerator
     collision_warning = 0
 
     setting_multiplier = {
-        0: [1.2, 1.7, 2.3],
-        1: [1.2, 1.4, 2],
-        2: [1.2, 1.3, 1.4]
+        2: [1.1, 1.7, 2.3],
+        1: [1.05, 1.4, 1.7],
+        0: [1.0, 1.3, 1.4]
     }
 
     multiply = [x * warn_multi for x in setting_multiplier.get(setting, setting_multiplier[0])]

@@ -23,6 +23,18 @@ class Language:
                 'Announcements': f'{"^2" if self.game_obj.settings.bus_announce_sound else "^1"}Announcements',
                 'Sound_effects': f'{"^2" if self.game_obj.settings.bus_sound_effects else "^1"}Sound effects',
                 'Start_offline_sim': "^1Stop Simulation" if self.game_obj.settings.bus_offline_sim else "^2Start Simulation",
+                'Forward_Collision_Warning': f'{"^2" if self.game_obj.settings.forward_collision_warning else "^1"}Forward Collision Warning',
+                'Collision_Warning_Distance': f'{"Close" if self.game_obj.settings.collision_warning_distance == 0 else "Medium" if self.game_obj.settings.collision_warning_distance == 1 else "Far"}',
+                'Blind_Spot_Warning': f'{"^2" if self.game_obj.settings.blind_spot_warning else "^1"}Blind Spot Warning',
+                'Side_Collision_Prevention': f'{"^2" if self.game_obj.settings.side_collision_prevention else "^1"}Side Collision Prevention',
+                'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Cross Traffic Warning',
+                'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Stability Control',
+                'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Light Assist',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Automatic Indicator Turnoff',
+                'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.parking_emergency_brake else "^1"}Parking Emergency Brake',
+                'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Park Distance Control',
+                'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visual Parking Aid',
+
 
             },
             'de': {
@@ -38,11 +50,23 @@ class Language:
                 'Bus_Menu': b'Bus Men\xfc',
                 'Bus_enabled': f'{"^2 Aktiviert" if self.game_obj.settings.bus_simulation else "^1 Deaktiviert"}',
                 'Door_Sound': (b"^2" if self.game_obj.settings.bus_door_sound else b"^1") + b'T\xfcr Sound',
-                'Route_Sound': f'{"^2" if self.game_obj.settings.bus_route_sound else "^1"}Linien Ansage',
+                'Route_Sound': (b"^2" if self.game_obj.settings.bus_route_sound else b"^1")+ b"Linien Ansage",
                 'Announcements': f'{"^2" if self.game_obj.settings.bus_announce_sound else "^1"}Halt Ansagen',
                 'Sound_effects': f'{"^2" if self.game_obj.settings.bus_sound_effects else "^1"}Soundeffekte',
                 'Start_offline_sim': "^1Simulation stoppen" if self.game_obj.settings.bus_offline_sim else "^2Simulation starten",
+                'Forward_Collision_Warning': f'{"^2" if self.game_obj.settings.forward_collision_warning else "^1"}Kollisionswarnung',
+                'Collision_Warning_Distance': f'{"Nah" if self.game_obj.settings.collision_warning_distance == 0 else "Mittel" if self.game_obj.settings.collision_warning_distance == 1 else "Weit"}',
+                'Blind_Spot_Warning': f'{"^2" if self.game_obj.settings.blind_spot_warning else "^1"}Totwinkelwarnung',
+                'Side_Collision_Prevention': f'{"^2" if self.game_obj.settings.side_collision_prevention else "^1"}Seitenkollisionsvermeidung',
+                'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Querverkehrswarnung',
+                'PSC': (b"^2" if self.game_obj.settings.PSC else b"^1")+b"Stabilit\xe4tskontrolle",
+                'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Lichtassistent',
+                'Automatic_Indicator_Turnoff': (b"^2" if self.game_obj.settings.indicator_turnoff else b"^1")+b"Autom. deaktivi. Blinker",
+                'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.parking_emergency_brake else "^1"}Parknotbremsung',
+                'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Parkabstandskontrolle',
+                'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visuelle Parkhilfe',
 
+                # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },
             'fr': {
                 'Menu': 'Menu',
@@ -61,6 +85,15 @@ class Language:
                 'Announcements': "^2" if self.game_obj.settings.bus_announce_sound else "^1" + 'Annonces',
                 'Sound_effects': "^2" if self.game_obj.settings.bus_sound_effects else "^1" + 'Effets sonores',
                 'Start_offline_sim': b"^1Arr\xeat de la simulation" if self.game_obj.settings.bus_offline_sim else b"^2D\xe9marrer la simulation",
+                'Forward_Collision_Warning': f'{"^2" if self.game_obj.settings.forward_collision_warning else "^1"}Avertissement de collision frontale',
+                'Collision_Warning_Distance': f'{"Proche" if self.game_obj.settings.collision_warning_distance == 0 else "Moyen" if self.game_obj.settings.collision_warning_distance == 1 else "Loin"}',
+                'Blind_Spot_Warning': f'{"^2" if self.game_obj.settings.blind_spot_warning else "^1"}Avertissement d\'angle mort',
+                'Side_Collision_Prevention': f'{"^2" if self.game_obj.settings.side_collision_prevention else "^1"}Pr\xe9vention des collisions lat\xe9rales',
+                'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Avertissement de circulation transversale',
+                'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Contr\xf4le de stabilit\xe9',
+                'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Assistance lumineuse',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Extinction automatique des indicateurs',
+
 
             },
             'es': {
@@ -80,6 +113,15 @@ class Language:
                 'Announcements': b"^2" if self.game_obj.settings.bus_announce_sound else b"^1" + b'Anuncios',
                 'Sound_effects': b"^2" if self.game_obj.settings.bus_sound_effects else b"^1" + b'efectos de sonido',
                 'Start_offline_sim': b"^1Detener simulaci\xf3n" if self.game_obj.settings.bus_offline_sim else b"^2Iniciar simulaci\xf3n",
+                'Forward_Collision_Warning': f'{"^2" if self.game_obj.settings.forward_collision_warning else "^1"}Advertencia de colisi\xf3n frontal',
+                'Collision_Warning_Distance': f'{"Cerca" if self.game_obj.settings.collision_warning_distance == 0 else "Medio" if self.game_obj.settings.collision_warning_distance == 1 else "Lejos"}',
+                'Blind_Spot_Warning': f'{"^2" if self.game_obj.settings.blind_spot_warning else "^1"}Advertencia de punto ciego',
+                'Side_Collision_Prevention': f'{"^2" if self.game_obj.settings.side_collision_prevention else "^1"}Prevenci\xf3n de colisi\xf3n lateral',
+                'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Advertencia de tr\xe1fico cruzado',
+                'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Control de estabilidad',
+                'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Asistencia de luz',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Apagado autom\xe1tico del indicador',
+
 
             },
             'it': {
@@ -99,6 +141,15 @@ class Language:
                 'Announcements': b"^2" if self.game_obj.settings.bus_announce_sound else b"^1" + b'Annunci',
                 'Sound_effects': b"^2" if self.game_obj.settings.bus_sound_effects else b"^1" + b'Effetti sonori',
                 'Start_offline_sim': b"^1Arresta la simulazione" if self.game_obj.settings.bus_offline_sim else b"^2Avvia la simulazione",
+                'Forward_Collision_Warning': f'{"^2" if self.game_obj.settings.forward_collision_warning else "^1"}Avviso di collisione frontale',
+                'Collision_Warning_Distance': f'{"Vicino" if self.game_obj.settings.collision_warning_distance == 0 else "Medio" if self.game_obj.settings.collision_warning_distance == 1 else "Lontano"}',
+                'Blind_Spot_Warning': f'{"^2" if self.game_obj.settings.blind_spot_warning else "^1"}Avviso di punto cieco',
+                'Side_Collision_Prevention': f'{"^2" if self.game_obj.settings.side_collision_prevention else "^1"}Prevenzione delle collisioni laterali',
+                'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Avviso di traffico incrociato',
+                'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Controllo di stabilit\xe0',
+                'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Assistente di luce',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Spegnimento automatico dell\'indicatore',
+
             },
             'tr': {
                 'Menu': b'Men\xfc',
@@ -117,6 +168,14 @@ class Language:
                 'Announcements': b"^2" if self.game_obj.settings.bus_announce_sound else b"^1" + b'Duyurular',
                 'Sound_effects': b"^2" if self.game_obj.settings.bus_sound_effects else b"^1" + b'Ses efektleri',
                 'Start_offline_sim': b"^1Sim\xfclasyonu durdur" if self.game_obj.settings.bus_offline_sim else b"^2Sim\xfclasyonu ba\xfelat",
+                'Forward_Collision_Warning': f'{"^2" if self.game_obj.settings.forward_collision_warning else "^1"}\xf6n \xe7arpma uyar\xfds\xfd',
+                'Collision_Warning_Distance': f'{"Yakin" if self.game_obj.settings.collision_warning_distance == 0 else "Orta" if self.game_obj.settings.collision_warning_distance == 1 else "Uzak"}',
+                'Blind_Spot_Warning': f'{"^2" if self.game_obj.settings.blind_spot_warning else "^1"}K\xf6r nokta uyar\xfds\xfd',
+                'Side_Collision_Prevention': f'{"^2" if self.game_obj.settings.side_collision_prevention else "^1"}Yan \xe7arpma \xf6nleme',
+                'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Trafik uyar\xfds\xfd',
+                'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Stabilite kontrol\xfc',
+                'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}I\xfe\xfdk asistan\xfd',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Otomatik sinyal iptali',
 
             },
         }

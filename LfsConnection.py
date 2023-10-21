@@ -31,6 +31,7 @@ class LFSConnection:
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
+        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu
 
         self.own_vehicle = OwnVehicle()
         self.settings = Setting(self)
@@ -220,22 +221,88 @@ class LFSConnection:
         pass
 
     def on_click(self, insim, btc):
-        click_actions = {
-            15: self.bus_simulation.open_bus_doors,
-            18: self.bus_simulation.accept_route,
-            21: Menu.open_menu,
-            24: Menu.open_bus_menu,
-            25: self.settings.change_language,
-            26: self.settings.activate_bus_offline,
-            40: Menu.close_menu,
+        click_action = False
+        click_actions = {}
+        if 21 <= btc.ClickID <= 40:  # Menu-Buttons
+            if self.current_menu == 0:  # None
+                click_action = True
 
-        }
-        action = click_actions.get(btc.ClickID)
-        if action:
-            try:
-                action()
-            except:
-                action(self)
+                click_actions = {
+                    21: Menu.open_menu,
+                }
+            elif self.current_menu == 1:  # Main Menu
+                click_action = True
+
+                click_actions = {
+                    15: self.bus_simulation.open_bus_doors,
+                    18: self.bus_simulation.accept_route,
+                    21: Menu.open_menu,
+                    22: Menu.open_drive_menu,
+                    23: Menu.open_park_menu,
+                    24: Menu.open_bus_menu,
+                    25: self.settings.change_language,
+                    26: self.settings.activate_bus_offline,
+                    40: Menu.close_menu,
+                }
+
+            elif self.current_menu == 2:  # Driving Menu
+
+                if btc.ClickID == 22:
+                    self.settings.forward_collision_warning = not self.settings.forward_collision_warning
+                elif btc.ClickID == 23:
+                    self.settings.blind_spot_warning = not self.settings.blind_spot_warning
+                elif btc.ClickID == 24:
+                    self.settings.side_collision_prevention = not self.settings.side_collision_prevention
+                elif btc.ClickID == 25:
+                    self.settings.cross_traffic_warning = not self.settings.cross_traffic_warning
+                elif btc.ClickID == 26:
+                    self.settings.PSC = not self.settings.PSC
+                elif btc.ClickID == 27:
+                    self.settings.light_assist = not self.settings.light_assist
+                elif btc.ClickID == 28:
+                    self.settings.indicator_turnoff = not self.settings.indicator_turnoff
+                elif btc.ClickID == 29:
+                    self.settings.collision_warning_distance = (self.settings.collision_warning_distance + 1) % 3
+                elif btc.ClickID == 40:
+                    Menu.close_menu(self)
+                if not btc.ClickID == 40:
+                    Menu.open_drive_menu(self)
+
+            elif self.current_menu == 3:  # Parking Menu
+                if btc.ClickID == 22:
+                    self.settings.park_distance_control = not self.settings.park_distance_control
+                elif btc.ClickID == 23:
+                    self.settings.parking_emergency_brake = not self.settings.parking_emergency_brake
+                elif btc.ClickID == 24:
+                    self.settings.visual_parking_aid = not self.settings.visual_parking_aid
+                elif btc.ClickID == 40:
+                    Menu.close_menu(self)
+                if not btc.ClickID == 40:
+                    Menu.open_park_menu(self)
+
+            elif self.current_menu == 4:  # Bus Menu
+                if btc.ClickID == 22:
+                    self.settings.bus_door_sound = not self.settings.bus_door_sound
+                elif btc.ClickID == 23:
+                    self.settings.bus_route_sound = not self.settings.bus_route_sound
+                elif btc.ClickID == 24:
+                    self.settings.bus_announce_sound = not self.settings.bus_announce_sound
+                elif btc.ClickID == 25:
+                    self.settings.bus_sound_effects = not self.settings.bus_sound_effects
+                elif btc.ClickID == 26:
+                    self.settings.bus_offline_sim = not self.settings.bus_offline_sim
+                elif btc.ClickID == 40:
+                    Menu.close_menu(self)
+                if not btc.ClickID == 40:
+                    Menu.open_bus_menu(self)
+
+        if click_action:
+            action = click_actions.get(btc.ClickID)
+            if action:
+                try:
+                    action()
+                except:
+                    action(self)
 
     def object_detection(self, insim, axm):
         pass
@@ -312,8 +379,6 @@ class LFSConnection:
                 self.timers[i][0] = 20
                 self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_PING)
 
-
-
     def start_assistants(self):
         self.get_relevant_cars()
 
@@ -347,7 +412,8 @@ class LFSConnection:
                     self.del_button(i)
                 self.bus_simulation.route = None
 
-        start_collision_warning()
+        if self.settings.forward_collision_warning:
+            start_collision_warning()
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()

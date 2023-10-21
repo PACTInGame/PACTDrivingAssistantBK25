@@ -8,21 +8,9 @@ import get_settings
 class Setting:
     def __init__(self, game_obj):
         self.game_obj = game_obj
-        self.head_up_display = True
-        self.forward_collision_warning = True
-        self.blind_spot_warning = True
-        self.cross_traffic_warning = True
-        self.light_assist = True
-        self.park_distance_control = True
-        self.emergency_assist = True
-        self.lane_assist = True
-        self.cop_aid_system = True
-        self.automatic_emergency_braking = True
-        self.collision_warning_distance = 0
-        self.automatic_gearbox = False
-        self.lane_dep_intensity = 0
-        self.image_hud = True
-        self.PSC = True
+
+        self.indicator_turnoff = True
+        self.side_collision_prevention = True
 
         self.bus_simulation = True
         self.bus_door_sound = True
@@ -30,21 +18,39 @@ class Setting:
         self.bus_announce_sound = True
         self.bus_sound_effects = True
         self.bus_offline_sim = False
-
-        self.resolution = 1920, 1080
-        self.collision_warning_sound = 1
-        self.bc = 0
-        self.unit = 0
-        self.offset_h = 0
-        self.offset_w = 0
         self.language = 'de'
 
+        self.parking_emergency_brake = True
+        self.visual_parking_aid = True
+
+
+
+        # TODO MAKE MORE SETTINGS PERSISTENT
         set_def = get_settings.get_settings_from_file()
-        self.persistentSettings = PersistentSettings.PersistentSettings(set_def[0], set_def[1], set_def[2], set_def[3], set_def[4],
-                                                         set_def[5], set_def[6], set_def[7], set_def[8], set_def[9],
-                                                         set_def[10], set_def[11], set_def[12], set_def[13],
-                                                         set_def[14], set_def[15], set_def[16], set_def[17],
-                                                         set_def[18], set_def[19], set_def[20])
+        
+        self.head_up_display = set_def[0]
+        self.forward_collision_warning = set_def[1]
+        self.blind_spot_warning = set_def[2]
+        self.cross_traffic_warning = set_def[3]
+        self.light_assist = set_def[4]
+        self.park_distance_control = set_def[5]
+        self.emergency_assist = set_def[6]
+        self.lane_assist = set_def[7]
+        self.cop_aid_system = set_def[8]
+        self.automatic_emergency_braking = set_def[9]
+        dist = set_def[10]
+        self.collision_warning_distance = 0 if dist == "close" else 1 if dist == "medium" else 2 if dist == "far" else 1
+        self.automatic_gearbox = set_def[11]
+        self.lane_dep_intensity = set_def[12]
+        self.image_hud = set_def[13]
+        self.PSC = set_def[14]
+        self.resolution = set_def[15]
+        self.collision_warning_sound = set_def[16]
+        self.bc = set_def[17]
+        self.unit = set_def[18]
+        self.offset_h = set_def[19]
+        self.offset_w = set_def[20]
+
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]
         self.SHIFT_DOWN_KEY = cont_def[1]
@@ -82,3 +88,7 @@ class Setting:
             self.game_obj.bus_hq.route_active = False
             self.game_obj.bus_simulation.new_route_offer = 0
             self.game_obj.bus_simulation.active = False
+
+    def change(self, var):
+        var = not var
+
