@@ -5,6 +5,7 @@ from threading import Thread
 import Calculations
 import CarDataBase
 import ForwardCollisionWarning
+import Gearbox
 import Menu
 import Sounds
 import pyinsim
@@ -39,6 +40,7 @@ class LFSConnection:
         self.language = Language(self)
         self.bus_hq = BusHQ(self)
         self.wheel_support = wheel.WheelSupport(self)
+        self.gearbox = Gearbox.Gearbox(self)
 
         self.outgauge = None
         self.game_time = 0
@@ -67,7 +69,7 @@ class LFSConnection:
         # get_own_car_data
         self.game_time = packet.Time
         self.own_vehicle.fuel = packet.Fuel
-        self.own_vehicle.speed = packet.Speed * 3.6 if self.settings.unit == 0 else packet.Speed * 2.236
+        self.own_vehicle.speed = packet.Speed * 3.6 if self.settings.unit == "metric" else packet.Speed * 2.236
         self.own_vehicle.rpm = packet.RPM
         self.own_vehicle.gear = packet.Gear
         self.own_vehicle.player_id = packet.PLID
@@ -414,6 +416,9 @@ class LFSConnection:
 
         if self.settings.forward_collision_warning:
             start_collision_warning()
+        if self.settings.automatic_gearbox:
+            self.gearbox.calculate_gear()
+
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
