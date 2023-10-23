@@ -1,3 +1,5 @@
+import webbrowser
+
 import Language
 import pyinsim
 
@@ -70,6 +72,7 @@ def open_drive_menu(game_object):
     game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
+
 def open_park_menu(game_object):
     game_object.current_menu = 3
     lang = game_object.settings.language
@@ -94,3 +97,18 @@ def close_menu(game_object):
         game_object.del_button(i)
     game_object.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
 
+
+def ask(game_obj):
+    game_obj.del_button(100)
+    game_obj.send_button(100, pyinsim.ISB_DARK, 95, 85, 30, 5, "^7This will forward you to Google "
+                                                               "Drive. Continue?")
+    game_obj.send_button(101, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 85, 15, 5, "^2Yes")
+    game_obj.send_button(102, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 100, 15, 5, "^1Cancel")
+
+def close_ask(game_obj):
+    for i in range(100, 103):
+        game_obj.del_button(i)
+    game_obj.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, "Update avail.")
+def open_google_drive(game_object):
+    webbrowser.open("https://drive.google.com/drive/folders/1Byr4onJvHW1MP7zCei0HUgOUG9t5R_Dl?usp=share_link")
+    close_ask(game_object)

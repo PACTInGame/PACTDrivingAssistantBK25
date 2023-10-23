@@ -6,6 +6,7 @@ import Calculations
 import CarDataBase
 import ForwardCollisionWarning
 import Gearbox
+import KeyboardMouseEmulator
 import Menu
 import Sounds
 import Version
@@ -23,6 +24,8 @@ from Vehicle import Vehicle
 # 1-10 Head up Display and "Waiting for you to hit the road"
 # 11-20 Bus Simulation
 # 20-40 Settings (Menu)
+
+# 100 update available
 
 class LFSConnection:
     def __init__(self):
@@ -42,6 +45,7 @@ class LFSConnection:
         self.bus_hq = BusHQ(self)
         self.wheel_support = wheel.WheelSupport(self)
         self.gearbox = Gearbox.Gearbox(self)
+        self.keyboard_support = KeyboardMouseEmulator
 
         self.outgauge = None
         self.game_time = 0
@@ -65,7 +69,8 @@ class LFSConnection:
         self.cars_previous_speed = []
         self.cars_previous_speed_buffer = []
         self.collision_warning_sound_played = False
-        Version.get_current_version(self.version)
+        self.update_available = Version.get_current_version(self.version)
+        self.holding_brake = False
 
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data
@@ -142,7 +147,11 @@ class LFSConnection:
             insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
             self.del_button(31)
             self.del_button(3)
-            self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
+            if self.update_available:
+                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5, "Menu")
+                self.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, "Update avail.")
+            else:
+                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
 
         def start_menu_insim():
             self.time_menu_open = time.time()
@@ -234,6 +243,7 @@ class LFSConnection:
 
                 click_actions = {
                     21: Menu.open_menu,
+                    100: Menu.open_google_drive,
                 }
             elif self.current_menu == 1:  # Main Menu
                 click_action = True
@@ -300,7 +310,13 @@ class LFSConnection:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
                     Menu.open_bus_menu(self)
-
+        else:
+            click_actions = {
+                100: Menu.ask,
+                101: Menu.open_google_drive,
+                102: Menu.close_ask,
+            }
+            click_action = True
         if click_action:
             action = click_actions.get(btc.ClickID)
             if action:
@@ -394,9 +410,18 @@ class LFSConnection:
             else:
                 self.collision_warning_intensity = 0
             if self.collision_warning_intensity > 2:
-                self.wheel_support.use_wheel_collision_warning(self)
+                if self.own_vehicle.control_mode == 2:
+                    self.wheel_support.use_wheel_collision_warning(self)
+                elif self.own_vehicle.control_mode == 1:
+                    self.keyboard_support.use_keyboard_collision_warning(self)
+                elif self.own_vehicle.control_mode == 0:
+                    self.keyboard_support.use_mouse_collision_warning(self)
             else:
-                self.wheel_support.use_wheel_stop(self)
+                if self.own_vehicle.control_mode == 2:
+                    self.wheel_support.use_wheel_stop(self)
+                elif self.own_vehicle.control_mode == 1:
+                    self.keyboard_support.release_brake(self)
+
             if self.collision_warning_intensity > 1 and not self.collision_warning_sound_played:
                 Sounds.collision_warning_sound(self.settings.collision_warning_sound)
                 self.collision_warning_sound_played = True
@@ -420,8 +445,8 @@ class LFSConnection:
         if self.settings.forward_collision_warning:
             start_collision_warning()
         if self.settings.automatic_gearbox:
-            self.gearbox.calculate_gear()
-
+            # self.gearbox.calculate_gear()
+            pass
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()

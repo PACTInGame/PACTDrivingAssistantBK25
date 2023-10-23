@@ -28,14 +28,11 @@ def get_current_version(current_version):
         if current_version != version:
             print("Current version: " + current_version)
             print("Update available to version: " + version)
+            return True
         else:
             print("No update available")
-        return version
+            return False
     else:
         print('Failed to retrieve version information.')
-        return "0.0.0"
+        return False
 
-
-
-if __name__ == '__main__':
-    get_current_version()
