@@ -204,6 +204,7 @@ class LFSConnection:
                 self.own_vehicle.roleplay = "civil"
                 self.del_button(33)
                 self.del_button(34)
+                # TODO check if this is necessary
 
             if len(flags) >= 4 and flags[-4] == 1:
                 self.own_vehicle.gearbox_mode = 0  # automatic
