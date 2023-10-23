@@ -8,6 +8,7 @@ import ForwardCollisionWarning
 import Gearbox
 import Menu
 import Sounds
+import Version
 import pyinsim
 import wheel
 from BusHQ import BusHQ
@@ -25,7 +26,7 @@ from Vehicle import Vehicle
 
 class LFSConnection:
     def __init__(self):
-
+        self.version = "0.0.0"
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
         self.running = True
@@ -64,6 +65,7 @@ class LFSConnection:
         self.cars_previous_speed = []
         self.cars_previous_speed_buffer = []
         self.collision_warning_sound_played = False
+        Version.get_current_version(self.version)
 
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data

@@ -14,7 +14,7 @@ def get_github_version(owner, repo, file_path):
     return None
 
 
-def get_current_version():
+def get_current_version(current_version):
     # Usage example
     owner = 'PACTInGame'
     repo = 'PACTDrivingAssistantBK25'
@@ -25,11 +25,16 @@ def get_current_version():
     if version:
         version = str(version)
         version = version.split('= ')[1]
-        print(f'Current version: {version}')
+        if current_version != version:
+            print("Current version: " + current_version)
+            print("Update available to version: " + version)
+        else:
+            print("No update available")
         return version
     else:
         print('Failed to retrieve version information.')
         return "0.0.0"
+
 
 
 if __name__ == '__main__':
