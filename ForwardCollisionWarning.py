@@ -51,11 +51,14 @@ def check_warning_needed(cars, own_x, own_y, own_heading, own_speed, accelerator
     (x4, y4) = Calculations.calc_polygon_points(own_x, own_y, 85 * 65536, ang4)
 
     own_rectangle = Polygon([(x1, y1), (x2, y2), (x3, y3), (x4, y4)])
+
     rectangles_others = Calculations.create_rectangles_for_collision_warning(cars)
 
     car_in_front = [rectangle[0] for rectangle in rectangles_others
                     if Calculations.polygon_intersect(rectangle[1], own_rectangle)]
-
+    for car in car_in_front:
+        if not (car[1] < 15 or car[1] > 345):
+            car_in_front.remove(car)
     collision_warning = 0
 
     setting_multiplier = {

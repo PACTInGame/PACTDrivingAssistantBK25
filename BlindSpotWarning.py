@@ -81,7 +81,6 @@ def check_blindspots(game_object):
                 blindspot_l = True
             if polygon_intersect(rectangle[2], rectangle_right):
                 blindspot_r = True
-    print("old: ", blindspot_r, blindspot_l)
     return blindspot_r, blindspot_l
 
 
@@ -105,7 +104,6 @@ def check_blindspots_ref(game_object):
                 blindspot_l = True
             if polygon_intersect(rectangle[2], rectangle_right):
                 blindspot_r = True
-    print("new: ", blindspot_r, blindspot_l)
     return blindspot_r, blindspot_l
 
 

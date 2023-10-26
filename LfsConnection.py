@@ -81,7 +81,7 @@ class LFSConnection:
         # get_own_car_data
         self.game_time = packet.Time
         self.own_vehicle.fuel = packet.Fuel
-        self.own_vehicle.speed = packet.Speed * 3.6 if self.settings.unit == "metric" else packet.Speed * 2.236
+        self.own_vehicle.speed = packet.Speed * 3.6
         self.own_vehicle.rpm = packet.RPM
         self.own_vehicle.gear = packet.Gear
         self.own_vehicle.player_id = packet.PLID
@@ -153,10 +153,13 @@ class LFSConnection:
             self.del_button(31)
             self.del_button(3)
             if self.update_available:
-                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5, self.language.translation(self.lang, "Menu"))
-                self.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, self.language.translation(self.lang, "Update"))
+                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5,
+                                 self.language.translation(self.lang, "Menu"))
+                self.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
+                                 self.language.translation(self.lang, "Update"))
             else:
-                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, self.language.translation(self.lang, "Menu"))
+                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5,
+                                 self.language.translation(self.lang, "Menu"))
 
         def start_menu_insim():
             self.time_menu_open = time.time()
@@ -392,7 +395,10 @@ class LFSConnection:
             if self.collision_warning_intensity > 0:
                 send_warning_button(self.collision_warning_intensity)
             else:
-                send_speed_button('^7', 'km/h', self.own_vehicle.speed)
+                if self.settings.unit == "metric":
+                    send_speed_button('^7', 'km/h', self.own_vehicle.speed)
+                else:
+                    send_speed_button('^7', 'mph', self.own_vehicle.speed * 0.621371)
                 send_rpm_button('^7', self.own_vehicle.rpm)
 
     def timers_decr(self):
@@ -498,25 +504,6 @@ class LFSConnection:
             self.timers_decr()
             warnings_thread = Thread(target=self.start_assistants)
             warnings_thread.start()
-            self.cars_previous_speed = self.cars_previous_speed_buffer
-            self.cars_previous_speed_buffer = []
-
-            for i, j in enumerate(self.cars_on_track):
-                if j.player_id == self.own_vehicle.player_id:
-                    self.own_vehicle.speed_mci = j.speed
-                    self.own_vehicle.x = j.x
-                    self.own_vehicle.y = j.y
-                    self.own_vehicle.z = j.z
-                    self.own_vehicle.heading = j.heading
-                    self.own_vehicle.direction = j.direction
-                    self.own_vehicle.steer_forces = j.steer_forces
-                self.cars_previous_speed_buffer.append((j.speed, j.player_id))
-
-            [car.update_distance(self.own_vehicle.x, self.own_vehicle.y, self.own_vehicle.z) for car in
-             self.cars_on_track]
-            [car.update_dynamic(speed[0] - car.speed) for speed in self.cars_previous_speed for car in
-             self.cars_on_track if
-             speed[1] == car.player_id and speed[0] - car.speed != 0.0]
 
         # DATA RECEIVING ---------------
         updated_this_packet = []
@@ -525,6 +512,27 @@ class LFSConnection:
          for data
          in MCI.Info for car in self.cars_on_track if car.player_id == data.PLID]
         [updated_this_packet.append(data.PLID) for data in MCI.Info]
+
+        self.cars_previous_speed = self.cars_previous_speed_buffer
+        self.cars_previous_speed_buffer = []
+
+        for i, j in enumerate(self.cars_on_track):
+            if j.player_id == self.own_vehicle.player_id:
+                self.own_vehicle.speed_mci = j.speed
+                self.own_vehicle.x = j.x
+                self.own_vehicle.y = j.y
+                self.own_vehicle.z = j.z
+                self.own_vehicle.heading = j.heading
+                self.own_vehicle.direction = j.direction
+                self.own_vehicle.steer_forces = j.steer_forces
+            self.cars_previous_speed_buffer.append((j.speed, j.player_id))
+
+        [car.update_dynamic(speed[0] - car.speed) for speed in self.cars_previous_speed for car in
+         self.cars_on_track if
+         speed[1] == car.player_id and speed[0] - car.speed != 0.0]
+
+        [car.update_distance(self.own_vehicle.x, self.own_vehicle.y, self.own_vehicle.z) for car in
+         self.cars_on_track]
 
     def get_pings(self, insim, ping):
         if not self.is_connected:
