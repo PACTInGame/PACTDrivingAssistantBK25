@@ -74,6 +74,7 @@ class LFSConnection:
         self.collision_warning_sound_played = False
         self.update_available = Version.get_current_version(self.version)
         self.holding_brake = False
+        self.lang = self.settings.language
 
     def outgauge_packet(self, outgauge, packet):
         # get_own_car_data
@@ -151,10 +152,10 @@ class LFSConnection:
             self.del_button(31)
             self.del_button(3)
             if self.update_available:
-                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5, "Menu")
-                self.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, "Update avail.")
+                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5, self.language.translation(self.lang, "Menu"))
+                self.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, self.language.translation(self.lang, "Update"))
             else:
-                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
+                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, self.language.translation(self.lang, "Menu"))
 
         def start_menu_insim():
             self.time_menu_open = time.time()
@@ -281,6 +282,8 @@ class LFSConnection:
                     self.settings.indicator_turnoff = not self.settings.indicator_turnoff
                 elif btc.ClickID == 29:
                     self.settings.collision_warning_distance = (self.settings.collision_warning_distance + 1) % 3
+                elif btc.ClickID == 30:
+                    self.settings.automatic_gearbox = not self.settings.automatic_gearbox
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
@@ -447,12 +450,12 @@ class LFSConnection:
 
         if self.settings.forward_collision_warning:
             start_collision_warning()
+
         if self.settings.automatic_gearbox:
-            # self.gearbox.calculate_gear()
-            pass
+            self.gearbox.calculate_gear()
+
         if self.settings.PSC:
             self.PSC.calculate_psc()
-
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()

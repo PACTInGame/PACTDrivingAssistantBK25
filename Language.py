@@ -17,6 +17,8 @@ class Language:
                 'Language': f'Language: English',
                 'Close': '^1Close',
                 'Bus_Menu': 'Bus Menu',
+                'Update': 'Update available',
+                'Google_Drive': 'This will forward you to Google Drive. Continue?',
                 'Bus_enabled': f'{"^2 Enabled" if self.game_obj.settings.bus_simulation else "^1 Disabled"}',
                 'Door_Sound': f'{"^2" if self.game_obj.settings.bus_door_sound else "^1"}Door Sound',
                 'Route_Sound': f'{"^2" if self.game_obj.settings.bus_route_sound else "^1"}Route Sound',
@@ -34,6 +36,7 @@ class Language:
                 'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.parking_emergency_brake else "^1"}Parking Emergency Brake',
                 'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Park Distance Control',
                 'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visual Parking Aid',
+                'Gearbox': f'{"^2" if self.game_obj.settings.automatic_gearbox else "^1"}Automatic Gearbox',
 
 
             },
@@ -48,6 +51,8 @@ class Language:
                 'Language': 'Sprache: Deutsch',
                 'Close': b'^1Schlie\xdfen',
                 'Bus_Menu': b'Bus Men\xfc',
+                'Update': b'Update verf\xfcgbar',
+                'Google_Drive': 'Sie werden zu Google Drive weitergeleitet. Fortfahren?',
                 'Bus_enabled': f'{"^2 Aktiviert" if self.game_obj.settings.bus_simulation else "^1 Deaktiviert"}',
                 'Door_Sound': (b"^2" if self.game_obj.settings.bus_door_sound else b"^1") + b'T\xfcr Sound',
                 'Route_Sound': (b"^2" if self.game_obj.settings.bus_route_sound else b"^1")+ b"Linien Ansage",
@@ -65,6 +70,7 @@ class Language:
                 'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.parking_emergency_brake else "^1"}Parknotbremsung',
                 'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Parkabstandskontrolle',
                 'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visuelle Parkhilfe',
+                'Gearbox': f'{"^2" if self.game_obj.settings.automatic_gearbox else "^1"}Automatikgetriebe',
 
                 # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },

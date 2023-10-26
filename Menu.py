@@ -70,7 +70,9 @@ def open_drive_menu(game_object):
                             game_object.language.translation(lang, "Light_Assist"))
     game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 0, 20, 5,
                             game_object.language.translation(lang, "Automatic_Indicator_Turnoff"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
+    game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
+                            game_object.language.translation(lang, "Gearbox"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 45, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 
@@ -96,22 +98,28 @@ def close_menu(game_object):
     game_object.current_menu = 0
     for i in range(21, 41):
         game_object.del_button(i)
-    game_object.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
+    game_object.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5,
+                            game_object.language.translation(game_object.lang, "Menu"))
     if game_object.update_available:
-        game_object.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, "Update avail.")
+        game_object.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
+                                game_object.language.translation(game_object.lang, "Update"))
 
 
 def ask(game_obj):
     game_obj.del_button(100)
-    game_obj.send_button(100, pyinsim.ISB_DARK, 95, 85, 30, 5, "^7This will forward you to Google "
-                                                               "Drive. Continue?")
-    game_obj.send_button(101, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 85, 15, 5, "^2Yes")
-    game_obj.send_button(102, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 100, 15, 5, "^1Cancel")
+    game_obj.send_button(100, pyinsim.ISB_DARK, 95, 75, 50, 5,
+                         game_obj.language.translation(game_obj.lang, "Google_Drive"))
+    game_obj.send_button(101, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 75, 15, 5, "^2Yes")
+    game_obj.send_button(102, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 110, 15, 5, "^1Cancel")
+
 
 def close_ask(game_obj):
     for i in range(100, 103):
         game_obj.del_button(i)
-    game_obj.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, "Update avail.")
+    game_obj.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
+                         game_obj.language.translation(game_obj.lang, "Update"))
+
+
 def open_google_drive(game_object):
     webbrowser.open("https://drive.google.com/drive/folders/1Byr4onJvHW1MP7zCei0HUgOUG9t5R_Dl?usp=share_link")
     close_ask(game_object)
