@@ -30,7 +30,7 @@ class PSC:
         x = self.game_object.settings.offset_w
         y = self.game_object.settings.offset_h
         override = False
-        if abs(ang_of_car) > self.oversteer_threshold:
+        if abs(ang_of_car) > self.oversteer_threshold and self.speed > 10:
             self.sent_slip = True
             self.game_object.send_button(41, pyinsim.ISB_DARK, 114 + x, 100 + y, 5, 5, "^3SLIP")
             max_throttle = -1000 + (abs(ang_of_car) - self.oversteer_threshold) * self.sensitivity
@@ -39,7 +39,7 @@ class PSC:
                 override = True
             if override and not self.game_object.collision_warning_intensity > 2:
                 self.overridden = True
-                self.game_object.wheel_support.use_wheel(self.game_object, max_throttle, 1000)
+                self.game_object.wheel_support.use_wheel_psc(self.game_object, max_throttle)
             elif self.overridden:
                 self.game_object.wheel_support.use_wheel_stop(self.game_object)
         elif self.sent_slip:

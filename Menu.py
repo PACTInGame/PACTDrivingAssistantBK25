@@ -9,6 +9,7 @@ def open_menu(game_object):
     top = 80
     game_object.current_menu = 1
     game_object.del_button(21)
+    game_object.del_button(100)
 
     game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "Menu"))
     game_object.send_button(22, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
@@ -96,6 +97,8 @@ def close_menu(game_object):
     for i in range(21, 41):
         game_object.del_button(i)
     game_object.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5, "Menu")
+    if game_object.update_available:
+        game_object.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5, "Update avail.")
 
 
 def ask(game_obj):
