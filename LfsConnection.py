@@ -12,6 +12,7 @@ import Sounds
 import Version
 import pyinsim
 import wheel
+from BlindSpotWarning import check_blindspots, check_blindspots_ref
 from BusHQ import BusHQ
 from BusSimulation import BusSimulation
 from Language import Language
@@ -456,6 +457,10 @@ class LFSConnection:
 
         if self.settings.PSC:
             self.PSC.calculate_psc()
+
+        if self.settings.blind_spot_warning:
+            check_blindspots(self)
+            check_blindspots_ref(self)
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
