@@ -72,8 +72,9 @@ class Gearbox:
         up = self.game_object.settings.SHIFT_UP_KEY
         down = self.game_object.settings.SHIFT_DOWN_KEY
 
-        if shift_action == 1:
-            self.send([ign, up, ign])
+        if not self.game_object.text_entry:
+            if shift_action == 1:
+                self.send([ign, up, ign])
 
-        elif shift_action == -1:
-            self.send([ign, down, ign])
+            elif shift_action == -1:
+                self.send([ign, down, ign])

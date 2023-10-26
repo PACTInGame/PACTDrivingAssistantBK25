@@ -7,9 +7,9 @@ def get_settings_from_file():
                 if 2 <= i <= 11:
                     line = line.split()
                     if str(line[0]) == "on":
-                        change_set[i - 2] = "^2"
+                        change_set[i - 2] = True
                     else:
-                        change_set[i - 2] = "^1"
+                        change_set[i - 2] = False
 
                 if i == 12:
                     line = line.split()
@@ -17,18 +17,18 @@ def get_settings_from_file():
                 if i == 13:
                     line = line.split()
                     if str(line[0]) == "on":
-                        change_set[i - 2] = "^2"
+                        change_set[i - 2] = True
                     else:
-                        change_set[i - 2] = "^1"
+                        change_set[i - 2] = False
                 if i == 14:
                     line = line.split()
                     change_set[i - 2] = str(line[0])
                 if i == 15 or i == 16:
                     line = line.split()
                     if str(line[0]) == "on":
-                        change_set[i - 2] = "^2"
+                        change_set[i - 2] = True
                     else:
-                        change_set[i - 2] = "^1"
+                        change_set[i - 2] = False
                 if i == 17:
                     line = line.split()
                     line = line[0].split("x")
