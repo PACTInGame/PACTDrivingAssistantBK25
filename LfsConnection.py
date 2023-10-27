@@ -32,6 +32,10 @@ from Vehicle import Vehicle
 
 class LFSConnection:
     def __init__(self):
+        """
+        The LFSConnection class is the main class of the program. It contains all the objects for the different
+        functionalities of the program. It also connects to the LFS insim port.
+        """
         self.version = "0.0.0"
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
@@ -78,6 +82,11 @@ class LFSConnection:
         self.lang = self.settings.language
 
     def outgauge_packet(self, outgauge, packet):
+        """
+        The outgauge_packet function is called every time a new outgauge packet is received, which is quite often.
+        The packet contains all the information about the car, which is then saved in the own_vehicle object.
+        All functions that depend on a very high refresh rate are called such as the head up display.
+        """
         # get_own_car_data
         self.game_time = packet.Time
         self.own_vehicle.fuel = packet.Fuel
@@ -119,6 +128,10 @@ class LFSConnection:
             self.sound_effects()
 
     def start_outgauge(self):
+        """
+        start_outgauge tries to connect to the outgauge port. For example, when the user was in the menu for more than
+        30 seconds. The outgauge connection differs from the insim connection.
+        """
         try:
             self.outgauge = pyinsim.outgauge('127.0.0.1', 30000, self.outgauge_packet, 30.0)
         except:
@@ -143,6 +156,11 @@ class LFSConnection:
         pass
 
     def insim_state(self, insim, sta):
+        """
+        this method receives the is_sta packet from LFS. It contains information about the game state, that will
+        be read and saved inside "flags" variable.
+        """
+
         def start_game_insim():
             self.on_track = True
             self.in_pits = False
@@ -187,6 +205,7 @@ class LFSConnection:
         self.text_entry = len(flags) >= 16 and flags[-16] == 1
         self.track = sta.Track
 
+    # Player Handling starts here -------------------------------------------------------
     def new_player(self, insim, npl):
         def remove_control_chars(player_name):
             for i in range(10):
@@ -237,12 +256,20 @@ class LFSConnection:
             self.own_vehicle.player_name = remove_control_chars(npl.PName)
 
     def player_left(self, insim, pll):
+        # TODO implement
         pass
 
     def player_pits(self, insim, plp):
+        # TODO implement
         pass
 
+    # Player Handling ends here -------------------------------------------------------
+
     def on_click(self, insim, btc):
+        """
+        This recieves the is_btc packet from lfs if a clickable button is pressed, and it handles which menus
+        will be opened or closed. Doesn't look that nice yet...
+        """
         click_action = False
         click_actions = {}
         if 21 <= btc.ClickID <= 40:  # Menu-Buttons
@@ -336,9 +363,17 @@ class LFSConnection:
                     action(self)
 
     def object_detection(self, insim, axm):
+        """
+        This method is used to get autcross layout objects from LFS. For example for the park distance control to work
+        also with layout objects.
+        """
         pass
 
     def send_button(self, click_id, style, t, l, w, h, text):
+        """
+        This method checks if a button is already on the screen and if not, it sends a new button to LFS.
+        It makes sending buttons easier than always sending the entire thing to lfs.
+        """
         if self.buttons_on_screen[click_id] == 0 or click_id in self.valid_ids:
             self.buttons_on_screen[click_id] = 1
             if type(text) == str:
@@ -363,6 +398,10 @@ class LFSConnection:
             self.buttons_on_screen[click_id] = 0
 
     def head_up_display(self):
+        """
+        This method is responsible for everything displayed on the head up display. This should be very efficient
+        as it is called at minimum every 10ms.
+        """
         x = self.settings.offset_w
         y = self.settings.offset_h
 
@@ -414,6 +453,9 @@ class LFSConnection:
                 self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_PING)
 
     def start_assistants(self):
+        """
+        This method is called every 200ms to start all driver assistance functions.
+        """
         self.get_relevant_cars()
 
         def start_collision_warning():
@@ -472,6 +514,10 @@ class LFSConnection:
         bus_thread.start()
 
     def get_relevant_cars(self):
+        """
+        This function decides if a car is relevant for the driver assistance functions or not. Therefore, the workload
+        is reduced and the program runs faster.
+        """
         relevant_cars = []
 
         for car in self.cars_on_track:
@@ -495,6 +541,11 @@ class LFSConnection:
         self.cars_relevant = relevant_cars
 
     def get_car_data(self, insim, MCI):
+        """
+        This method is called every time a new MCI packet is received. It stores all information about the cars on track.
+        However, since there might be multiple MCI packets, as one packet can only contain up to 8 cars, some of the
+        functionaltiy will only be called every 200 ms to reduce the workload, such as the driver assistance functions.
+        """
         if not self.running:
             sys.exit()
         curr_time = time.time()
