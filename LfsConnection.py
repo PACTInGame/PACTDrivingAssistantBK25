@@ -4,6 +4,7 @@ from threading import Thread
 
 import Calculations
 import CarDataBase
+import CrossTrafficWarning
 import ForwardCollisionWarning
 import Gearbox
 import KeyboardMouseEmulator
@@ -60,6 +61,10 @@ class LFSConnection:
         self.buttons_on_screen = [0] * 255
         self.valid_ids = {*range(1, 41)}
         self.collision_warning_intensity = 0
+        # two separate variables for cross traffic warning
+        # as braking is not directly connected to warning logic
+        self.cross_traffic_braking = False
+        self.cross_warning_intensity = 0, 0
         self.timers = []
         self.time_MCI = 0
         self.is_connected = False
@@ -77,6 +82,7 @@ class LFSConnection:
         self.cars_previous_speed = []
         self.cars_previous_speed_buffer = []
         self.collision_warning_sound_played = False
+        self.cross_traffic_warning_sound_played = False
         self.update_available = Version.get_current_version(self.version)
         self.holding_brake = False
         self.lang = self.settings.language
@@ -417,6 +423,22 @@ class LFSConnection:
             self.send_button(1, 32 if intensity < 3 else 16, 119 + x, 90 + y, 13, 8, '^1<< ---')
             self.send_button(2, 32 if intensity < 3 else 16, 119 + x, 103 + y, 13, 8, '^1--- >>')
 
+        def send_cross_button(intensity):
+            if intensity[0] == 1:
+                if intensity[1] > 180:
+                    self.send_button(1, pyinsim.ISB_LIGHT, 119 + x, 90 + y, 13, 8, b'^3^L^H\xa1n\xa1n')
+                    self.send_button(2, pyinsim.ISB_LIGHT, 119 + x, 103 + y, 13, 8, b'^3^L^H\xa1n\xa1n')
+                else:
+                    self.send_button(1, pyinsim.ISB_LIGHT, 119 + x, 90 + y, 13, 8, b'^3^L^H\xa1m\xa1m')
+                    self.send_button(2, pyinsim.ISB_LIGHT, 119 + x, 103 + y, 13, 8, b'^3^L^H\xa1m\xa1m')
+            else:
+                if intensity[1] > 180:
+                    self.send_button(1, pyinsim.ISB_LIGHT, 119 + x, 90 + y, 13, 8, b'^1^L^H\xa1n\xa1n')
+                    self.send_button(2, pyinsim.ISB_LIGHT, 119 + x, 103 + y, 13, 8, b'^1^L^H\xa1n\xa1n')
+                else:
+                    self.send_button(1, pyinsim.ISB_LIGHT, 119 + x, 90 + y, 13, 8, b'^1^L^H\xa1m\xa1m')
+                    self.send_button(2, pyinsim.ISB_LIGHT, 119 + x, 103 + y, 13, 8, b'^1^L^H\xa1m\xa1m')
+
         def send_gear_button(gear_mode):
             self.send_button(5, pyinsim.ISB_DARK, 123 + x, 116 + y, 4, 4, '^7' + gear_mode)
 
@@ -433,6 +455,8 @@ class LFSConnection:
 
             if self.collision_warning_intensity > 0:
                 send_warning_button(self.collision_warning_intensity)
+            elif self.cross_warning_intensity[0] > 0:
+                send_cross_button(self.cross_warning_intensity)
             else:
                 if self.settings.unit == "metric":
                     send_speed_button('^7', 'km/h', self.own_vehicle.speed)
@@ -458,6 +482,21 @@ class LFSConnection:
         """
         self.get_relevant_cars()
 
+        def brake_emergency():
+            if self.own_vehicle.control_mode == 2:
+                self.wheel_support.use_wheel_collision_warning(self)
+            elif self.own_vehicle.control_mode == 1:
+                self.keyboard_support.use_keyboard_collision_warning(self)
+            elif self.own_vehicle.control_mode == 0:
+                self.keyboard_support.use_mouse_collision_warning(self)
+
+        def release_brake():
+            if self.own_vehicle.control_mode == 2:
+                self.wheel_support.use_wheel_stop(self)
+            elif self.own_vehicle.control_mode == 1:
+                self.keyboard_support.release_brake(self)
+            # TODO ADD MOUSE SUPPORT
+
         def start_collision_warning():
             if 12 < self.own_vehicle.speed or (
                     self.collision_warning_intensity > 0 and self.own_vehicle.speed > 0.5) and self.own_vehicle.gear > 1:
@@ -465,23 +504,27 @@ class LFSConnection:
             else:
                 self.collision_warning_intensity = 0
             if self.collision_warning_intensity > 2:
-                if self.own_vehicle.control_mode == 2:
-                    self.wheel_support.use_wheel_collision_warning(self)
-                elif self.own_vehicle.control_mode == 1:
-                    self.keyboard_support.use_keyboard_collision_warning(self)
-                elif self.own_vehicle.control_mode == 0:
-                    self.keyboard_support.use_mouse_collision_warning(self)
+                brake_emergency()
             else:
-                if self.own_vehicle.control_mode == 2:
-                    self.wheel_support.use_wheel_stop(self)
-                elif self.own_vehicle.control_mode == 1:
-                    self.keyboard_support.release_brake(self)
-
+                if not self.cross_traffic_braking:
+                    release_brake()
             if self.collision_warning_intensity > 1 and not self.collision_warning_sound_played:
                 Sounds.collision_warning_sound(self.settings.collision_warning_sound)
                 self.collision_warning_sound_played = True
             if self.collision_warning_sound_played and self.collision_warning_intensity == 0:
                 self.collision_warning_sound_played = False
+
+        def start_cross_traffic_warning():
+            self.cross_traffic_braking = CrossTrafficWarning.cross_traffic(self)
+            if self.cross_traffic_braking:
+                brake_emergency()
+            elif self.collision_warning_intensity < 3:
+                release_brake()
+            if self.cross_warning_intensity[0] > 1 and not self.cross_traffic_warning_sound_played:
+                Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+                self.cross_traffic_warning_sound_played = True
+            if self.cross_traffic_warning_sound_played and self.cross_warning_intensity[0] == 0:
+                self.cross_traffic_warning_sound_played = False
 
         def start_bus_sim():
             if self.bus_simulation.active:
@@ -509,6 +552,9 @@ class LFSConnection:
         if self.settings.blind_spot_warning:
             check_blindspots(self)
             check_blindspots_ref(self)
+
+        if self.settings.cross_traffic_warning:
+            start_cross_traffic_warning()
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
