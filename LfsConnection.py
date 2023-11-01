@@ -9,6 +9,7 @@ import ForwardCollisionWarning
 import Gearbox
 import KeyboardMouseEmulator
 import Menu
+import SideCollisionPrevention
 import Sounds
 import Version
 import pyinsim
@@ -28,6 +29,7 @@ from Vehicle import Vehicle
 # 11-20 Bus Simulation
 # 20-40 Settings (Menu)
 # 41-43 PSC
+# 44-47 Blind Spot Warning
 
 # 100 update available
 
@@ -540,6 +542,17 @@ class LFSConnection:
                     self.del_button(i)
                 self.bus_simulation.route = None
 
+        def start_blindspot():
+            blindspot_r, blindspot_l = check_blindspots_ref(self)
+            if blindspot_l:
+                self.send_button(44, pyinsim.ISB_DARK, 110, 10, 5, 10, '^3!')
+            else:
+                self.del_button(44)
+            if blindspot_r:
+                self.send_button(45, pyinsim.ISB_DARK, 110, 190, 5, 10, '^3!')
+            else:
+                self.del_button(45)
+
         if self.settings.forward_collision_warning:
             start_collision_warning()
 
@@ -550,11 +563,13 @@ class LFSConnection:
             self.PSC.calculate_psc()
 
         if self.settings.blind_spot_warning:
-            check_blindspots(self)
-            check_blindspots_ref(self)
+            start_blindspot()
 
         if self.settings.cross_traffic_warning:
             start_cross_traffic_warning()
+
+        if self.settings.side_collision_prevention:
+            SideCollisionPrevention.calculate_warning(self)
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
