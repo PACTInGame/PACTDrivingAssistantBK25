@@ -15,7 +15,6 @@ def cross_traffic_warning(car_position, car_heading, car_speed, own_position, ow
     # Check if the other car is coming from the side (either from right or left)
     if 30 <= angle <= 100 or 260 <= angle <= 330:
         heading_diff = (car_heading - own_heading) % 65536
-        print(heading_diff)
         # Check if the car has the correct relative heading
         if (0 <= heading_diff <= 32768 and 0 <= angle <= 180) or (32768 < heading_diff <= 65536 and 180 < angle <= 360):
             own_speed_mps = own_speed / 3.6
@@ -42,14 +41,12 @@ def cross_traffic_warning(car_position, car_heading, car_speed, own_position, ow
                 s = (b * e - c * d) / denom
                 t = (a * e - b * d) / denom
             else:
-                print("returning bc denom = 0")
                 return float('inf'), angle, float('inf'), 0
 
             intersection_own = np.array([own_x, own_y]) + s * own_dir
             intersection_car = np.array([car_x, car_y]) + t * car_dir
             angle2intersection_own = calculate_angle(own_x, intersection_own[0], own_y, intersection_own[1],
                                                      own_heading)
-            print("angle2intersection_own: ", angle2intersection_own)
             if angle2intersection_own > 340 or angle2intersection_own < 20:
                 # Calculate the distances from each car to the intersection point
                 distance_own = np.linalg.norm(intersection_own - np.array([own_x, own_y])) / 65536
@@ -58,8 +55,6 @@ def cross_traffic_warning(car_position, car_heading, car_speed, own_position, ow
                 # Calculate time it takes for both cars to reach the intersection point
                 time_to_intersection_own = distance_own / own_speed_mps if own_speed_mps != 0 else float('inf')
                 time_to_intersection_car = distance_car / car_speed_mps if car_speed_mps != 0 else float('inf')
-                print("time to intersection own: ", time_to_intersection_own)
-                print("time to intersection car: ", time_to_intersection_car)
                 # Check if both cars will reach the intersection point within the 5-meter offset
                 if not (math.isinf(time_to_intersection_own) or math.isinf(time_to_intersection_car)):
                     time_difference = time_to_intersection_own - time_to_intersection_car

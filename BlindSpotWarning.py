@@ -1,5 +1,6 @@
 from shapely import Polygon
 
+import SideCollisionPrevention
 from Calculations import calc_polygon_points, polygon_intersect
 
 
@@ -76,11 +77,11 @@ def check_blindspots(game_object):
                 ok = True
         speed_diff = rectangle[0] - own_speed
         if rectangle[1] < speed_diff * 1.2 and ok:
-
             if polygon_intersect(rectangle[2], rectangle_left):
                 blindspot_l = True
             if polygon_intersect(rectangle[2], rectangle_right):
                 blindspot_r = True
+
     return blindspot_r, blindspot_l
 
 
@@ -99,12 +100,13 @@ def check_blindspots_ref(game_object):
 
     for rectangle in rectangles_others:
         if is_within_threshold(own_vehicle.heading, rectangle[3]) and rectangle[1] < (
-                rectangle[0] - own_vehicle.speed) * 1.2:
+                rectangle[0] - own_vehicle.speed + 5) * 1.2:
             if polygon_intersect(rectangle[2], rectangle_left):
                 blindspot_l = True
             if polygon_intersect(rectangle[2], rectangle_right):
                 blindspot_r = True
-    return blindspot_r, blindspot_l
+    sidecollision_r, sidecollision_l = SideCollisionPrevention.calculate_warning(blindspot_l, blindspot_r, game_object, rectangles_others)
+    return blindspot_r, blindspot_l, sidecollision_r, sidecollision_l
 
 
 def normalize_angle(angle):

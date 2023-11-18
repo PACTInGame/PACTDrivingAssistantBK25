@@ -59,6 +59,7 @@ class LFSConnection:
         self.keyboard_support = KeyboardMouseEmulator
 
         self.outgauge = None
+        self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
         self.valid_ids = {*range(1, 41)}
@@ -85,9 +86,15 @@ class LFSConnection:
         self.cars_previous_speed_buffer = []
         self.collision_warning_sound_played = False
         self.cross_traffic_warning_sound_played = False
+        self.side_collision_warning_sound_played = time.perf_counter()
         self.update_available = Version.get_current_version(self.version)
         self.holding_brake = False
         self.lang = self.settings.language
+
+        self.blindspot_l = False
+        self.blindspot_r = False
+        self.sidecollision_r = False
+        self.sidecollision_l = False
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -135,6 +142,15 @@ class LFSConnection:
             self.head_up_display()
             self.sound_effects()
 
+    def outsim_packet(self, outsim, packet):
+        """
+        The outsim_packet function is called every time a new outsim packet is received. The packet contains mainly
+        information for sim rigs like motion. We can use it for getting the users steering input.
+        """
+        # not yet used
+        pass
+
+
     def start_outgauge(self):
         """
         start_outgauge tries to connect to the outgauge port. For example, when the user was in the menu for more than
@@ -144,6 +160,16 @@ class LFSConnection:
             self.outgauge = pyinsim.outgauge('127.0.0.1', 30000, self.outgauge_packet, 30.0)
         except:
             print("Failed to connect to OutGauge. Maybe it was still active.")
+
+    def start_outsim(self):
+        """
+        start_outsim tries to connect to the outsim port. For example, when the user was in the menu for more than
+        30 seconds. The outsim connection differs from the insim connection.
+        """
+        try:
+            self.outsim = pyinsim.outsim('127.0.0.1', 29998, self.outsim_packet, 30.0)
+        except:
+            print("Failed to connect to OutSim. Maybe it was still active.")
 
     def sound_effects(self):
         if self.own_vehicle.roleplay == "civil":
@@ -543,12 +569,13 @@ class LFSConnection:
                 self.bus_simulation.route = None
 
         def start_blindspot():
-            blindspot_r, blindspot_l = check_blindspots_ref(self)
-            if blindspot_l:
+            self.blindspot_r, self.blindspot_l, self.sidecollision_r, self.sidecollision_l = check_blindspots_ref(self)
+            if self.blindspot_l:
                 self.send_button(44, pyinsim.ISB_DARK, 110, 10, 5, 10, '^3!')
             else:
                 self.del_button(44)
-            if blindspot_r:
+
+            if self.blindspot_r:
                 self.send_button(45, pyinsim.ISB_DARK, 110, 190, 5, 10, '^3!')
             else:
                 self.del_button(45)
@@ -569,8 +596,21 @@ class LFSConnection:
             start_cross_traffic_warning()
 
         if self.settings.side_collision_prevention:
-            SideCollisionPrevention.calculate_warning(self)
-
+            time_now = time.perf_counter()
+            if self.sidecollision_l:
+                self.send_button(46, pyinsim.ISB_DARK, 110, 15, 10, 15, '^1!')
+                if time_now > self.side_collision_warning_sound_played + 2:
+                    self.side_collision_warning_sound_played = time.perf_counter()
+                    Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+            else:
+                self.del_button(46)
+            if self.sidecollision_r:
+                self.send_button(47, pyinsim.ISB_DARK, 110, 180, 10, 15, '^1!')
+                if time_now > self.side_collision_warning_sound_played + 2:
+                    self.side_collision_warning_sound_played = time.perf_counter()
+                    Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+            else:
+                self.del_button(47)
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
 
