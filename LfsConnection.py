@@ -9,6 +9,7 @@ import ForwardCollisionWarning
 import Gearbox
 import KeyboardMouseEmulator
 import Menu
+import ParkDistanceControl
 import SideCollisionPrevention
 import Sounds
 import Version
@@ -30,7 +31,7 @@ from Vehicle import Vehicle
 # 20-40 Settings (Menu)
 # 41-43 PSC
 # 44-47 Blind Spot Warning
-
+# 48-54 PDC
 # 100 update available
 
 class LFSConnection:
@@ -62,7 +63,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41)}
+        self.valid_ids = {*range(1, 41), *range(48, 55)}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -95,6 +96,10 @@ class LFSConnection:
         self.blindspot_r = False
         self.sidecollision_r = False
         self.sidecollision_l = False
+        self.rect_obj = []  # TODO get layout data
+        self.front_beep = 0
+        self.rear_beep = 0
+        self.beep_thread_started = False
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -150,7 +155,6 @@ class LFSConnection:
         # not yet used
         pass
 
-
     def start_outgauge(self):
         """
         start_outgauge tries to connect to the outgauge port. For example, when the user was in the menu for more than
@@ -187,7 +191,7 @@ class LFSConnection:
                     Sounds.playsound_indicator_off()
 
     def message_handling(self, insim, mso):
-        pass
+        print(mso.Msg)
 
     def insim_state(self, insim, sta):
         """
@@ -580,6 +584,34 @@ class LFSConnection:
             else:
                 self.del_button(45)
 
+        def start_side_collision_prevention():
+            time_now = time.perf_counter()
+            if self.sidecollision_l:
+                self.send_button(46, pyinsim.ISB_DARK, 110, 15, 10, 15, '^1!')
+                if time_now > self.side_collision_warning_sound_played + 2:
+                    self.side_collision_warning_sound_played = time.perf_counter()
+                    Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+            else:
+                self.del_button(46)
+
+            if self.sidecollision_r:
+                self.send_button(47, pyinsim.ISB_DARK, 110, 180, 10, 15, '^1!')
+                if time_now > self.side_collision_warning_sound_played + 2:
+                    self.side_collision_warning_sound_played = time.perf_counter()
+                    Sounds.collision_warning_sound(self.settings.collision_warning_sound)
+            else:
+                self.del_button(47)
+
+        def start_park_assistance():
+            sensors = ParkDistanceControl.sensors(self)
+            ParkDistanceControl.draw_pdc_buttons(self, sensors)
+            if not self.beep_thread_started and (self.front_beep > 0 or self.rear_beep > 0):
+                self.beep_thread_started = True
+                park_beep_thread = Thread(target=ParkDistanceControl.beep(self))
+                park_beep_thread.start()
+            if self.front_beep == 0 and self.rear_beep == 0:
+                self.beep_thread_started = False
+
         if self.settings.forward_collision_warning:
             start_collision_warning()
 
@@ -596,21 +628,15 @@ class LFSConnection:
             start_cross_traffic_warning()
 
         if self.settings.side_collision_prevention:
-            time_now = time.perf_counter()
-            if self.sidecollision_l:
-                self.send_button(46, pyinsim.ISB_DARK, 110, 15, 10, 15, '^1!')
-                if time_now > self.side_collision_warning_sound_played + 2:
-                    self.side_collision_warning_sound_played = time.perf_counter()
-                    Sounds.collision_warning_sound(self.settings.collision_warning_sound)
-            else:
-                self.del_button(46)
-            if self.sidecollision_r:
-                self.send_button(47, pyinsim.ISB_DARK, 110, 180, 10, 15, '^1!')
-                if time_now > self.side_collision_warning_sound_played + 2:
-                    self.side_collision_warning_sound_played = time.perf_counter()
-                    Sounds.collision_warning_sound(self.settings.collision_warning_sound)
-            else:
-                self.del_button(47)
+            start_side_collision_prevention()
+
+        if self.settings.park_distance_control and self.own_vehicle.speed < 10:
+            start_park_assistance()
+        else:
+            self.rear_beep = 0
+            self.front_beep = 0
+            self.beep_thread_started = False
+            ParkDistanceControl.del_pdc_buttons(self)
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
 

@@ -1,7 +1,6 @@
 def calculate_warning(blindspot_l, blindspot_r, game_object, rectangles_others):
     side_collision_r, side_collision_l = False, False
     for rectangle in rectangles_others:
-        print(is_left_threshold(game_object.own_vehicle.heading, rectangle[3]))
         if is_left_threshold(game_object.own_vehicle.heading,
                              rectangle[3]) and blindspot_l and game_object.own_vehicle.steer_forces > 50:
             side_collision_l = True

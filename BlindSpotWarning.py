@@ -100,7 +100,7 @@ def check_blindspots_ref(game_object):
 
     for rectangle in rectangles_others:
         if is_within_threshold(own_vehicle.heading, rectangle[3]) and rectangle[1] < (
-                rectangle[0] - own_vehicle.speed + 5) * 1.2:
+                rectangle[0] - own_vehicle.speed + (5 if own_vehicle.speed > 15 else 0)) * 1.2:
             if polygon_intersect(rectangle[2], rectangle_left):
                 blindspot_l = True
             if polygon_intersect(rectangle[2], rectangle_right):

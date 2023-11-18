@@ -13,6 +13,17 @@ def beep():
     mixer.music.play()
 
 
+def pdc_front():
+    mixer.music.load('data\\sounds\\beep_front.wav')
+    mixer.music.play()
+
+
+def pdc_rear():
+    print("rear")
+    mixer.music.load('data\\sounds\\beep_rear.wav')
+    mixer.music.play()
+
+
 def beep_intense():
     mixer.music.load('data\\sounds\\emawarning_intense.wav')
     mixer.music.play()
@@ -41,6 +52,7 @@ def play_bus_door_open():
 def play_bus_door_close():
     mixer.music.load('data\\sounds\\door_close.wav')
     mixer.music.play()
+
 
 def new_route():
     mixer.music.load('data\\sounds\\bus_radio\\bl_new_route.wav')
