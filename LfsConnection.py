@@ -2,6 +2,7 @@ import sys
 import time
 from threading import Thread
 
+import Boardcomputer
 import Calculations
 import CarDataBase
 import CrossTrafficWarning
@@ -57,6 +58,8 @@ class LFSConnection:
         self.wheel_support = wheel.WheelSupport(self)
         self.gearbox = Gearbox.Gearbox(self)
         self.PSC = PSC(self)
+        self.boardcomputer = Boardcomputer.Boardcomputer(self)
+        self.boardcomputer.reset()
         self.keyboard_support = KeyboardMouseEmulator
 
         self.outgauge = None
@@ -637,6 +640,9 @@ class LFSConnection:
             self.front_beep = 0
             self.beep_thread_started = False
             ParkDistanceControl.del_pdc_buttons(self)
+
+        if self.settings.bc != "none":
+            self.boardcomputer.update()
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
 
