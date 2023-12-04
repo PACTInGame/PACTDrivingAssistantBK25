@@ -50,6 +50,8 @@ class Setting:
         self.unit = set_def[18]
         self.offset_h = set_def[19]
         self.offset_w = set_def[20]
+        self.automatic_indicator_turnoff = set_def[21]
+        self.park_emergency_brake = set_def[22]
 
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]

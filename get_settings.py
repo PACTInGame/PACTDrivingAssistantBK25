@@ -1,6 +1,6 @@
 def get_settings_from_file():
     change_set = ["^2", "^2", "^2", "^2", "^2", "^2", "^2", "^2", "^2", "^2", "medium", "^2", "normal", "^2", "^1",
-                  "1920x1080", "0", "avg", "metric", "0", "0"]
+                  "1920x1080", "0", "avg", "metric", "0", "0", "^2", "^2"]
     try:
         with open("settings.txt") as fp:
             for i, line in enumerate(fp):
@@ -54,6 +54,13 @@ def get_settings_from_file():
                     line = line.split()
                     change_set[i - 2] = int(line[0])
 
+                if i == 23 or i == 24:
+                    line = line.split()
+                    if str(line[0]) == "on":
+                        change_set[i - 2] = True
+                    else:
+                        change_set[i - 2] = False
+
         print("Settings loaded successfully")
         return change_set
 
@@ -103,7 +110,8 @@ def get_controls_from_file():
         print("Error loading control-settings. Make sure controls.txt exists in Folder.")
 
 
-def write_settings(settings):
+def write_settings(game_obj):
+    settings = game_obj.settings
     file_string = "Important: Only change the letter in the at the beginning. Do not rearrange this layout. \n" \
                   'Assistance-Default-Settings ("on", or "off". Space necessary between setting and "<--"):\n' \
                   "{} <-- Head-up display\n" \
@@ -123,33 +131,37 @@ def write_settings(settings):
                   "{} <-- stability control\n" \
                   "{} <-- Monitor resolution\n" \
                   "{} <-- warning sound (change in menu, when program is active)\n" \
-                  "{} <-- Trip-computer mode\n"\
+                  "{} <-- Trip-computer mode\n" \
                   "{} <-- unit\n" \
                   "{} <-- HUD height offset\n" \
-                  "{} <-- HUD width offset".format(settings.head_up_display,
-                                                     settings.forward_collision_warning,
-                                                     settings.blind_spot_warning,
-                                                     settings.cross_traffic_warning,
-                                                     settings.light_assist,
-                                                     settings.park_distance_control,
-                                                     settings.emergency_assist,
-                                                     settings.lane_assist,
-                                                     settings.cop_aid_system,
-                                                     settings.automatic_emergency_braking,
-                                                     settings.collision_warning_distance,
-                                                     settings.automatic_gearbox,
-                                                     settings.lane_dep_intensity,
-                                                     settings.image_hud,
-                                                     settings.PSC,
-                                                     settings.resolution,
-                                                     settings.collision_warning_sound,
-                                                     settings.bc,
-                                                     settings.unit,
-                                                     settings.offseth,
-                                                     settings.offsetw)
+                  "{} <-- HUD width offset\n" \
+                  "{} <-- automatic indicator turnoff\n" \
+                  "{} <-- park emergency brake".format(settings.head_up_display,
+                                                       settings.forward_collision_warning,
+                                                       settings.blind_spot_warning,
+                                                       settings.cross_traffic_warning,
+                                                       settings.light_assist,
+                                                       settings.park_distance_control,
+                                                       settings.emergency_assist,
+                                                       settings.lane_assist,
+                                                       settings.cop_aid_system,
+                                                       settings.automatic_emergency_braking,
+                                                       settings.collision_warning_distance,
+                                                       settings.automatic_gearbox,
+                                                       settings.lane_dep_intensity,
+                                                       settings.image_hud,
+                                                       settings.PSC,
+                                                       settings.resolution,
+                                                       settings.collision_warning_sound,
+                                                       settings.bc,
+                                                       settings.unit,
+                                                       settings.offset_h,
+                                                       settings.offset_w,
+                                                       settings.automatic_indicator_turnoff,
+                                                       settings.park_emergency_brake)
 
-    file_string = file_string.replace("^2", "on")
-    file_string = file_string.replace("^1", "off")
+    file_string = file_string.replace("True", "on")
+    file_string = file_string.replace("False", "off")
     try:
         with open('settings.txt', 'w') as file:
             file.write(file_string)

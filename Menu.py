@@ -1,6 +1,7 @@
 import webbrowser
 
 import Language
+import get_settings
 import pyinsim
 
 
@@ -20,7 +21,26 @@ def open_menu(game_object):
                             game_object.language.translation(lang, "Bus_Sim"))
     game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
                             game_object.language.translation(lang, "Language"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+    game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+                            game_object.language.translation(lang, "General"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
+                            game_object.language.translation(lang, "Close"))
+
+
+def open_general_menu(game_object):
+    lang = game_object.settings.language
+    game_object.current_menu = 5
+    top = 80
+    for i in range(21, 41):
+        game_object.del_button(i)
+    game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "General"))
+    game_object.send_button(22, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
+                            game_object.language.translation(lang, "Units"))
+    game_object.send_button(23, pyinsim.ISB_LIGHT, top + 5, 20, 10, 5,
+                            game_object.language.translation(lang, "Metric")
+                            if game_object.settings.unit == "metric"
+                            else game_object.language.translation(lang, "Imperial"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 
@@ -103,6 +123,8 @@ def close_menu(game_object):
     if game_object.update_available:
         game_object.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
                                 game_object.language.translation(game_object.lang, "Update"))
+
+    get_settings.write_settings(game_object)
 
 
 def ask(game_obj):

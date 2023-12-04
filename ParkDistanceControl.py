@@ -174,13 +174,13 @@ def draw_pdc_buttons(game_obj, sensors):
             elif sensor[0] == 0:
                 c6 = b"^1"
                 front_beep = 3 if front_beep < 3 else front_beep
-    game_obj.send_button(48, pyinsim.ISB_LMB, 100 + x, 130 + y, 5, 5, c6 + b'^J\x84\xac')
-    game_obj.send_button(49, pyinsim.ISB_LMB, 100 + x, 133 + y, 5, 5, c1 + b'^J\x84\xaa')
-    game_obj.send_button(50, pyinsim.ISB_LMB, 100 + x, 136 + y, 5, 5, c2 + b'^J\x84\xad')
-    game_obj.send_button(51, pyinsim.ISB_LMB, 115 + x, 130 + y, 5, 5, c5 + b'^J\x84\xaf')
-    game_obj.send_button(52, pyinsim.ISB_LMB, 115 + x, 133 + y, 5, 5, c4 + b'^J\x84\xaa')
-    game_obj.send_button(53, pyinsim.ISB_LMB, 115 + x, 136 + y, 5, 5, c3 + b'^J\x84\xae')
-    game_obj.send_button(54, pyinsim.ISB_LMB, 107 + x, 130 + y, 11, 5, b'^J\x81\xe1P\x81\xe2')
+    game_obj.send_button(48, pyinsim.ISB_LMB, 110 + x, 120 + y, 5, 5, c6 + b'^J\x84\xac')
+    game_obj.send_button(49, pyinsim.ISB_LMB, 110 + x, 123 + y, 5, 5, c1 + b'^J\x84\xaa')
+    game_obj.send_button(50, pyinsim.ISB_LMB, 110 + x, 126 + y, 5, 5, c2 + b'^J\x84\xad')
+    game_obj.send_button(51, pyinsim.ISB_LMB, 125 + x, 120 + y, 5, 5, c5 + b'^J\x84\xaf')
+    game_obj.send_button(52, pyinsim.ISB_LMB, 125 + x, 123 + y, 5, 5, c4 + b'^J\x84\xaa')
+    game_obj.send_button(53, pyinsim.ISB_LMB, 125 + x, 126 + y, 5, 5, c3 + b'^J\x84\xae')
+    game_obj.send_button(54, pyinsim.ISB_LMB, 117 + x, 120 + y, 11, 5, b'^J\x81\xe1P\x81\xe2')
     game_obj.front_beep = front_beep
     game_obj.rear_beep = rear_beep
 

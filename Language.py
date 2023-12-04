@@ -37,6 +37,10 @@ class Language:
                 'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Park Distance Control',
                 'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visual Parking Aid',
                 'Gearbox': f'{"^2" if self.game_obj.settings.automatic_gearbox else "^1"}Automatic Gearbox',
+                'General': 'General',
+                'Units': 'Units',
+                'Metric': 'Metric',
+                'Imperial': 'Imperial',
 
 
             },
@@ -71,7 +75,10 @@ class Language:
                 'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Parkabstandskontrolle',
                 'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visuelle Parkhilfe',
                 'Gearbox': f'{"^2" if self.game_obj.settings.automatic_gearbox else "^1"}Automatikgetriebe',
-
+                'General': 'Allgemein',
+                'Units': 'Einheiten',
+                'Metric': 'Metrisch',
+                'Imperial': 'Imperial',
                 # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },
             'fr': {

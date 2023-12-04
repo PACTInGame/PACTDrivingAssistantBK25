@@ -28,6 +28,8 @@ from Vehicle import Vehicle
 
 # Button IDs
 # 1-10 Head up Display and "Waiting for you to hit the road"
+# 6 = Board-computer
+# (7,8,9) = Notifications
 # 11-20 Bus Simulation
 # 20-40 Settings (Menu)
 # 41-43 PSC
@@ -48,7 +50,7 @@ class LFSConnection:
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
-        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu
+        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu, 5 = General Menu
 
         self.own_vehicle = OwnVehicle()
         self.settings = Setting(self)
@@ -103,6 +105,7 @@ class LFSConnection:
         self.front_beep = 0
         self.rear_beep = 0
         self.beep_thread_started = False
+        self.notifications = []
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -320,6 +323,7 @@ class LFSConnection:
                 click_actions = {
                     21: Menu.open_menu,
                     100: Menu.open_google_drive,
+
                 }
             elif self.current_menu == 1:  # Main Menu
                 click_action = True
@@ -332,7 +336,7 @@ class LFSConnection:
                     23: Menu.open_park_menu,
                     24: Menu.open_bus_menu,
                     25: self.settings.change_language,
-                    26: self.settings.activate_bus_offline,
+                    26: Menu.open_general_menu,
                     40: Menu.close_menu,
                 }
 
@@ -388,11 +392,20 @@ class LFSConnection:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
                     Menu.open_bus_menu(self)
+
+            elif self.current_menu == 5:  # General Menu
+                if btc.ClickID == 22:
+                    self.settings.unit = "metric" if self.settings.unit == "imperial" else "imperial"
+                elif btc.ClickID == 40:
+                    Menu.close_menu(self)
+                if not btc.ClickID == 40:
+                    Menu.open_general_menu(self)
         else:
             click_actions = {
                 100: Menu.ask,
                 101: Menu.open_google_drive,
                 102: Menu.close_ask,
+                6: self.boardcomputer.reset,
             }
             click_action = True
         if click_action:
@@ -454,9 +467,25 @@ class LFSConnection:
         def send_rpm_button(color_code, rpm):
             self.send_button(2, pyinsim.ISB_DARK, 119 + x, 103 + y, 13, 8, f'{color_code}%.1f RPM' % (rpm / 1000))
 
+        def send_extra_info_button():
+            range_k = self.boardcomputer.range_km
+            color = "^7" if range_k > 20 else "^3" if range_k > 5 else "^1"
+            unit = "km" if self.settings.unit == "metric" else "mi"
+            if unit == "mi":
+                range_k = range_k * 0.621371
+            self.send_button(6, pyinsim.ISB_DARK, 113 + x, 90 + y, 13, 6, f"{color}{round(range_k) if range_k > 0  else '---'} {unit}")
+
         def send_warning_button(intensity):
             self.send_button(1, 32 if intensity < 3 else 16, 119 + x, 90 + y, 13, 8, '^1<< ---')
             self.send_button(2, 32 if intensity < 3 else 16, 119 + x, 103 + y, 13, 8, '^1--- >>')
+
+        def send_notifications():
+            num_notifications = 0
+            for notification in self.notifications:
+                if num_notifications < 3:
+                    self.send_button(7 + num_notifications, pyinsim.ISB_DARK, 127 + x + num_notifications * 6, 90 + y,
+                                     26, 6, notification[0])
+                    num_notifications += 1
 
         def send_cross_button(intensity):
             if intensity[0] == 1:
@@ -498,6 +527,8 @@ class LFSConnection:
                 else:
                     send_speed_button('^7', 'mph', self.own_vehicle.speed * 0.621371)
                 send_rpm_button('^7', self.own_vehicle.rpm)
+            send_extra_info_button()
+            send_notifications()
 
     def timers_decr(self):
         for i in range(len(self.timers)):
@@ -615,6 +646,20 @@ class LFSConnection:
             if self.front_beep == 0 and self.rear_beep == 0:
                 self.beep_thread_started = False
 
+        def start_boardcomputer():
+            if self.own_vehicle.fuel > self.boardcomputer.percent_fuel_at_reset:
+                self.boardcomputer.reset()
+            self.boardcomputer.update()
+
+        def check_notifications():
+            if self.notifications:
+                self.notifications[0][1] -= 0.2
+                if self.notifications[0][1] <= 0:
+                    self.del_button(7)
+                    self.del_button(8)
+                    self.del_button(9)
+                    del self.notifications[0]
+
         if self.settings.forward_collision_warning:
             start_collision_warning()
 
@@ -642,9 +687,13 @@ class LFSConnection:
             ParkDistanceControl.del_pdc_buttons(self)
 
         if self.settings.bc != "none":
-            self.boardcomputer.update()
+            start_boardcomputer()
+
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()
+
+        if self.notifications:
+            check_notifications()
 
     def get_relevant_cars(self):
         """
