@@ -13,6 +13,7 @@ import Menu
 import ParkDistanceControl
 import SideCollisionPrevention
 import Sounds
+import Tips
 import Version
 import pyinsim
 import wheel
@@ -96,7 +97,9 @@ class LFSConnection:
         self.update_available = Version.get_current_version(self.version)
         self.holding_brake = False
         self.lang = self.settings.language
-
+        self.brake_intervention_was_active = True
+        # TODO Reset all axis on restart
+        # TODO PSC needs to check if accelerator is pressed
         self.blindspot_l = False
         self.blindspot_r = False
         self.sidecollision_r = False
@@ -106,6 +109,8 @@ class LFSConnection:
         self.rear_beep = 0
         self.beep_thread_started = False
         self.notifications = []
+
+        self.last_tip_time = time.perf_counter()
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -370,6 +375,12 @@ class LFSConnection:
             elif self.current_menu == 3:  # Parking Menu
                 if btc.ClickID == 22:
                     self.settings.park_distance_control = not self.settings.park_distance_control
+                    if not self.settings.park_distance_control:
+                        self.settings.visual_parking_aid = False
+                        self.settings.audible_parking_aid = False
+                    else:
+                        self.settings.visual_parking_aid = True
+                        self.settings.audible_parking_aid = True
                 elif btc.ClickID == 23:
                     self.settings.park_emergency_brake = not self.settings.park_emergency_brake
                 elif btc.ClickID == 24:
@@ -579,6 +590,7 @@ class LFSConnection:
         self.get_relevant_cars()
 
         def brake_emergency():
+            self.brake_intervention_was_active = True
             if self.settings.automatic_emergency_braking:
                 if self.own_vehicle.control_mode == 2:
                     self.wheel_support.use_wheel_collision_warning(self)
@@ -588,10 +600,13 @@ class LFSConnection:
                     self.keyboard_support.use_mouse_collision_warning(self)
 
         def release_brake():
-            if self.own_vehicle.control_mode == 2:
-                self.wheel_support.use_wheel_stop(self)
-            elif self.own_vehicle.control_mode == 1:
-                self.keyboard_support.release_brake(self)
+            if self.brake_intervention_was_active:
+                if self.own_vehicle.control_mode == 2:
+                    self.wheel_support.use_wheel_stop(self)
+                elif self.own_vehicle.control_mode == 1:
+                    self.keyboard_support.release_brake(self)
+                self.brake_intervention_was_active = False
+
             # TODO ADD MOUSE SUPPORT and fix keyboard braking issue
 
         def start_collision_warning():
@@ -727,6 +742,11 @@ class LFSConnection:
 
         if self.notifications:
             check_notifications()
+
+        if self.last_tip_time < time.perf_counter() - 10:
+            self.last_tip_time = time.perf_counter()
+            tip = Tips.get_tip(self.settings.language)
+            self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
 
     def get_relevant_cars(self):
         """

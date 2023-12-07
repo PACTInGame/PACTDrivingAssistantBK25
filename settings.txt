@@ -18,9 +18,9 @@ on <-- stability control
 1920x1080 <-- Monitor resolution
 1 <-- warning sound (change in menu, when program is active)
 range <-- Trip-computer mode
-imperial <-- unit
+metric <-- unit
 -3 <-- HUD height offset
-0 <-- HUD width offset
+-2 <-- HUD width offset
 on <-- automatic indicator turnoff
 on <-- park emergency brake
 en <-- language
