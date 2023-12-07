@@ -51,6 +51,8 @@ class Language:
                 'left': 'left',
                 'right': 'right',
                 'Audible_Parking_Aid': f'{"^2" if self.game_obj.settings.audible_parking_aid else "^1"}Audible Parking Aid',
+                'Emergency_Brake': f'{"^2" if self.game_obj.settings.automatic_emergency_braking else "^1"}Braking Intervention',
+                'Emergency_Brake_Setting': f'^7{"Warn and Brake" if self.game_obj.settings.automatic_emergency_braking else "Warn only"}',
 
             },
             'de': {
@@ -98,6 +100,8 @@ class Language:
                 'left': 'links',
                 'right': 'rechts',
                 'Audible_Parking_Aid': f'{"^2" if self.game_obj.settings.audible_parking_aid else "^1"}Akustische Parkhilfe',
+                'Emergency_Brake': f'{"^2" if self.game_obj.settings.automatic_emergency_braking else "^1"}Bremseingriff',
+                'Emergency_Brake_Setting': f'^7{"Warnung und Bremsung" if self.game_obj.settings.automatic_emergency_braking else "Nur Warnung"}',
                 # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },
             'fr': {

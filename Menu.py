@@ -13,16 +13,17 @@ def open_menu(game_object):
     game_object.del_button(100)
 
     game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "Menu"))
-    game_object.send_button(22, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
-                            game_object.language.translation(lang, "Driving"))
-    game_object.send_button(23, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 0, 20, 5,
-                            game_object.language.translation(lang, "Parking"))
-    game_object.send_button(24, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 15, 0, 20, 5,
-                            game_object.language.translation(lang, "Bus_Sim"))
-    game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
-                            game_object.language.translation(lang, "Language"))
-    game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+    game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
                             game_object.language.translation(lang, "General"))
+    game_object.send_button(22, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 0, 20, 5,
+                            game_object.language.translation(lang, "Driving"))
+    game_object.send_button(23, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 15, 0, 20, 5,
+                            game_object.language.translation(lang, "Parking"))
+    game_object.send_button(24, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
+                            game_object.language.translation(lang, "Bus_Sim"))
+    game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+                            game_object.language.translation(lang, "Language"))
+
     game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
@@ -91,7 +92,11 @@ def open_drive_menu(game_object):
     top = 80
     for i in range(21, 41):
         game_object.del_button(i)
-    game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "Driving"))
+    game_object.send_button(21, pyinsim.ISB_DARK, top-5, 0, 20, 5, game_object.language.translation(lang, "Driving"))
+    game_object.send_button(31, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top, 0, 20, 5,
+                            game_object.language.translation(lang, "Emergency_Brake"))
+    game_object.send_button(32, pyinsim.ISB_LIGHT, top, 20, 20, 5,
+                            game_object.language.translation(lang, "Emergency_Brake_Setting"))
     game_object.send_button(22, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
                             game_object.language.translation(lang, "Forward_Collision_Warning"))
     game_object.send_button(29, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 20, 10, 5,

@@ -360,6 +360,8 @@ class LFSConnection:
                     self.settings.collision_warning_distance = (self.settings.collision_warning_distance + 1) % 3
                 elif btc.ClickID == 30:
                     self.settings.automatic_gearbox = not self.settings.automatic_gearbox
+                elif btc.ClickID == 31:
+                    self.settings.automatic_emergency_braking = not self.settings.automatic_emergency_braking
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
@@ -577,19 +579,20 @@ class LFSConnection:
         self.get_relevant_cars()
 
         def brake_emergency():
-            if self.own_vehicle.control_mode == 2:
-                self.wheel_support.use_wheel_collision_warning(self)
-            elif self.own_vehicle.control_mode == 1:
-                self.keyboard_support.use_keyboard_collision_warning(self)
-            elif self.own_vehicle.control_mode == 0:
-                self.keyboard_support.use_mouse_collision_warning(self)
+            if self.settings.automatic_emergency_braking:
+                if self.own_vehicle.control_mode == 2:
+                    self.wheel_support.use_wheel_collision_warning(self)
+                elif self.own_vehicle.control_mode == 1:
+                    self.keyboard_support.use_keyboard_collision_warning(self)
+                elif self.own_vehicle.control_mode == 0:
+                    self.keyboard_support.use_mouse_collision_warning(self)
 
         def release_brake():
             if self.own_vehicle.control_mode == 2:
                 self.wheel_support.use_wheel_stop(self)
             elif self.own_vehicle.control_mode == 1:
                 self.keyboard_support.release_brake(self)
-            # TODO ADD MOUSE SUPPORT
+            # TODO ADD MOUSE SUPPORT and fix keyboard braking issue
 
         def start_collision_warning():
             if 12 < self.own_vehicle.speed or (

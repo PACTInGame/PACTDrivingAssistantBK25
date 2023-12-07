@@ -9,7 +9,6 @@ class Setting:
     def __init__(self, game_obj):
         self.game_obj = game_obj
 
-        self.side_collision_prevention = True
 
         self.bus_simulation = True
         self.bus_door_sound = True
@@ -50,6 +49,7 @@ class Setting:
         self.language = set_def[23]
         self.audible_parking_aid = set_def[24]
         self.visual_parking_aid = set_def[25]
+        self.side_collision_prevention = set_def[26]
 
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]
