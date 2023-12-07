@@ -40,8 +40,26 @@ def open_general_menu(game_object):
                             game_object.language.translation(lang, "Metric")
                             if game_object.settings.unit == "metric"
                             else game_object.language.translation(lang, "Imperial"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 0, 20, 5,
-                            game_object.language.translation(lang, "Close"))
+    game_object.send_button(24, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 0, 20, 5,
+                            game_object.language.translation(lang, "HUD"))
+    game_object.send_button(27, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 20, 5, 5,
+                            game_object.language.translation(lang, "up"))
+    game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 25, 5, 5,
+                            game_object.language.translation(lang, "down"))
+    game_object.send_button(29, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 30, 5, 5,
+                            game_object.language.translation(lang, "left"))
+    game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 35, 5, 5,
+                            game_object.language.translation(lang, "right"))
+    game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 15, 0, 20, 5,
+                            game_object.language.translation(lang, "Board_computer"))
+    game_object.send_button(26, pyinsim.ISB_LIGHT, top + 15, 20, 10, 5,
+                            game_object.language.translation(lang, "Range")
+                            if game_object.settings.bc == "range"
+                            else game_object.language.translation(lang, "Distance")
+                            if game_object.settings.bc == "distance"
+                            else game_object.language.translation(lang, "off"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
+    game_object.language.translation(lang, "Close"))
 
 
 def open_bus_menu(game_object):
@@ -109,7 +127,9 @@ def open_park_menu(game_object):
                             game_object.language.translation(lang, "Parking_Emergency_Brake"))
     game_object.send_button(24, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 15, 0, 20, 5,
                             game_object.language.translation(lang, "Visual_Parking_Aid"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
+    game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
+                            game_object.language.translation(lang, "Audible_Parking_Aid"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 

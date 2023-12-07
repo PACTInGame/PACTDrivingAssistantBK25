@@ -32,8 +32,8 @@ class Language:
                 'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Cross Traffic Warning',
                 'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Stability Control',
                 'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Light Assist',
-                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Automatic Indicator Turnoff',
-                'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.parking_emergency_brake else "^1"}Parking Emergency Brake',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.automatic_indicator_turnoff else "^1"}Automatic Indicator Turnoff',
+                'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.park_emergency_brake else "^1"}Parking Emergency Brake',
                 'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Park Distance Control',
                 'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visual Parking Aid',
                 'Gearbox': f'{"^2" if self.game_obj.settings.automatic_gearbox else "^1"}Automatic Gearbox',
@@ -41,7 +41,16 @@ class Language:
                 'Units': 'Units',
                 'Metric': 'Metric',
                 'Imperial': 'Imperial',
-
+                'HUD': f'{"^2" if self.game_obj.settings.head_up_display else "^1"}Head-Up Display',
+                'Board_computer': f'{"^2" if self.game_obj.settings.bc else "^1"}Board Computer',
+                'Range': 'Range',
+                'Distance': 'Distance',
+                'off': 'off',
+                'up': 'up',
+                'down': 'down',
+                'left': 'left',
+                'right': 'right',
+                'Audible_Parking_Aid': f'{"^2" if self.game_obj.settings.audible_parking_aid else "^1"}Audible Parking Aid',
 
             },
             'de': {
@@ -70,8 +79,8 @@ class Language:
                 'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Querverkehrswarnung',
                 'PSC': (b"^2" if self.game_obj.settings.PSC else b"^1")+b"Stabilit\xe4tskontrolle",
                 'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Lichtassistent',
-                'Automatic_Indicator_Turnoff': (b"^2" if self.game_obj.settings.indicator_turnoff else b"^1")+b"Autom. deaktivi. Blinker",
-                'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.parking_emergency_brake else "^1"}Parknotbremsung',
+                'Automatic_Indicator_Turnoff': (b"^2" if self.game_obj.settings.automatic_indicator_turnoff else b"^1")+b"Autom. deaktivi. Blinker",
+                'Parking_Emergency_Brake': f'{"^2" if self.game_obj.settings.park_emergency_brake else "^1"}Parknotbremsung',
                 'Park_Distance_Control': f'{"^2" if self.game_obj.settings.park_distance_control else "^1"}Parkabstandskontrolle',
                 'Visual_Parking_Aid': f'{"^2" if self.game_obj.settings.visual_parking_aid else "^1"}Visuelle Parkhilfe',
                 'Gearbox': f'{"^2" if self.game_obj.settings.automatic_gearbox else "^1"}Automatikgetriebe',
@@ -79,6 +88,16 @@ class Language:
                 'Units': 'Einheiten',
                 'Metric': 'Metrisch',
                 'Imperial': 'Imperial',
+                'HUD': f'{"^2" if self.game_obj.settings.head_up_display else "^1"}Head-Up Display',
+                'Board_computer': f'{"^2" if self.game_obj.settings.bc else "^1"}Bordcomputer',
+                'Range': 'Reichweite',
+                'Distance': 'Distanz',
+                'off': 'aus',
+                'up': 'hoch',
+                'down': 'runter',
+                'left': 'links',
+                'right': 'rechts',
+                'Audible_Parking_Aid': f'{"^2" if self.game_obj.settings.audible_parking_aid else "^1"}Akustische Parkhilfe',
                 # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },
             'fr': {
@@ -105,7 +124,7 @@ class Language:
                 'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Avertissement de circulation transversale',
                 'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Contr\xf4le de stabilit\xe9',
                 'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Assistance lumineuse',
-                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Extinction automatique des indicateurs',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.automatic_indicator_turnoff else "^1"}Extinction automatique des indicateurs',
 
 
             },
@@ -133,7 +152,7 @@ class Language:
                 'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Advertencia de tr\xe1fico cruzado',
                 'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Control de estabilidad',
                 'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Asistencia de luz',
-                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Apagado autom\xe1tico del indicador',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.automatic_indicator_turnoff else "^1"}Apagado autom\xe1tico del indicador',
 
 
             },
@@ -161,7 +180,7 @@ class Language:
                 'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Avviso di traffico incrociato',
                 'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Controllo di stabilit\xe0',
                 'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}Assistente di luce',
-                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Spegnimento automatico dell\'indicatore',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.automatic_indicator_turnoff else "^1"}Spegnimento automatico dell\'indicatore',
 
             },
             'tr': {
@@ -188,7 +207,7 @@ class Language:
                 'Cross_Traffic_Warning': f'{"^2" if self.game_obj.settings.cross_traffic_warning else "^1"}Trafik uyar\xfds\xfd',
                 'PSC': f'{"^2" if self.game_obj.settings.PSC else "^1"}Stabilite kontrol\xfc',
                 'Light_Assist': f'{"^2" if self.game_obj.settings.light_assist else "^1"}I\xfe\xfdk asistan\xfd',
-                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.indicator_turnoff else "^1"}Otomatik sinyal iptali',
+                'Automatic_Indicator_Turnoff': f'{"^2" if self.game_obj.settings.automatic_indicator_turnoff else "^1"}Otomatik sinyal iptali',
 
             },
         }

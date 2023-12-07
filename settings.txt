@@ -1,6 +1,6 @@
 Important: Only change the letter in the at the beginning. Do not rearrange this layout. 
 Assistance-Default-Settings ("on", or "off". Space necessary between setting and "<--"):
-off <-- Head-up display
+on <-- Head-up display
 on <-- Forward collision warning
 on <-- Blind spot warning
 on <-- Cross traffic warning
@@ -11,15 +11,18 @@ off <-- Lane assist
 off <-- Cop aid system
 off <-- Automatic Emergency Braking
 1 <-- Collision Warning Distance (early, medium, late)
-on <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
+off <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
 early <-- Lane departure warning intensity (early, normal, reduced)
 off <-- Head-up display with images
 on <-- stability control
 1920x1080 <-- Monitor resolution
 1 <-- warning sound (change in menu, when program is active)
-off <-- Trip-computer mode
+distance <-- Trip-computer mode
 metric <-- unit
-0 <-- HUD height offset
-0 <-- HUD width offset
+-3 <-- HUD height offset
+-6 <-- HUD width offset
 off <-- automatic indicator turnoff
-off <-- park emergency brake
+on <-- park emergency brake
+de <-- language
+on <-- audible parking aid
+on <-- visual parking aid

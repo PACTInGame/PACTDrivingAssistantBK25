@@ -9,7 +9,6 @@ class Setting:
     def __init__(self, game_obj):
         self.game_obj = game_obj
 
-        self.indicator_turnoff = True
         self.side_collision_prevention = True
 
         self.bus_simulation = True
@@ -18,10 +17,6 @@ class Setting:
         self.bus_announce_sound = True
         self.bus_sound_effects = True
         self.bus_offline_sim = False
-        self.language = 'de'
-
-        self.parking_emergency_brake = True
-        self.visual_parking_aid = True
 
 
 
@@ -52,6 +47,9 @@ class Setting:
         self.offset_w = set_def[20]
         self.automatic_indicator_turnoff = set_def[21]
         self.park_emergency_brake = set_def[22]
+        self.language = set_def[23]
+        self.audible_parking_aid = set_def[24]
+        self.visual_parking_aid = set_def[25]
 
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]

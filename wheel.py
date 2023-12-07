@@ -12,19 +12,27 @@ class WheelSupport:
         self.accelerator = 1000
         self.brake = 1000
         self.steer = 0
+        try:
+            vj.open()
+            vj.close()
+            self.vjoy_available = True
+        except:
+            self.vjoy_available = False
 
     def use(self):
-        vj.open()
+        if self.vjoy_available:
+            vj.open()
 
-        # valueX(brake), valueY(throttle) between -1000 and 1000, 1000 = 0%, -1000 = 100%
-        # scale between 0 and 16000
+            # valueX(brake), valueY(throttle) between -1000 and 1000, 1000 = 0%, -1000 = 100%
+            # scale between 0 and 16000
 
-        scale = 16.39
-        xPos = self.accelerator + 23
-        yPos = self.brake + 23
-        zPos = self.steer + 23
-        setJoy(xPos, yPos, zPos, scale)
-        vj.close()
+            scale = 16.39
+            xPos = self.accelerator + 23
+            yPos = self.brake + 23
+            zPos = self.steer + 23
+            setJoy(xPos, yPos, zPos, scale)
+            vj.close()
+
 
     def use_wheel_collision_warning(self, game_obj):
         self.brake = -1000

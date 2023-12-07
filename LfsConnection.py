@@ -355,7 +355,7 @@ class LFSConnection:
                 elif btc.ClickID == 27:
                     self.settings.light_assist = not self.settings.light_assist
                 elif btc.ClickID == 28:
-                    self.settings.indicator_turnoff = not self.settings.indicator_turnoff
+                    self.settings.automatic_indicator_turnoff = not self.settings.automatic_indicator_turnoff
                 elif btc.ClickID == 29:
                     self.settings.collision_warning_distance = (self.settings.collision_warning_distance + 1) % 3
                 elif btc.ClickID == 30:
@@ -369,9 +369,11 @@ class LFSConnection:
                 if btc.ClickID == 22:
                     self.settings.park_distance_control = not self.settings.park_distance_control
                 elif btc.ClickID == 23:
-                    self.settings.parking_emergency_brake = not self.settings.parking_emergency_brake
+                    self.settings.park_emergency_brake = not self.settings.park_emergency_brake
                 elif btc.ClickID == 24:
                     self.settings.visual_parking_aid = not self.settings.visual_parking_aid
+                elif btc.ClickID == 25:
+                    self.settings.audible_parking_aid = not self.settings.audible_parking_aid
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
@@ -396,6 +398,18 @@ class LFSConnection:
             elif self.current_menu == 5:  # General Menu
                 if btc.ClickID == 22:
                     self.settings.unit = "metric" if self.settings.unit == "imperial" else "imperial"
+                elif btc.ClickID == 24:
+                    self.settings.head_up_display = not self.settings.head_up_display
+                elif btc.ClickID == 25:
+                    self.settings.bc = "range" if self.settings.bc == "off" else "distance" if self.settings.bc == "range" else "off"
+                elif btc.ClickID == 27:
+                    self.settings.offset_w -= 1
+                elif btc.ClickID == 28:
+                    self.settings.offset_w += 1
+                elif btc.ClickID == 29:
+                    self.settings.offset_h -= 1
+                elif btc.ClickID == 30:
+                    self.settings.offset_h += 1
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
@@ -468,12 +482,23 @@ class LFSConnection:
             self.send_button(2, pyinsim.ISB_DARK, 119 + x, 103 + y, 13, 8, f'{color_code}%.1f RPM' % (rpm / 1000))
 
         def send_extra_info_button():
-            range_k = self.boardcomputer.range_km
-            color = "^7" if range_k > 20 else "^3" if range_k > 5 else "^1"
             unit = "km" if self.settings.unit == "metric" else "mi"
-            if unit == "mi":
-                range_k = range_k * 0.621371
-            self.send_button(6, pyinsim.ISB_DARK, 113 + x, 90 + y, 13, 6, f"{color}{round(range_k) if range_k > 0  else '---'} {unit}")
+
+            if self.settings.bc == "range":
+                range_k = self.boardcomputer.range_km
+                color = "^7" if range_k > 20 else "^3" if range_k > 5 else "^1"
+                if unit == "mi":
+                    range_k = range_k * 0.621371
+                self.send_button(6, pyinsim.ISB_DARK, 113 + x, 90 + y, 13, 6,
+                                 f"{color}{round(range_k) if range_k > 0 else '---'} {unit}")
+            elif self.settings.bc == "distance":
+                distance = self.boardcomputer.distance_driven_meters / 1000
+                if unit == "mi":
+                    distance = distance * 0.621371
+                self.send_button(6, pyinsim.ISB_DARK, 113 + x, 90 + y, 13, 6,
+                                 f"^7{round(distance) if distance > 0 else '0'} {unit}")
+            else:
+                self.del_button(6)
 
         def send_warning_button(intensity):
             self.send_button(1, 32 if intensity < 3 else 16, 119 + x, 90 + y, 13, 8, '^1<< ---')
@@ -529,6 +554,9 @@ class LFSConnection:
                 send_rpm_button('^7', self.own_vehicle.rpm)
             send_extra_info_button()
             send_notifications()
+        else:
+            for i in range(1, 10):
+                self.del_button(i)
 
     def timers_decr(self):
         for i in range(len(self.timers)):
@@ -639,12 +667,14 @@ class LFSConnection:
         def start_park_assistance():
             sensors = ParkDistanceControl.sensors(self)
             ParkDistanceControl.draw_pdc_buttons(self, sensors)
-            if not self.beep_thread_started and (self.front_beep > 0 or self.rear_beep > 0):
-                self.beep_thread_started = True
-                park_beep_thread = Thread(target=ParkDistanceControl.beep(self))
-                park_beep_thread.start()
-            if self.front_beep == 0 and self.rear_beep == 0:
-                self.beep_thread_started = False
+
+            if self.settings.audible_parking_aid:
+                if not self.beep_thread_started and (self.front_beep > 0 or self.rear_beep > 0):
+                    self.beep_thread_started = True
+                    park_beep_thread = Thread(target=ParkDistanceControl.beep(self))
+                    park_beep_thread.start()
+                if self.front_beep == 0 and self.rear_beep == 0:
+                    self.beep_thread_started = False
 
         def start_boardcomputer():
             if self.own_vehicle.fuel > self.boardcomputer.percent_fuel_at_reset:

@@ -91,8 +91,8 @@ def create_rectangles_for_others(cars):
 
 def draw_pdc_buttons(game_obj, sensors):
     # Num 48-54
-    x = game_obj.settings.offset_h
-    y = game_obj.settings.offset_w
+    x = game_obj.settings.offset_w
+    y = game_obj.settings.offset_h
     c1 = b"^7"
     c2 = b"^7"
     c3 = b"^7"
@@ -174,22 +174,23 @@ def draw_pdc_buttons(game_obj, sensors):
             elif sensor[0] == 0:
                 c6 = b"^1"
                 front_beep = 3 if front_beep < 3 else front_beep
-    game_obj.send_button(48, pyinsim.ISB_LMB, 110 + x, 120 + y, 5, 5, c6 + b'^J\x84\xac')
-    game_obj.send_button(49, pyinsim.ISB_LMB, 110 + x, 123 + y, 5, 5, c1 + b'^J\x84\xaa')
-    game_obj.send_button(50, pyinsim.ISB_LMB, 110 + x, 126 + y, 5, 5, c2 + b'^J\x84\xad')
-    game_obj.send_button(51, pyinsim.ISB_LMB, 125 + x, 120 + y, 5, 5, c5 + b'^J\x84\xaf')
-    game_obj.send_button(52, pyinsim.ISB_LMB, 125 + x, 123 + y, 5, 5, c4 + b'^J\x84\xaa')
-    game_obj.send_button(53, pyinsim.ISB_LMB, 125 + x, 126 + y, 5, 5, c3 + b'^J\x84\xae')
-    game_obj.send_button(54, pyinsim.ISB_LMB, 117 + x, 120 + y, 11, 5, b'^J\x81\xe1P\x81\xe2')
+    if game_obj.settings.visual_parking_aid:
+        game_obj.send_button(48, pyinsim.ISB_LMB, 110 + x, 120 + y, 5, 5, c6 + b'^J\x84\xac')
+        game_obj.send_button(49, pyinsim.ISB_LMB, 110 + x, 123 + y, 5, 5, c1 + b'^J\x84\xaa')
+        game_obj.send_button(50, pyinsim.ISB_LMB, 110 + x, 126 + y, 5, 5, c2 + b'^J\x84\xad')
+        game_obj.send_button(51, pyinsim.ISB_LMB, 125 + x, 120 + y, 5, 5, c5 + b'^J\x84\xaf')
+        game_obj.send_button(52, pyinsim.ISB_LMB, 125 + x, 123 + y, 5, 5, c4 + b'^J\x84\xaa')
+        game_obj.send_button(53, pyinsim.ISB_LMB, 125 + x, 126 + y, 5, 5, c3 + b'^J\x84\xae')
+        game_obj.send_button(54, pyinsim.ISB_LMB, 117 + x, 120 + y, 11, 5, b'^J\x81\xe1P\x81\xe2')
+    else:
+        del_pdc_buttons(game_obj)
     game_obj.front_beep = front_beep
     game_obj.rear_beep = rear_beep
 
 
 def beep(game_obj):
     timer = time.perf_counter()
-    print("started")
-    while not (game_obj.front_beep == 0 and game_obj.rear_beep == 0):
-        print(game_obj.rear_beep)
+    while not (game_obj.front_beep == 0 and game_obj.rear_beep == 0) and game_obj.settings.audible_parking_aid:
         if game_obj.front_beep == 1:
             if timer < time.perf_counter() - 0.6:
                 Sounds.pdc_front()

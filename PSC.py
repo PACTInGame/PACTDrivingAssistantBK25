@@ -30,9 +30,9 @@ class PSC:
         x = self.game_object.settings.offset_w
         y = self.game_object.settings.offset_h
         override = False
-        if abs(ang_of_car) > self.oversteer_threshold and self.speed > 10:
+        if abs(ang_of_car) > self.oversteer_threshold and self.speed > 10 and self.game_object.own_vehicle.gear > 0:
             self.sent_slip = True
-            self.game_object.send_button(41, pyinsim.ISB_DARK, 114 + x, 100 + y, 5, 5, "^3SLIP")
+            self.game_object.send_button(41, pyinsim.ISB_DARK, 113 + x, 103 + y, 13, 6, "^3SLIP")
             max_throttle = -1000 + (abs(ang_of_car) - self.oversteer_threshold) * self.sensitivity
             own_throttle = self.game_object.own_vehicle.throttle * -2000 + 1000
             if own_throttle < max_throttle:

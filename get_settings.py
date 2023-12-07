@@ -1,6 +1,6 @@
 def get_settings_from_file():
     change_set = ["^2", "^2", "^2", "^2", "^2", "^2", "^2", "^2", "^2", "^2", "medium", "^2", "normal", "^2", "^1",
-                  "1920x1080", "0", "avg", "metric", "0", "0", "^2", "^2"]
+                  "1920x1080", "0", "avg", "metric", "0", "0", "^2", "^2", "de", "^2", "^2"]
     try:
         with open("settings.txt") as fp:
             for i, line in enumerate(fp):
@@ -61,10 +61,22 @@ def get_settings_from_file():
                     else:
                         change_set[i - 2] = False
 
+                if i == 25:
+                    line = line.split()
+                    change_set[i - 2] = str(line[0])
+
+                if i == 26 or i == 27:
+                    line = line.split()
+                    if str(line[0]) == "on":
+                        change_set[i - 2] = True
+                    else:
+                        change_set[i - 2] = False
+
         print("Settings loaded successfully")
         return change_set
 
-    except:
+    except Exception as e:
+        print(e)
         print("Error loading settings. Make sure settings.txt exists in Folder.")
 
 
@@ -136,29 +148,35 @@ def write_settings(game_obj):
                   "{} <-- HUD height offset\n" \
                   "{} <-- HUD width offset\n" \
                   "{} <-- automatic indicator turnoff\n" \
-                  "{} <-- park emergency brake".format(settings.head_up_display,
-                                                       settings.forward_collision_warning,
-                                                       settings.blind_spot_warning,
-                                                       settings.cross_traffic_warning,
-                                                       settings.light_assist,
-                                                       settings.park_distance_control,
-                                                       settings.emergency_assist,
-                                                       settings.lane_assist,
-                                                       settings.cop_aid_system,
-                                                       settings.automatic_emergency_braking,
-                                                       settings.collision_warning_distance,
-                                                       settings.automatic_gearbox,
-                                                       settings.lane_dep_intensity,
-                                                       settings.image_hud,
-                                                       settings.PSC,
-                                                       settings.resolution,
-                                                       settings.collision_warning_sound,
-                                                       settings.bc,
-                                                       settings.unit,
-                                                       settings.offset_h,
-                                                       settings.offset_w,
-                                                       settings.automatic_indicator_turnoff,
-                                                       settings.park_emergency_brake)
+                  "{} <-- park emergency brake\n" \
+                  "{} <-- language\n" \
+                  "{} <-- audible parking aid\n" \
+                  "{} <-- visual parking aid".format(settings.head_up_display,
+                                                     settings.forward_collision_warning,
+                                                     settings.blind_spot_warning,
+                                                     settings.cross_traffic_warning,
+                                                     settings.light_assist,
+                                                     settings.park_distance_control,
+                                                     settings.emergency_assist,
+                                                     settings.lane_assist,
+                                                     settings.cop_aid_system,
+                                                     settings.automatic_emergency_braking,
+                                                     settings.collision_warning_distance,
+                                                     settings.automatic_gearbox,
+                                                     settings.lane_dep_intensity,
+                                                     settings.image_hud,
+                                                     settings.PSC,
+                                                     settings.resolution,
+                                                     settings.collision_warning_sound,
+                                                     settings.bc,
+                                                     settings.unit,
+                                                     settings.offset_h,
+                                                     settings.offset_w,
+                                                     settings.automatic_indicator_turnoff,
+                                                     settings.park_emergency_brake,
+                                                     settings.language,
+                                                     settings.audible_parking_aid,
+                                                     settings.visual_parking_aid)
 
     file_string = file_string.replace("True", "on")
     file_string = file_string.replace("False", "off")
