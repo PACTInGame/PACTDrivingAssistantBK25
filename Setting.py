@@ -64,7 +64,7 @@ class Setting:
         self.BRAKE_KEY = cont_def[7]
         self.ACC_KEY = cont_def[8]
         self.HANDBRAKE_KEY = cont_def[9]
-        self.controller_throttle, self.controller_brake, self.num_joystick = get_settings.get_acc_settings_from_file()
+        self.controller_throttle, self.controller_brake, self.controller_steer, self.num_joystick = get_settings.get_acc_settings_from_file()
 
     def change_language(self):
         languages = ['en', 'de', 'fr', 'es', 'it', 'tr']

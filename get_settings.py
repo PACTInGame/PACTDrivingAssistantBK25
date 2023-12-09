@@ -83,6 +83,7 @@ def get_settings_from_file():
 def get_acc_settings_from_file():
     throttle = -1
     brake = -1
+    steer = -1
     joy = -1
     try:
         with open("acc_settings.txt") as fp:
@@ -96,11 +97,14 @@ def get_acc_settings_from_file():
                 if i == 3:
                     line = line.split()
                     joy = int(line[0])
+                if i == 4:
+                    line = line.split()
+                    steer = int(line[0])
         if throttle != -1 and brake != -1:
             print("ACC settings loaded successfully")
         else:
             print("ACC not set up yet. ACC unavailable.")
-        return throttle, brake, joy
+        return throttle, brake, steer, joy
 
     except:
         print("Error loading ACC settings. ACC unavailable settings.txt exists in Folder.")

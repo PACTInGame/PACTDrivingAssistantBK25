@@ -6,18 +6,19 @@ import Boardcomputer
 import Calculations
 import CarDataBase
 import CrossTrafficWarning
+import ExeRunningChecker
 import ForwardCollisionWarning
 import Gearbox
+import GetControllerInput
 import KeyboardMouseEmulator
 import Menu
 import ParkDistanceControl
-import SideCollisionPrevention
 import Sounds
 import Tips
 import Version
 import pyinsim
 import wheel
-from BlindSpotWarning import check_blindspots, check_blindspots_ref
+from BlindSpotWarning import check_blindspots_ref
 from BusHQ import BusHQ
 from BusSimulation import BusSimulation
 from Language import Language
@@ -44,6 +45,10 @@ class LFSConnection:
         The LFSConnection class is the main class of the program. It contains all the objects for the different
         functionalities of the program. It also connects to the LFS insim port.
         """
+        while not ExeRunningChecker.is_lfs_running():
+            print("Waiting for LFS to start.")
+            time.sleep(3)
+
         self.version = "0.0.0"
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
@@ -64,6 +69,7 @@ class LFSConnection:
         self.boardcomputer = Boardcomputer.Boardcomputer(self)
         self.boardcomputer.reset()
         self.keyboard_support = KeyboardMouseEmulator
+        self.controller_inputs = GetControllerInput.ControllerInput(self)
 
         self.outgauge = None
         self.outsim = None
@@ -111,6 +117,7 @@ class LFSConnection:
         self.notifications = []
 
         self.last_tip_time = time.perf_counter()
+
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -211,7 +218,12 @@ class LFSConnection:
         """
 
         def start_game_insim():
+            print("Game started")
             self.on_track = True
+            get_inputs_thread = Thread(target=self.controller_inputs.check_controller_input)
+            get_inputs_thread.start()
+            insim.send(pyinsim.ISP_MST,
+                       Msg=b"/axis %.1i steer" % self.settings.STEER_AXIS)
             self.in_pits = False
             if time.time() - self.time_menu_open >= 30:
                 self.start_outgauge()

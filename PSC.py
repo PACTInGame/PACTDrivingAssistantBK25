@@ -35,7 +35,7 @@ class PSC:
             if self.game_object.settings.head_up_display:
                 self.game_object.send_button(41, pyinsim.ISB_DARK, 113 + x, 103 + y, 13, 6, "^3SLIP")
             max_throttle = -1000 + (abs(ang_of_car) - self.oversteer_threshold) * self.sensitivity
-            own_throttle = self.game_object.own_vehicle.throttle * -2000 + 1000
+            own_throttle = self.game_object.controller_inputs.accelerator * -2000 + 1000
             if own_throttle < max_throttle:
                 override = True
             if override and not self.game_object.collision_warning_intensity > 2:
@@ -45,6 +45,7 @@ class PSC:
                 self.game_object.wheel_support.use_wheel_stop(self.game_object)
         elif self.sent_slip:
             self.sent_slip = False
+            self.game_object.wheel_support.use_wheel_stop(self.game_object)
             self.game_object.del_button(41)
 
     def circular_difference(self, a, b, max_value=65536):
