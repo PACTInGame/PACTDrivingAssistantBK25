@@ -20,6 +20,7 @@ class Boardcomputer:
         self.range_km = -1
 
     def update(self):
+        # TODO Sometimes wrong after race restart
         fuel = self.game_obj.own_vehicle.fuel
         add_distance = self.game_obj.own_vehicle.speed / 3.6 / 5
         self.distance_driven_meters += add_distance
@@ -27,7 +28,7 @@ class Boardcomputer:
         self.percent_fuel_burned_since_reset = abs(self.percent_fuel_at_reset - fuel)
         if self.distance_since_reset > 200:  # TODO increase to 1000 for release
             fuel_percent_per_km = self.percent_fuel_burned_since_reset / self.distance_since_reset * 1000
-            self.range_km = fuel / fuel_percent_per_km
+            self.range_km = fuel / fuel_percent_per_km if fuel_percent_per_km > 0 else -1
 
         if self.percent_fuel_at_reset < fuel or self.percent_fuel_at_reset == 0:
             self.reset()

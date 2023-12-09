@@ -1,5 +1,6 @@
 import sys
 import time
+from multiprocessing import Process
 from threading import Thread
 
 import Boardcomputer
@@ -220,8 +221,10 @@ class LFSConnection:
         def start_game_insim():
             print("Game started")
             self.on_track = True
-            get_inputs_thread = Thread(target=self.controller_inputs.check_controller_input)
-            get_inputs_thread.start()
+            #p = Process(target=self.controller_inputs.check_controller_input)
+            #p.start()
+            #get_inputs_thread = Thread(target=self.controller_inputs.check_controller_input)
+            #get_inputs_thread.start()
             insim.send(pyinsim.ISP_MST,
                        Msg=b"/axis %.1i steer" % self.settings.STEER_AXIS)
             self.in_pits = False
@@ -727,6 +730,7 @@ class LFSConnection:
             self.gearbox.calculate_gear()
 
         if self.settings.PSC:
+            self.controller_inputs.check_controller_input()
             self.PSC.calculate_psc()
 
         if self.settings.blind_spot_warning:

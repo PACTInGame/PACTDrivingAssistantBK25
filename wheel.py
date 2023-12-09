@@ -59,8 +59,11 @@ class WheelSupport:
         game_obj.insim.send(pyinsim.ISP_MST,
                             Msg=b"/axis %.1i throttle" % game_obj.settings.VJOY_AXIS)
 
-    def use_wheel_psc(self, game_obj, accel):
+    def use_wheel_psc(self, game_obj, accel, brake):
+        self.brake = brake
         self.accelerator = accel
         self.use()
         game_obj.insim.send(pyinsim.ISP_MST,
                             Msg=b"/axis %.1i throttle" % game_obj.settings.VJOY_AXIS)
+        game_obj.insim.send(pyinsim.ISP_MST,
+                            Msg=b"/axis %.1i brake" % game_obj.settings.VJOY_AXIS1)
