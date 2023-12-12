@@ -55,7 +55,6 @@ class PSC:
                 max_throttle = 1000
         if own_throttle < max_throttle:
             oversteer = True
-            print(max_throttle, own_throttle)
         if understeer or oversteer:
             self.sent_slip = True
             if self.game_object.settings.head_up_display:

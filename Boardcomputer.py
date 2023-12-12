@@ -12,7 +12,12 @@ class Boardcomputer:
         self.last_fuel = 0
 
     def reset(self):
-        print("reset")
+        already_notified = False
+        for note in self.game_obj.notifications:
+            if "^7Trip reset." in note[0]:
+                already_notified = True
+        if not already_notified :
+            self.game_obj.notifications.append(["^7Trip reset.", 3])
         self.distance_since_reset = 0
         self.percent_fuel_burned_since_reset = 0
         self.liters_per_100km = 0

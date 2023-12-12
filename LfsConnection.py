@@ -50,10 +50,11 @@ class LFSConnection:
             print("Waiting for LFS to start.")
             time.sleep(3)
 
-        self.version = "0.0.0"
+        self.version = "0.0.1"
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
         self.running = True
+        self.notifications = []
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
@@ -114,7 +115,6 @@ class LFSConnection:
         self.front_beep = 0
         self.rear_beep = 0
         self.beep_thread_started = False
-        self.notifications = []
 
         self.last_tip_time = time.perf_counter()
 
@@ -517,7 +517,7 @@ class LFSConnection:
                 color = "^7" if range_k > 20 else "^3" if range_k > 5 else "^1"
                 if unit == "mi":
                     range_k = range_k * 0.621371
-                self.send_button(6, pyinsim.ISB_DARK, 113 + x, 90 + y, 13, 6,
+                self.send_button(6, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 113 + x, 90 + y, 13, 6,
                                  f"{color}{round(range_k) if range_k > 0 else '---'} {unit}")
             elif self.settings.bc == "distance":
                 distance = self.boardcomputer.distance_driven_meters / 1000
