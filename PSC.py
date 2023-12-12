@@ -40,6 +40,8 @@ class PSC:
         max_throttle = -1000
         min_braking = 1000
         own_throttle = self.game_object.controller_inputs.accelerator * -2000 + 1000
+        if own_throttle < -1000:
+            own_throttle = -1000
         own_braking = self.game_object.controller_inputs.brake * -2000 + 1000
         if 30 < self.speed < 110 and gear > 0:
             max_steering = self.calculate_max_steering(self.speed)
@@ -73,8 +75,7 @@ class PSC:
         if override and not self.game_object.collision_warning_intensity > 2:
             self.overridden = True
             self.game_object.wheel_support.use_wheel_psc(self.game_object, max_throttle, min_braking)
-        elif self.overridden:
-            self.game_object.wheel_support.use_wheel_stop(self.game_object)
+
 
     def circular_difference(self, a, b, max_value=65536):
         """

@@ -106,7 +106,6 @@ class LFSConnection:
         self.lang = self.settings.language
         self.brake_intervention_was_active = True
         # TODO Reset all axis on restart
-        # TODO PSC needs to check if accelerator is pressed
         self.blindspot_l = False
         self.blindspot_r = False
         self.sidecollision_r = False
@@ -118,7 +117,6 @@ class LFSConnection:
         self.notifications = []
 
         self.last_tip_time = time.perf_counter()
-
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -221,10 +219,10 @@ class LFSConnection:
         def start_game_insim():
             print("Game started")
             self.on_track = True
-            #p = Process(target=self.controller_inputs.check_controller_input)
-            #p.start()
-            #get_inputs_thread = Thread(target=self.controller_inputs.check_controller_input)
-            #get_inputs_thread.start()
+            # p = Process(target=self.controller_inputs.check_controller_input)
+            # p.start()
+            # get_inputs_thread = Thread(target=self.controller_inputs.check_controller_input)
+            # get_inputs_thread.start()
             insim.send(pyinsim.ISP_MST,
                        Msg=b"/axis %.1i steer" % self.settings.STEER_AXIS)
             self.in_pits = False
@@ -320,12 +318,14 @@ class LFSConnection:
             self.own_vehicle.player_name = remove_control_chars(npl.PName)
 
     def player_left(self, insim, pll):
-        # TODO implement
-        pass
+        for car in self.cars_on_track:
+            if car.player_id == pll.PLID:
+                self.cars_on_track.remove(car)
 
     def player_pits(self, insim, plp):
-        # TODO implement
-        pass
+        for car in self.cars_on_track:
+            if car.player_id == plp.PLID:
+                self.cars_on_track.remove(car)
 
     # Player Handling ends here -------------------------------------------------------
 

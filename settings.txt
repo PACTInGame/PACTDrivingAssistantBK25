@@ -20,7 +20,7 @@ on <-- stability control
 range <-- Trip-computer mode
 metric <-- unit
 -3 <-- HUD height offset
--2 <-- HUD width offset
+4 <-- HUD width offset
 on <-- automatic indicator turnoff
 on <-- park emergency brake
 en <-- language
