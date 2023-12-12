@@ -27,3 +27,6 @@ en <-- language
 on <-- audible parking aid
 on <-- visual parking aid
 on <-- side collision prevention
+on <-- Indicator Sounds
+on <-- Adaptive Brake Lights
+on <-- Adaptive Brake Lights Style

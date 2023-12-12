@@ -53,6 +53,9 @@ class Language:
                 'Audible_Parking_Aid': f'{"^2" if self.game_obj.settings.audible_parking_aid else "^1"}Audible Parking Aid',
                 'Emergency_Brake': f'{"^2" if self.game_obj.settings.automatic_emergency_braking else "^1"}Braking Intervention',
                 'Emergency_Brake_Setting': f'^7{"Warn and Brake" if self.game_obj.settings.automatic_emergency_braking else "Warn only"}',
+                'Indicator_Sound': f'{"^2" if self.game_obj.settings.indicator_sound else "^1"}Indicator Sounds',
+                'Adaptive_Brake_Light': f'{"^2" if self.game_obj.settings.adaptive_brake_light else "^1"}Adaptive Brake Light',
+                'Adaptive_Brake_Light_Style': f'{"^7Indicators" if self.game_obj.settings.adaptive_brake_light_style else "^7Lights"}',
 
             },
             'de': {

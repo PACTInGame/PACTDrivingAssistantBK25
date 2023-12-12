@@ -19,6 +19,7 @@ import Tips
 import Version
 import pyinsim
 import wheel
+from AdaptiveBrakeLight import AdaptiveBrakeLight
 from BlindSpotWarning import check_blindspots_ref
 from BusHQ import BusHQ
 from BusSimulation import BusSimulation
@@ -72,6 +73,7 @@ class LFSConnection:
         self.boardcomputer.reset()
         self.keyboard_support = KeyboardMouseEmulator
         self.controller_inputs = GetControllerInput.ControllerInput(self)
+        self.AdaptiveBrakeLight = AdaptiveBrakeLight(self)
 
         self.outgauge = None
         self.outsim = None
@@ -194,18 +196,19 @@ class LFSConnection:
 
     def sound_effects(self):
         if self.own_vehicle.roleplay == "civil":
-            if self.own_vehicle.indicator_right != self.indicator_right_sound:
-                self.indicator_right_sound = self.own_vehicle.indicator_right
-                if self.own_vehicle.indicator_right:
-                    Sounds.playsound_indicator_on()
-                else:
-                    Sounds.playsound_indicator_off()
-            elif self.own_vehicle.indicator_left != self.indicator_left_sound:
-                self.indicator_left_sound = self.own_vehicle.indicator_left
-                if self.own_vehicle.indicator_left:
-                    Sounds.playsound_indicator_on()
-                else:
-                    Sounds.playsound_indicator_off()
+            if self.settings.indicator_sound and not self.AdaptiveBrakeLight.braking:
+                if self.own_vehicle.indicator_right != self.indicator_right_sound:
+                    self.indicator_right_sound = self.own_vehicle.indicator_right
+                    if self.own_vehicle.indicator_right:
+                        Sounds.playsound_indicator_on()
+                    else:
+                        Sounds.playsound_indicator_off()
+                elif self.own_vehicle.indicator_left != self.indicator_left_sound:
+                    self.indicator_left_sound = self.own_vehicle.indicator_left
+                    if self.own_vehicle.indicator_left:
+                        Sounds.playsound_indicator_on()
+                    else:
+                        Sounds.playsound_indicator_off()
 
     def message_handling(self, insim, mso):
         print(mso.Msg)
@@ -223,8 +226,12 @@ class LFSConnection:
             # p.start()
             # get_inputs_thread = Thread(target=self.controller_inputs.check_controller_input)
             # get_inputs_thread.start()
-            insim.send(pyinsim.ISP_MST,
-                       Msg=b"/axis %.1i steer" % self.settings.STEER_AXIS)
+            self.insim.send(pyinsim.ISP_MST,
+                            Msg=b"/axis %.1i steer" % self.settings.STEER_AXIS)
+            self.insim.send(pyinsim.ISP_MST,
+                            Msg=b"/axis %.1i brake" % self.settings.BRAKE_AXIS)
+            self.insim.send(pyinsim.ISP_MST,
+                            Msg=b"/axis %.1i throttle" % self.settings.THROTTLE_AXIS)
             self.in_pits = False
             if time.time() - self.time_menu_open >= 30:
                 self.start_outgauge()
@@ -302,9 +309,6 @@ class LFSConnection:
                 self.own_vehicle.roleplay = "tow"
             else:
                 self.own_vehicle.roleplay = "civil"
-                self.del_button(33)
-                self.del_button(34)
-                # TODO check if this is necessary
 
             if len(flags) >= 4 and flags[-4] == 1:
                 self.own_vehicle.gearbox_mode = 0  # automatic
@@ -382,6 +386,10 @@ class LFSConnection:
                     self.settings.automatic_gearbox = not self.settings.automatic_gearbox
                 elif btc.ClickID == 31:
                     self.settings.automatic_emergency_braking = not self.settings.automatic_emergency_braking
+                elif btc.ClickID == 33:
+                    self.settings.adaptive_brake_light = not self.settings.adaptive_brake_light
+                elif btc.ClickID == 34:
+                    self.settings.adaptive_brake_light_style = not self.settings.adaptive_brake_light_style
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
@@ -438,6 +446,8 @@ class LFSConnection:
                     self.settings.offset_h -= 1
                 elif btc.ClickID == 30:
                     self.settings.offset_h += 1
+                elif btc.ClickID == 31:
+                    self.settings.indicator_sound = not self.settings.indicator_sound
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
@@ -752,6 +762,9 @@ class LFSConnection:
 
         if self.settings.bc != "none":
             start_boardcomputer()
+
+        if self.settings.adaptive_brake_light:
+            self.AdaptiveBrakeLight.update()
 
         bus_thread = Thread(target=start_bus_sim)
         bus_thread.start()

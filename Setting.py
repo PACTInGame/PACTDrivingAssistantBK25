@@ -50,6 +50,9 @@ class Setting:
         self.audible_parking_aid = set_def[24]
         self.visual_parking_aid = set_def[25]
         self.side_collision_prevention = set_def[26]
+        self.indicator_sound = set_def[27]
+        self.adaptive_brake_light = set_def[28]
+        self.adaptive_brake_light_style = set_def[29]
 
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]

@@ -59,8 +59,10 @@ def open_general_menu(game_object):
                             else game_object.language.translation(lang, "Distance")
                             if game_object.settings.bc == "distance"
                             else game_object.language.translation(lang, "off"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
-    game_object.language.translation(lang, "Close"))
+    game_object.send_button(31, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
+                            game_object.language.translation(lang, "Indicator_Sound"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+                            game_object.language.translation(lang, "Close"))
 
 
 def open_bus_menu(game_object):
@@ -80,7 +82,6 @@ def open_bus_menu(game_object):
                             game_object.language.translation(lang, "Sound_effects"))
     game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                             game_object.language.translation(lang, "Start_offline_sim"))
-    print(game_object.settings.bus_offline_sim)
     game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
@@ -92,7 +93,7 @@ def open_drive_menu(game_object):
     top = 80
     for i in range(21, 41):
         game_object.del_button(i)
-    game_object.send_button(21, pyinsim.ISB_DARK, top-5, 0, 20, 5, game_object.language.translation(lang, "Driving"))
+    game_object.send_button(21, pyinsim.ISB_DARK, top - 5, 0, 20, 5, game_object.language.translation(lang, "Driving"))
     game_object.send_button(31, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top, 0, 20, 5,
                             game_object.language.translation(lang, "Emergency_Brake"))
     game_object.send_button(32, pyinsim.ISB_LIGHT, top, 20, 20, 5,
@@ -111,11 +112,15 @@ def open_drive_menu(game_object):
                             game_object.language.translation(lang, "PSC"))
     game_object.send_button(27, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
                             game_object.language.translation(lang, "Light_Assist"))
-    game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 0, 20, 5,
+    game_object.send_button(33, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 0, 20, 5,
+                            game_object.language.translation(lang, "Adaptive_Brake_Light"))
+    game_object.send_button(34, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 20, 10, 5,
+                            game_object.language.translation(lang, "Adaptive_Brake_Light_Style"))
+    game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
                             game_object.language.translation(lang, "Automatic_Indicator_Turnoff"))
-    game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
+    game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 45, 0, 20, 5,
                             game_object.language.translation(lang, "Gearbox"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 45, 0, 20, 5,
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 50, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 
