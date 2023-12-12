@@ -17,6 +17,10 @@ class AdaptiveBrakeLight:
         self.brake = self.game_obj.own_vehicle.brake
         if self.brake > 0.9 and self.speed > 10:
             self.braking = True
+        elif self.brake < 0.9 and self.speed > 10:
+            self.braking = False
+            self.stopped = False
+            self.game_obj.insim.send(pyinsim.ISP_MST, Msg=b"/press 0")
         elif self.braking and self.speed < 10:
             self.stopped = True
             self.braking = False

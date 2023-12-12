@@ -14,13 +14,13 @@ on <-- Automatic Emergency Braking
 off <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
 early <-- Lane departure warning intensity (early, normal, reduced)
 off <-- Head-up display with images
-on <-- stability control
+off <-- stability control
 1920x1080 <-- Monitor resolution
 1 <-- warning sound (change in menu, when program is active)
-range <-- Trip-computer mode
+off <-- Trip-computer mode
 metric <-- unit
 -3 <-- HUD height offset
-4 <-- HUD width offset
+1 <-- HUD width offset
 on <-- automatic indicator turnoff
 on <-- park emergency brake
 en <-- language

@@ -276,6 +276,7 @@ class LFSConnection:
 
     # Player Handling starts here -------------------------------------------------------
     def new_player(self, insim, npl):
+        # TODO check all players and remove those that are in list but not in packets
         def remove_control_chars(player_name):
             for i in range(10):
                 player_name = player_name.replace(bytes(f"^{i}", 'utf-8'), b"")
