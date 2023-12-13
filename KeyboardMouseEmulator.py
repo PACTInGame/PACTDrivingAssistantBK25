@@ -3,7 +3,7 @@ import keyboard
 
 import pyinsim
 
-SPARE_KEY = "M"
+SPARE_KEY = "m"
 
 
 def use_keyboard_collision_warning(game_object):
