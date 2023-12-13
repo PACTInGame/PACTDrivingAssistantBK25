@@ -29,4 +29,4 @@ on <-- visual parking aid
 on <-- side collision prevention
 on <-- Indicator Sounds
 on <-- Adaptive Brake Lights
-on <-- Adaptive Brake Lights Style
+off <-- Adaptive Brake Lights Style
