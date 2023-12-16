@@ -12,10 +12,11 @@ class AdaptiveBrakeLight:
         self.brake = self.game_obj.own_vehicle.brake
 
     def update(self):
+        # TODO check speed
         self.setting = self.game_obj.settings.adaptive_brake_light_style
         self.speed = self.game_obj.own_vehicle.speed
         self.brake = self.game_obj.own_vehicle.brake
-        if self.brake > 0.9 and self.speed > 10:
+        if self.brake > 0.9 and self.speed > 40:
             self.braking = True
         elif self.brake < 0.9 and self.speed > 10:
             self.braking = False

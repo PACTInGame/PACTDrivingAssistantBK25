@@ -59,7 +59,7 @@ class LFSConnection:
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
-        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu, 5 = General Menu
+        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu, 5 = General Menu, 6 = Keys Menu
 
         self.own_vehicle = OwnVehicle()
         self.settings = Setting(self)
@@ -362,6 +362,7 @@ class LFSConnection:
                     24: Menu.open_bus_menu,
                     25: self.settings.change_language,
                     26: Menu.open_general_menu,
+                    27: Menu.open_keys_menu,
                     40: Menu.close_menu,
                 }
 
@@ -505,6 +506,7 @@ class LFSConnection:
             self.buttons_on_screen[click_id] = 0
 
     def head_up_display(self):
+        # TODO make sure HUD changes position when outside view
         """
         This method is responsible for everything displayed on the head up display. This should be very efficient
         as it is called at minimum every 10ms.
@@ -620,20 +622,16 @@ class LFSConnection:
             if self.settings.automatic_emergency_braking:
                 if self.own_vehicle.control_mode == 2:
                     self.wheel_support.use_wheel_collision_warning(self)
-                elif self.own_vehicle.control_mode == 1:
+                elif self.own_vehicle.control_mode == 1 or self.own_vehicle.control_mode == 0:
                     self.keyboard_support.use_keyboard_collision_warning(self)
-                elif self.own_vehicle.control_mode == 0:
-                    self.keyboard_support.use_mouse_collision_warning(self)
 
         def release_brake():
             if self.brake_intervention_was_active:
                 if self.own_vehicle.control_mode == 2:
                     self.wheel_support.use_wheel_stop(self)
-                elif self.own_vehicle.control_mode == 1:
+                elif self.own_vehicle.control_mode == 1 or self.own_vehicle.control_mode == 0:
                     self.keyboard_support.release_brake(self)
                 self.brake_intervention_was_active = False
-
-            # TODO ADD MOUSE SUPPORT and fix keyboard braking issue
 
         def start_collision_warning():
             if 12 < self.own_vehicle.speed or (

@@ -21,10 +21,71 @@ def open_menu(game_object):
                             game_object.language.translation(lang, "Parking"))
     game_object.send_button(24, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
                             game_object.language.translation(lang, "Bus_Sim"))
-    game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+    game_object.send_button(27, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+                            game_object.language.translation(lang, "Keys_Axes"))
+    game_object.send_button(25, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
                             game_object.language.translation(lang, "Language"))
 
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 0, 20, 5,
+                            game_object.language.translation(lang, "Close"))
+
+
+def open_keys_menu(game_object):
+    # TODO : menu and btcs not finished
+    lang = game_object.settings.language
+    game_object.current_menu = 6
+    top = 80
+    for i in range(21, 41):
+        game_object.del_button(i)
+    game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "Keys_Axes"))
+    game_object.send_button(22, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
+                            game_object.language.translation(lang, "Shift_Up"))
+    game_object.send_button(23, pyinsim.ISB_LIGHT, top + 5, 20, 5, 5,
+                            game_object.settings.SHIFT_UP_KEY)
+    game_object.send_button(24, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 10, 0, 20, 5,
+                            game_object.language.translation(lang, "Shift_Down"))
+    game_object.send_button(25, pyinsim.ISB_LIGHT, top + 10, 20, 5, 5,
+                            game_object.settings.SHIFT_DOWN_KEY)
+    game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 15, 0, 20, 5,
+                            game_object.language.translation(lang, "Ignition"))
+    game_object.send_button(27, pyinsim.ISB_LIGHT, top + 15, 20, 5, 5,
+                            game_object.settings.IGNITION_KEY)
+    game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
+                            game_object.language.translation(lang, "Handbrake"))
+    game_object.send_button(29, pyinsim.ISB_LIGHT, top + 20, 20, 5, 5,
+                            game_object.settings.IGNITION_KEY)
+    print(game_object.own_vehicle.control_mode)
+    if game_object.own_vehicle.control_mode == 2:
+        game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+                                game_object.language.translation(lang, "Throttle_Axis"))
+        game_object.send_button(31, pyinsim.ISB_LIGHT, top + 25, 20, 5, 5,
+                                str(game_object.settings.THROTTLE_AXIS))
+        game_object.send_button(32, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
+                                game_object.language.translation(lang, "Brake_Axis"))
+        game_object.send_button(33, pyinsim.ISB_LIGHT, top + 30, 20, 5, 5,
+                                str(game_object.settings.BRAKE_AXIS))
+        game_object.send_button(34, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 0, 20, 5,
+                                game_object.language.translation(lang, "Steer_Axis"))
+        game_object.send_button(35, pyinsim.ISB_LIGHT, top + 35, 20, 5, 5,
+                                str(game_object.settings.STEER_AXIS))
+    else:
+        game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
+                                game_object.language.translation(lang, "Throttle_Key"))
+        game_object.send_button(31, pyinsim.ISB_LIGHT, top + 25, 20, 5, 5,
+                                game_object.settings.ACC_KEY)
+        game_object.send_button(32, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 30, 0, 20, 5,
+                                game_object.language.translation(lang, "Brake_Key"))
+        game_object.send_button(33, pyinsim.ISB_LIGHT, top + 30, 20, 5, 5,
+                                game_object.settings.BRAKE_KEY)
+        game_object.send_button(34, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 35, 0, 20, 5,
+                                game_object.language.translation(lang, "Spare_Key_1"))
+        game_object.send_button(35, pyinsim.ISB_LIGHT, top + 35, 20, 5, 5,
+                                game_object.settings.SPARE_KEY_1)
+        game_object.send_button(36, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
+                                game_object.language.translation(lang, "Spare_Key_2"))
+        game_object.send_button(37, pyinsim.ISB_LIGHT, top + 40, 20, 5, 5,
+                                game_object.settings.SPARE_KEY_2)
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40 if game_object.own_vehicle.control_mode == 2 else top+45, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 

@@ -111,18 +111,21 @@ def get_acc_settings_from_file():
 
 
 def get_controls_from_file():
-    change_set = ["s", "x", "i", "2", "3", "1", "6", "down", "up", "q"]
+    change_set = ["s", "x", "i", "2", "3", "1", "6", "down", "up", "q", "m", "k"]
     try:
         with open("controls.txt") as fp:
             for i, line in enumerate(fp):
                 if 1 <= i <= 10:
                     line = line.split()
                     change_set[i - 1] = line[0]
-
+                elif 12 <= i <= 13:
+                    line = line.split()
+                    change_set[i - 2] = line[0]
         print("Controls loaded successfully")
         return change_set
 
-    except:
+    except Exception as e:
+        print(e)
         print("Error loading control-settings. Make sure controls.txt exists in Folder.")
 
 
