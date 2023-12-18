@@ -39,7 +39,8 @@ from Vehicle import Vehicle
 # 41-43 PSC
 # 44-47 Blind Spot Warning
 # 48-54 PDC
-# 100 update available
+# 100-102 update available
+# 103 Mode change (All on, All off, Cop, Race)
 
 class LFSConnection:
     def __init__(self):
@@ -79,7 +80,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55)}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -239,14 +240,14 @@ class LFSConnection:
             insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
             self.del_button(31)
             self.del_button(3)
+
             if self.update_available:
-                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5,
-                                 self.language.translation(self.lang, "Menu"))
                 self.send_button(100, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
                                  self.language.translation(self.lang, "Update"))
-            else:
-                self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 7, 5,
-                                 self.language.translation(self.lang, "Menu"))
+
+            self.send_button(21, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5,
+                             self.language.translation(self.lang, "Menu"))
+            Menu.send_mode(self)
 
         def start_menu_insim():
             self.time_menu_open = time.time()
@@ -348,7 +349,7 @@ class LFSConnection:
                 click_actions = {
                     21: Menu.open_menu,
                     100: Menu.open_google_drive,
-
+                    103: Menu.change_mode  # TODO Not working yet
                 }
             elif self.current_menu == 1:  # Main Menu
                 click_action = True

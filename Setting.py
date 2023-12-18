@@ -53,6 +53,7 @@ class Setting:
         self.indicator_sound = set_def[27]
         self.adaptive_brake_light = set_def[28]
         self.adaptive_brake_light_style = set_def[29]
+        self.pact_mode = set_def[30]  # 0 = all on, 1 = all off, 2 = cop, 3 = race
 
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]

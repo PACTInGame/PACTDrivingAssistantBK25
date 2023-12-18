@@ -5,6 +5,31 @@ import get_settings
 import pyinsim
 
 
+def send_mode(game_object):
+    if game_object.settings.pact_mode == 0:
+        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                game_object.language.translation(game_object.lang, "All_on"))
+    elif game_object.settings.pact_mode == 1:
+        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                game_object.language.translation(game_object.lang, "All_off"))
+    elif game_object.settings.pact_mode == 2:
+        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                game_object.language.translation(game_object.lang, "Cop_Mode"))
+    else:
+        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                game_object.language.translation(game_object.lang, "Race_Mode"))
+
+
+def change_mode(game_object):
+    mode = game_object.settings.pact_mode
+    mode += 1
+    if mode > 3:
+        mode = 0
+    game_object.settings.pact_mode = mode
+    send_mode(game_object)
+
+
+
 def open_menu(game_object):
     lang = game_object.settings.language
     top = 80
@@ -85,7 +110,8 @@ def open_keys_menu(game_object):
                                 game_object.language.translation(lang, "Spare_Key_2"))
         game_object.send_button(37, pyinsim.ISB_LIGHT, top + 40, 20, 5, 5,
                                 game_object.settings.SPARE_KEY_2)
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40 if game_object.own_vehicle.control_mode == 2 else top+45, 0, 20, 5,
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK,
+                            top + 40 if game_object.own_vehicle.control_mode == 2 else top + 45, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 
