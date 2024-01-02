@@ -29,7 +29,6 @@ def change_mode(game_object):
     send_mode(game_object)
 
 
-
 def open_menu(game_object):
     lang = game_object.settings.language
     top = 80
@@ -60,6 +59,7 @@ def open_keys_menu(game_object):
     # TODO : menu and btcs not finished
     lang = game_object.settings.language
     game_object.current_menu = 6
+    game_object.notifications.append(["^1Not yet implemented.", 3])
     top = 80
     for i in range(21, 41):
         game_object.del_button(i)
@@ -80,7 +80,6 @@ def open_keys_menu(game_object):
                             game_object.language.translation(lang, "Handbrake"))
     game_object.send_button(29, pyinsim.ISB_LIGHT, top + 20, 20, 5, 5,
                             game_object.settings.IGNITION_KEY)
-    print(game_object.own_vehicle.control_mode)
     if game_object.own_vehicle.control_mode == 2:
         game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                                 game_object.language.translation(lang, "Throttle_Axis"))
@@ -243,6 +242,7 @@ def close_menu(game_object):
                                 game_object.language.translation(game_object.lang, "Update"))
 
     get_settings.write_settings(game_object)
+    send_mode(game_object)
 
 
 def ask(game_obj):

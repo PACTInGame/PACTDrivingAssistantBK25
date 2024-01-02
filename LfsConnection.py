@@ -25,6 +25,7 @@ from BusSimulation import BusSimulation
 from Language import Language
 from OwnVehicle import OwnVehicle
 from PSC import PSC
+from RaceAssist import RaceAssist
 from Setting import Setting
 from Vehicle import Vehicle
 
@@ -76,6 +77,7 @@ class LFSConnection:
         self.keyboard_support = KeyboardMouseEmulator
         self.controller_inputs = GetControllerInput.ControllerInput(self)
         self.AdaptiveBrakeLight = AdaptiveBrakeLight(self)
+        self.RaceAssist = RaceAssist(self)
 
         self.outgauge = None
         self.outsim = None
@@ -96,6 +98,7 @@ class LFSConnection:
         self.on_track = False
         self.in_pits = False
         self.track = ""
+        self.in_game_cam = 0  # 0 = Follow, 1 = Heli, 2 = TV, 3 = Driver, 4 = Custom, 255 = Another
 
         # for checking the previous state
         self.indicator_right_sound = False
@@ -260,7 +263,7 @@ class LFSConnection:
                              "Waiting for you to hit the road.")
 
         flags = [int(i) for i in str("{0:b}".format(sta.Flags))]
-
+        self.in_game_cam = sta.InGameCam
         if len(flags) >= 15:
             game = flags[-1] == 1 and flags[-15] == 1
 
@@ -454,6 +457,12 @@ class LFSConnection:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:
                     Menu.open_general_menu(self)
+
+            elif self.current_menu == 6:
+                if btc.ClickID == 40:
+                    Menu.close_menu(self)
+                if not btc.ClickID == 40:
+                    Menu.open_general_menu(self)
         else:
             click_actions = {
                 100: Menu.ask,
@@ -574,29 +583,40 @@ class LFSConnection:
         def send_gear_button(gear_mode):
             self.send_button(5, pyinsim.ISB_DARK, 123 + x, 116 + y, 4, 4, '^7' + gear_mode)
 
-        if self.settings.head_up_display:
-            if self.own_vehicle.gear > 1:
-                if self.own_vehicle.gearbox_mode > 0 and not self.settings.automatic_gearbox:
-                    send_gear_button('%.i' % (self.own_vehicle.gear - 1))
-                else:
-                    send_gear_button('D%.i' % (self.own_vehicle.gear - 1))
-            elif self.own_vehicle.gear == 1:
-                send_gear_button('n')
-            elif self.own_vehicle.gear == 0:
-                send_gear_button('r')
+        def send_outside_hud():
+            # TODO create outside hud at the bottom of the screen
+            for i in range(1, 10):
+                self.del_button(i)
 
-            if self.collision_warning_intensity > 0:
-                send_warning_button(self.collision_warning_intensity)
-            elif self.cross_warning_intensity[0] > 0:
-                send_cross_button(self.cross_warning_intensity)
-            else:
-                if self.settings.unit == "metric":
-                    send_speed_button('^7', 'km/h', self.own_vehicle.speed)
+        if self.settings.head_up_display:
+            if self.in_game_cam == 3:
+                if self.own_vehicle.gear > 1:
+                    if self.own_vehicle.gearbox_mode > 0 and not self.settings.automatic_gearbox:
+                        send_gear_button('%.i' % (self.own_vehicle.gear - 1))
+                    else:
+                        send_gear_button('D%.i' % (self.own_vehicle.gear - 1))
+                elif self.own_vehicle.gear == 1:
+                    send_gear_button('n')
+                elif self.own_vehicle.gear == 0:
+                    send_gear_button('r')
+
+                if self.collision_warning_intensity > 0:
+                    send_warning_button(self.collision_warning_intensity)
+                elif self.cross_warning_intensity[0] > 0:
+                    send_cross_button(self.cross_warning_intensity)
                 else:
-                    send_speed_button('^7', 'mph', self.own_vehicle.speed * 0.621371)
-                send_rpm_button('^7', self.own_vehicle.rpm)
-            send_extra_info_button()
-            send_notifications()
+                    if self.settings.unit == "metric":
+                        send_speed_button('^7', 'km/h', self.own_vehicle.speed)
+                    else:
+                        send_speed_button('^7', 'mph', self.own_vehicle.speed * 0.621371)
+                    send_rpm_button('^7', self.own_vehicle.rpm)
+                send_extra_info_button()
+                send_notifications()
+            elif self.in_game_cam in [0, 1, 2, 4]:
+                send_outside_hud()
+            else:
+                for i in range(1, 10):
+                    self.del_button(i)
         else:
             for i in range(1, 10):
                 self.del_button(i)
@@ -780,11 +800,13 @@ class LFSConnection:
             if self.notifications:
                 check_notifications()
 
-            if self.last_tip_time < time.perf_counter() - 10:
+            if self.last_tip_time < time.perf_counter() - 60:
                 self.last_tip_time = time.perf_counter()
                 tip = Tips.get_tip(self.settings.language)
                 self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
-
+        if RACE:
+            self.RaceAssist.update_coordinates_and_timestamp()
+            self.RaceAssist.check_live_delta_previous_lap()
     def get_relevant_cars(self):
         """
         This function decides if a car is relevant for the driver assistance functions or not. Therefore, the workload
@@ -863,6 +885,17 @@ class LFSConnection:
             print("connection to LFS successful")
             self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_SST)
 
+    def get_laptimes(self, insim, lap):
+        if self.own_vehicle.player_id == lap.PLID:
+            self.RaceAssist.update_lap_time(lap.LTime)
+            self.RaceAssist.update_total_time(lap.ETime)
+            self.RaceAssist.update_laps_done(lap.LapsDone)
+
+    def get_split_times(self, insim, spx):
+        if self.own_vehicle.player_id == spx.PLID:
+            self.RaceAssist.update_split_times(spx.Split, spx.STime)
+            self.RaceAssist.update_total_time(spx.ETime)
+
     def run(self):
         self.insim.bind(pyinsim.ISP_MCI, self.get_car_data)
         self.insim.bind(pyinsim.ISP_MSO, self.message_handling)
@@ -873,6 +906,8 @@ class LFSConnection:
         self.insim.bind(pyinsim.ISP_BTC, self.on_click)
         self.insim.bind(pyinsim.ISP_AXM, self.object_detection)
         self.insim.bind(pyinsim.TINY_PING, self.get_pings)
+        self.insim.bind(pyinsim.ISP_LAP, self.get_laptimes)
+        self.insim.bind(pyinsim.ISP_SPX, self.get_split_times)
         self.start_outgauge()
         self.insim.send(pyinsim.ISP_TINY, ReqI=255, SubT=pyinsim.TINY_NPL)
         self.timers.append([20, "NPL"])  # Timer 1

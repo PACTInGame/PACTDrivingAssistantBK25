@@ -48,3 +48,8 @@ def calculate_angle(x1, x2, y1, y2, own_heading):
 
 def get_distance(list_of_cars):
     return list_of_cars[0].distance
+
+
+def calc_distance(x1, y1, x2, y2):
+    # Vector length
+    return math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
