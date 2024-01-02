@@ -3,13 +3,14 @@ import requests
 
 def get_github_version(owner, repo, file_path):
     url = f'https://raw.githubusercontent.com/{owner}/{repo}/main/{file_path}'
+    try:
+        response = requests.get(url)
 
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        version = response.text.strip()
-        return version
-
+        if response.status_code == 200:
+            version = response.text.strip()
+            return version
+    except:
+        "It seems like there is internet issue! Starting without version check."
     # Return None if the version file couldn't be retrieved
     return None
 

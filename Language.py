@@ -57,6 +57,10 @@ class Language:
                 'Adaptive_Brake_Light': f'{"^2" if self.game_obj.settings.adaptive_brake_light else "^1"}Adaptive Brake Light',
                 'Adaptive_Brake_Light_Style': f'{"^7Indicators" if self.game_obj.settings.adaptive_brake_light_style else "^7Lights"}',
                 'Keys_Axes': 'Keys and Axes',
+                'All_on': '^7All on',
+                'All_off': '^1All off',
+                'Cop_Mode': '^4Cop/Rescue',
+                'Race_Mode': '^6Race',
 
             },
             'de': {

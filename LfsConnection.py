@@ -1,6 +1,5 @@
 import sys
 import time
-from multiprocessing import Process
 from threading import Thread
 
 import Boardcomputer
@@ -53,6 +52,8 @@ class LFSConnection:
             time.sleep(3)
 
         self.version = "0.0.1"
+        self.update_available = Version.get_current_version(self.version)
+
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
         self.running = True
@@ -80,7 +81,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55), 101}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -105,7 +106,7 @@ class LFSConnection:
         self.collision_warning_sound_played = False
         self.cross_traffic_warning_sound_played = False
         self.side_collision_warning_sound_played = time.perf_counter()
-        self.update_available = Version.get_current_version(self.version)
+
         self.holding_brake = False
         self.lang = self.settings.language
         self.brake_intervention_was_active = True
@@ -348,8 +349,6 @@ class LFSConnection:
 
                 click_actions = {
                     21: Menu.open_menu,
-                    100: Menu.open_google_drive,
-                    103: Menu.change_mode  # TODO Not working yet
                 }
             elif self.current_menu == 1:  # Main Menu
                 click_action = True
@@ -461,6 +460,8 @@ class LFSConnection:
                 101: Menu.open_google_drive,
                 102: Menu.close_ask,
                 6: self.boardcomputer.reset,
+                103: Menu.change_mode
+
             }
             click_action = True
         if click_action:
@@ -733,49 +734,56 @@ class LFSConnection:
                     self.del_button(9)
                     del self.notifications[0]
 
-        if self.settings.forward_collision_warning:
-            start_collision_warning()
+        ALL_ON = self.settings.pact_mode == 0
+        ALL_OFF = self.settings.pact_mode == 1
+        COP = self.settings.pact_mode == 2
+        RACE = self.settings.pact_mode == 3
 
-        if self.settings.automatic_gearbox:
-            self.gearbox.calculate_gear()
+        if not ALL_OFF and not RACE:
+            if self.settings.forward_collision_warning:
+                start_collision_warning()
 
-        if self.settings.PSC:
-            self.controller_inputs.check_controller_input()
-            self.PSC.calculate_psc()
+            if self.settings.automatic_gearbox:
+                self.gearbox.calculate_gear()
 
-        if self.settings.blind_spot_warning:
-            start_blindspot()
+            if self.settings.PSC and not COP:
+                self.controller_inputs.check_controller_input()
+                self.PSC.calculate_psc()
 
-        if self.settings.cross_traffic_warning:
-            start_cross_traffic_warning()
+            if self.settings.blind_spot_warning:
+                start_blindspot()
 
-        if self.settings.side_collision_prevention:
-            start_side_collision_prevention()
+            if self.settings.cross_traffic_warning and not COP:
+                start_cross_traffic_warning()
 
-        if self.settings.park_distance_control and self.own_vehicle.speed < 10:
-            start_park_assistance()
-        else:
-            self.rear_beep = 0
-            self.front_beep = 0
-            self.beep_thread_started = False
-            ParkDistanceControl.del_pdc_buttons(self)
+            if self.settings.side_collision_prevention and not COP:
+                start_side_collision_prevention()
 
-        if self.settings.bc != "none":
-            start_boardcomputer()
+            if self.settings.park_distance_control and self.own_vehicle.speed < 10:
+                start_park_assistance()
+            else:
+                self.rear_beep = 0
+                self.front_beep = 0
+                self.beep_thread_started = False
+                ParkDistanceControl.del_pdc_buttons(self)
 
-        if self.settings.adaptive_brake_light:
-            self.AdaptiveBrakeLight.update()
+            if self.settings.bc != "none":
+                start_boardcomputer()
 
-        bus_thread = Thread(target=start_bus_sim)
-        bus_thread.start()
+            if self.settings.adaptive_brake_light:
+                self.AdaptiveBrakeLight.update()
 
-        if self.notifications:
-            check_notifications()
+            if ALL_ON:
+                bus_thread = Thread(target=start_bus_sim)
+                bus_thread.start()
 
-        if self.last_tip_time < time.perf_counter() - 10:
-            self.last_tip_time = time.perf_counter()
-            tip = Tips.get_tip(self.settings.language)
-            self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
+            if self.notifications:
+                check_notifications()
+
+            if self.last_tip_time < time.perf_counter() - 10:
+                self.last_tip_time = time.perf_counter()
+                tip = Tips.get_tip(self.settings.language)
+                self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
 
     def get_relevant_cars(self):
         """

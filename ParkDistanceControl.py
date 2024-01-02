@@ -1,8 +1,6 @@
 import math
 import time
-
 from shapely import Polygon
-
 import Calculations
 import Sounds
 import pyinsim
