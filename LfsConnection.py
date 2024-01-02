@@ -621,7 +621,7 @@ class LFSConnection:
 
         def brake_emergency():
             self.brake_intervention_was_active = True
-            if self.settings.automatic_emergency_braking:
+            if self.settings.automatic_emergency_braking and ALL_ON:
                 if self.own_vehicle.control_mode == 2:
                     self.wheel_support.use_wheel_collision_warning(self)
                 elif self.own_vehicle.control_mode == 1 or self.own_vehicle.control_mode == 0:
