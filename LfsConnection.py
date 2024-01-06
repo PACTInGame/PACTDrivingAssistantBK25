@@ -215,7 +215,30 @@ class LFSConnection:
                         Sounds.playsound_indicator_off()
 
     def message_handling(self, insim, mso):
-        print(mso.Msg)
+        message = mso.Msg.decode()
+        print(message)
+        if '^L$' in message:
+            message = message.split(': ^L$')[1]
+            print(message)
+            if message == "help":
+                answer = "If you need more help, please visit the forum page."
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc up : increase acc speed by 5 kph")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc down : decrease acc speed by 5 kph")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc on : set acc speed to current speed")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc off : turn off acc")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$set x on : turn on setting x")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$set x off : turn off setting x")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"available settings : hud, collisionwarn, crosstrafficwarn, blindspot, light, psc, gearbox")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$setup gearbox : start the gearbox setup for a new mod")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$mode x: x = all on/ all off/ cop/ race")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$siren on/off : turn on/off siren")
+                self.insim.send(pyinsim.ISP_MSL, Msg=b"$strobe on/off : turn on/off strobe")
+
+
+            else:
+                answer = "Unknown Command"
+            self.insim.send(pyinsim.ISP_MSL, Msg=answer.encode())
+
 
     def insim_state(self, insim, sta):
         """
