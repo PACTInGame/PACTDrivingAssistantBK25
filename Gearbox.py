@@ -43,6 +43,7 @@ class Gearbox:
 
     def calculate_gear(self):
         # TODO this should work for all cars and be stored in files or smth
+        # TODO And add support for different setups per car
         self.update_data()
         gears_and_max_speed = {
             0: 0,
