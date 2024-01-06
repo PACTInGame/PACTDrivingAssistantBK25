@@ -142,7 +142,6 @@ class LFSConnection:
         self.own_vehicle.throttle = packet.Throttle
         self.own_vehicle.clutch = packet.Clutch
         self.own_vehicle.turbo = packet.Turbo
-
         self.own_vehicle.indicator_left = pyinsim.DL_SIGNAL_L & packet.ShowLights
         self.own_vehicle.indicator_right = pyinsim.DL_SIGNAL_R & packet.ShowLights
         self.own_vehicle.hazard_lights = self.own_vehicle.indicator_left and self.own_vehicle.indicator_right
