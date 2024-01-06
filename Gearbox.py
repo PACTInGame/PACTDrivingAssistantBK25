@@ -1,5 +1,5 @@
 # Class to represent cars gearbox
-import threading
+from threading import Thread
 import time
 
 import pydirectinput
@@ -34,14 +34,27 @@ class Gearbox:
     def send(self, keys):
         if time.perf_counter() - self.last_executed >= 1:
             self.last_executed = time.perf_counter()
+            t = Thread(target=self.press, args=(keys,))
+            t.start()
 
-            for key in keys:
-                print("key: " + str(key))
-                pydirectinput.press(key)
+    def press(self, keys):
+        for key in keys:
+            pydirectinput.press(key)
 
     def calculate_gear(self):
         # TODO this should work for all cars and be stored in files or smth
         self.update_data()
+        gears_and_max_speed = {
+            0: 0,
+            1: 65,
+            2: 105,
+            3: 141,
+            4: 190,
+            5: 246,
+            6: 275,
+        }
+        '''
+        FZ5
         gears_and_max_speed = {
             0: 0,
             1: 86,
@@ -51,7 +64,7 @@ class Gearbox:
             5: 223,
             6: 257,
         }
-
+        '''
         # As list comprehension
         percentage_gears = [self.speed / gears_and_max_speed[i] * 100 for i in range(1, len(gears_and_max_speed))]
 
@@ -63,13 +76,11 @@ class Gearbox:
 
             if wanted_percentage < 50:
                 wanted_percentage = 50
-        print(wanted_percentage)
         filtered_percentages = [p for p in percentage_gears if p <= 95.0]
 
         # Find the value closest to 'percent' in the filtered listxi
         closest = min(filtered_percentages, key=lambda x: abs(x - wanted_percentage))
         find_index = percentage_gears.index(closest) + 2
-        print("find index: " + str(find_index))
         if self.gear < find_index and self.accelerator_pedal_position > 0 and not self.brake_pedal_position > 0:
             shift_action = 1
         elif self.gear > find_index:
@@ -124,6 +135,7 @@ class Gearbox:
 
         if not self.game_object.text_entry:
             if shift_action == 1:
+
                 self.send([ign, up, ign])
 
             elif shift_action == -1:
