@@ -16,6 +16,8 @@ import ParkDistanceControl
 import Sounds
 import Tips
 import Version
+import get_settings
+import messagehandling
 import pyinsim
 import wheel
 from AdaptiveBrakeLight import AdaptiveBrakeLight
@@ -154,6 +156,7 @@ class LFSConnection:
         self.own_vehicle.eng_light = pyinsim.DL_SPARE & packet.ShowLights > 0
 
         if self.own_vehicle.cname != packet.Car:
+            # Vehicle Model Change
             self.own_vehicle.cname = packet.Car
             if b"Batt" in packet.Display1:
                 self.own_vehicle.eng_type = "electric"
@@ -164,7 +167,7 @@ class LFSConnection:
             self.own_vehicle.redline = CarDataBase.get_vehicle_redline(self.own_vehicle.cname)
             self.own_vehicle.collision_warning_multiplier = CarDataBase.get_vehicle_length(self.own_vehicle.cname)
             self.own_vehicle.max_gears = CarDataBase.get_max_gears(self.own_vehicle.cname)
-
+            self.gearbox.get_gears_and_max_speed()
         # Function calls
         if self.on_track:
             self.head_up_display()
@@ -216,29 +219,7 @@ class LFSConnection:
 
     def message_handling(self, insim, mso):
         message = mso.Msg.decode()
-        print(message)
-        if '^L$' in message:
-            message = message.split(': ^L$')[1]
-            print(message)
-            if message == "help":
-                answer = "If you need more help, please visit the forum page."
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc up : increase acc speed by 5 kph")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc down : decrease acc speed by 5 kph")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc on : set acc speed to current speed")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$acc off : turn off acc")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$set x on : turn on setting x")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$set x off : turn off setting x")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"available settings : hud, collisionwarn, crosstrafficwarn, blindspot, light, psc, gearbox")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$setup gearbox : start the gearbox setup for a new mod")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$mode x: x = all on/ all off/ cop/ race")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$siren on/off : turn on/off siren")
-                self.insim.send(pyinsim.ISP_MSL, Msg=b"$strobe on/off : turn on/off strobe")
-
-
-            else:
-                answer = "Unknown Command"
-            self.insim.send(pyinsim.ISP_MSL, Msg=answer.encode())
-
+        messagehandling.handle_commands(message, self)
 
     def insim_state(self, insim, sta):
         """
@@ -829,6 +810,7 @@ class LFSConnection:
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()
             self.RaceAssist.check_live_delta_previous_lap()
+
     def get_relevant_cars(self):
         """
         This function decides if a car is relevant for the driver assistance functions or not. Therefore, the workload

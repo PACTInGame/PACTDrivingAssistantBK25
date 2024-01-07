@@ -14,7 +14,7 @@ on <-- Automatic Emergency Braking
 off <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
 early <-- Lane departure warning intensity (early, normal, reduced)
 off <-- Head-up display with images
-off <-- stability control
+on <-- stability control
 1920x1080 <-- Monitor resolution
 1 <-- warning sound (change in menu, when program is active)
 distance <-- Trip-computer mode
@@ -29,5 +29,5 @@ on <-- visual parking aid
 off <-- side collision prevention
 on <-- Indicator Sounds
 on <-- Adaptive Brake Lights
-off <-- Adaptive Brake Lights Style
+on <-- Adaptive Brake Lights Style
 0 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)
