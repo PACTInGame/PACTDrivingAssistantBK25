@@ -16,7 +16,6 @@ import ParkDistanceControl
 import Sounds
 import Tips
 import Version
-import get_settings
 import messagehandling
 import pyinsim
 import wheel

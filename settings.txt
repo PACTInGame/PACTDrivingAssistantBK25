@@ -11,7 +11,7 @@ off <-- Lane assist
 off <-- Cop aid system
 on <-- Automatic Emergency Braking
 1 <-- Collision Warning Distance (early, medium, late)
-off <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
+on <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
 early <-- Lane departure warning intensity (early, normal, reduced)
 off <-- Head-up display with images
 on <-- stability control

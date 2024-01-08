@@ -65,8 +65,10 @@ class Gearbox:
             if cname in key:
                 # Extracting the prefix from the key
                 prefix = key.split("_")[0]
+                postfix = key.split("_")[1]
                 formatted_values = {int(v.split(":")[0]): int(v.split(":")[1]) for v in values}
-                results.append([prefix, formatted_values])
+                results.append([prefix, formatted_values, postfix])
+
 
         return results
 
@@ -76,6 +78,7 @@ class Gearbox:
             self.car_supported = True
             if len(gears_and_max_speed_list) > 1:
                 # TODO be able to select
+                self.gears_and_max_speed = gears_and_max_speed_list
                 self.make_selection = True
             else:
                 self.make_selection = False
@@ -84,11 +87,11 @@ class Gearbox:
             self.car_supported = False
 
     def calculate_gear(self):
-        # TODO this should work for all cars and be stored in files or smth
         # TODO And add support for different setups per car
         self.update_data()
-
-        if self.car_supported:
+        if self.make_selection:
+            self.game_object.send_button
+        if self.car_supported and not self.make_selection:
             # As list comprehension
             percentage_gears = [self.speed / self.gears_and_max_speed[i] * 100 for i in range(1, len(self.gears_and_max_speed) + 1)]
             wanted_percentage = self.accelerator_pedal_position * 100 + 10
@@ -108,7 +111,6 @@ class Gearbox:
                 closest = percentage_gears[-1]
             else:
                 closest = min(self.filtered_percentages, key=lambda x: abs(x - wanted_percentage))
-            print(closest)
             find_index = percentage_gears.index(closest) + 2
             if self.gear < find_index and self.accelerator_pedal_position > 0 and not self.brake_pedal_position > 0:
                 shift_action = find_index - self.gear
