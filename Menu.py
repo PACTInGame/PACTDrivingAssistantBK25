@@ -38,6 +38,7 @@ def change_mode(game_object):
         for i in range(110, 121):
             game_object.del_button(i)
     send_mode(game_object)
+    get_settings.write_settings(game_object)
 
 
 def open_menu(game_object):
