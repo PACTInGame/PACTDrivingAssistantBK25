@@ -4,6 +4,8 @@ import time
 
 import pydirectinput
 
+import pyinsim
+
 
 class Gearbox:
     def __init__(self, game_object):
@@ -45,8 +47,11 @@ class Gearbox:
         tim = time.perf_counter()
         for key in keys:
             pydirectinput.press(key)
+
     def get_gearbox_data_from_file(self, cname):
-        cname = cname.decode()
+        cname = str(cname)
+        cname = cname[2:-1]
+        print(cname)
         text_file = open("data/gearbox.txt", "r").read()
         # Parse the text file and store the data in a dictionary of dictionaries
         data_dict = {}
@@ -64,11 +69,11 @@ class Gearbox:
         for key, values in data_dict.items():
             if cname in key:
                 # Extracting the prefix from the key
-                prefix = key.split("_")[0]
-                postfix = key.split("_")[1]
+                prefix = key.rsplit("_")[0]
+                postfix = key.rsplit("_")[1]
+                postfix = postfix.split(":")[0]
                 formatted_values = {int(v.split(":")[0]): int(v.split(":")[1]) for v in values}
                 results.append([prefix, formatted_values, postfix])
-
 
         return results
 
@@ -86,14 +91,29 @@ class Gearbox:
         else:
             self.car_supported = False
 
+    def gearbox_select(self, number):
+        self.gears_and_max_speed = self.gears_and_max_speed[number][1]
+        self.make_selection = False
+        for i in range(11):
+            self.game_object.del_button(120 + i)
+
     def calculate_gear(self):
         # TODO And add support for different setups per car
+        # TODO only 10 settings per car saveable
         self.update_data()
         if self.make_selection:
-            self.game_object.send_button
+            self.game_object.send_button(120, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 50, 87, 26, 5,
+                                         "Select gearbox settings")
+            for i in range(len(self.gears_and_max_speed)):
+                if i > 10: # TODO check if this is right
+                    break
+                self.game_object.send_button(121 + i, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 55 + 5 * i, 87, 26, 5,
+                                             self.gears_and_max_speed[i][2])
+
         if self.car_supported and not self.make_selection:
             # As list comprehension
-            percentage_gears = [self.speed / self.gears_and_max_speed[i] * 100 for i in range(1, len(self.gears_and_max_speed) + 1)]
+            percentage_gears = [self.speed / self.gears_and_max_speed[i] * 100 for i in
+                                range(1, len(self.gears_and_max_speed) + 1)]
             wanted_percentage = self.accelerator_pedal_position * 100 + 10
             if wanted_percentage > 100:
                 wanted_percentage = 100
@@ -118,12 +138,14 @@ class Gearbox:
                 shift_action = find_index - self.gear
             else:
                 shift_action = 0
+            if self.cornering > 500 or self.cornering < -500:
+                shift_action = 0
 
             ign = self.game_object.settings.IGNITION_KEY
             up = self.game_object.settings.SHIFT_UP_KEY
             down = self.game_object.settings.SHIFT_DOWN_KEY
 
-            if not self.game_object.text_entry:
+            if not self.game_object.text_entry: # TODO check also if on track and not shift held down
                 if shift_action >= 1:
                     self.send([ign, up, ign])
 
@@ -135,4 +157,3 @@ class Gearbox:
 
                 elif shift_action <= -3:
                     self.send([ign, down, down, down, ign])
-

@@ -42,7 +42,8 @@ from Vehicle import Vehicle
 # 48-54 PDC
 # 100-102 update available
 # 103 Mode change (All on, All off, Cop, Race)
-
+# 110 - 120 RaceAssist
+# 121 - 130 Gearbox selection
 class LFSConnection:
     def __init__(self):
         """
@@ -471,13 +472,27 @@ class LFSConnection:
                 101: Menu.open_google_drive,
                 102: Menu.close_ask,
                 6: self.boardcomputer.reset,
-                103: Menu.change_mode
+                103: Menu.change_mode,
+                121: self.gearbox.gearbox_select,
+                122: self.gearbox.gearbox_select,
+                123: self.gearbox.gearbox_select,
+                124: self.gearbox.gearbox_select,
+                125: self.gearbox.gearbox_select,
+                126: self.gearbox.gearbox_select,
+                127: self.gearbox.gearbox_select,
+                128: self.gearbox.gearbox_select,
+                129: self.gearbox.gearbox_select,
+                130: self.gearbox.gearbox_select,
+
+
 
             }
             click_action = True
         if click_action:
             action = click_actions.get(btc.ClickID)
-            if action:
+            if 121 <= btc.ClickID <= 130:
+                action(btc.ClickID - 121)
+            elif action:
                 try:
                     action()
                 except:
