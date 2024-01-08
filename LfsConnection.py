@@ -56,7 +56,7 @@ class LFSConnection:
 
         self.version = "0.0.1"
         self.update_available = Version.get_current_version(self.version)
-        self.INTERVAL = 200
+        self.INTERVAL = 200  # TODO doesnt make sense bc Interval will not be updated if changed here
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
                                    Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=self.INTERVAL)
         self.running = True
@@ -484,8 +484,6 @@ class LFSConnection:
                 129: self.gearbox.gearbox_select,
                 130: self.gearbox.gearbox_select,
 
-
-
             }
             click_action = True
         if click_action:
@@ -605,7 +603,7 @@ class LFSConnection:
                 self.del_button(i)
 
         if self.settings.head_up_display:
-            if self.in_game_cam == 3: # Drivers View
+            if self.in_game_cam == 3:  # Drivers View
                 if self.own_vehicle.gear > 1:
                     if self.own_vehicle.gearbox_mode > 0 and not self.settings.automatic_gearbox:
                         send_gear_button('%.i' % (self.own_vehicle.gear - 1))
@@ -824,7 +822,6 @@ class LFSConnection:
             self.RaceAssist.update_coordinates_and_timestamp()
             self.RaceAssist.check_live_delta_previous_lap()
             self.RaceAssist.check_live_delta_best_lap()
-
 
     def get_relevant_cars(self):
         """
