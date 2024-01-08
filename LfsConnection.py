@@ -41,6 +41,7 @@ from Vehicle import Vehicle
 # 48-54 PDC
 # 100-102 update available
 # 103 Mode change (All on, All off, Cop, Race)
+# 110 - 120 Race Assist
 
 class LFSConnection:
     def __init__(self):
@@ -54,9 +55,9 @@ class LFSConnection:
 
         self.version = "0.0.1"
         self.update_available = Version.get_current_version(self.version)
-
+        self.INTERVAL = 200
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
-                                   Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=200)
+                                   Flags=pyinsim.ISF_MCI | pyinsim.ISF_LOCAL, Interval=self.INTERVAL)
         self.running = True
         self.notifications = []
         self.players = {}
@@ -83,7 +84,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -517,7 +518,6 @@ class LFSConnection:
             self.buttons_on_screen[click_id] = 0
 
     def head_up_display(self):
-        # TODO make sure HUD changes position when outside view
         """
         This method is responsible for everything displayed on the head up display. This should be very efficient
         as it is called at minimum every 10ms.
@@ -589,7 +589,7 @@ class LFSConnection:
                 self.del_button(i)
 
         if self.settings.head_up_display:
-            if self.in_game_cam == 3:
+            if self.in_game_cam == 3: # Drivers View
                 if self.own_vehicle.gear > 1:
                     if self.own_vehicle.gearbox_mode > 0 and not self.settings.automatic_gearbox:
                         send_gear_button('%.i' % (self.own_vehicle.gear - 1))
@@ -807,6 +807,8 @@ class LFSConnection:
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()
             self.RaceAssist.check_live_delta_previous_lap()
+            self.RaceAssist.check_live_delta_best_lap()
+
     def get_relevant_cars(self):
         """
         This function decides if a car is relevant for the driver assistance functions or not. Therefore, the workload

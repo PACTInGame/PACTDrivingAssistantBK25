@@ -17,7 +17,7 @@ off <-- Head-up display with images
 on <-- stability control
 1920x1080 <-- Monitor resolution
 1 <-- warning sound (change in menu, when program is active)
-range <-- Trip-computer mode
+off <-- Trip-computer mode
 metric <-- unit
 -3 <-- HUD height offset
 1 <-- HUD width offset
@@ -30,4 +30,4 @@ on <-- side collision prevention
 on <-- Indicator Sounds
 on <-- Adaptive Brake Lights
 on <-- Adaptive Brake Lights Style
-0 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)
+3 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)

@@ -1,6 +1,7 @@
 import time
 
 import Calculations
+import pyinsim
 
 
 class RaceAssist:
@@ -35,11 +36,12 @@ class RaceAssist:
 
     def update_lap_time(self, lap_time):
         self.lap_times.append(lap_time)
-        print("update_laptime")
+        print("updated laptime")
         self.coordinates_and_timestamps_last_lap = self.coordinates_and_timestamps_this_lap
         self.coordinates_and_timestamps_this_lap = []
         if min(self.lap_times) == lap_time:
             self.coordinates_and_timestamps_best_lap = self.coordinates_and_timestamps_last_lap
+        # todo: set a limit for the max number of coordinates per lap
 
     def update_total_time(self, total_time):
         self.total_time_in_race = [total_time, time.perf_counter()]
@@ -65,6 +67,7 @@ class RaceAssist:
         self.coordinates_and_timestamps_this_lap.append([veh.x, veh.y, time_lap_split])
 
     def check_live_delta_previous_lap(self):
+        # TODO Refactor and make more efficient and together with check_live_delta_best_lap
         min_dist = 131072000  # 2km
         time_next_point = 5940000
         if len(self.coordinates_and_timestamps_last_lap) > 0:
@@ -76,4 +79,58 @@ class RaceAssist:
                 if dist < min_dist:
                     min_dist = dist
                     time_next_point = timestamp
-            print((time_now - time_next_point))
+
+            current_delta = time_now - time_next_point
+            current_delta = round(current_delta, 3)
+
+            if current_delta < 0 and self.laps_driven > 1:
+                current_delta = str(current_delta)
+                current_delta = "^2" + current_delta
+                self.game_object.send_button(112, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 88, 12, 5, current_delta)
+            elif current_delta > 0 and self.laps_driven > 1:
+                current_delta = str(current_delta)
+                current_delta = "^1+" + current_delta
+                self.game_object.send_button(112, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 88, 12, 5, current_delta)
+            elif self.laps_driven > 1:
+                current_delta = "^7-0.000"
+                self.game_object.send_button(112, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 88, 12, 5, current_delta)
+            else:
+                current_delta = "Calc..."
+                self.game_object.send_button(112, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 88, 12, 5, current_delta)
+        else:
+            current_delta = "Await flying lap"
+            self.game_object.send_button(112, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 88, 12, 5, current_delta)
+
+    def check_live_delta_best_lap(self):
+        min_dist = 131072000  # 2km
+        time_next_point = 5940000
+        if len(self.coordinates_and_timestamps_best_lap) > 0:
+            veh = self.game_object.own_vehicle
+            time_now = time.perf_counter() - self.start_time_this_lap
+            for coordinates in self.coordinates_and_timestamps_best_lap:
+                x, y, timestamp = coordinates
+                dist = Calculations.calc_distance(veh.x, veh.y, x, y)
+                if dist < min_dist:
+                    min_dist = dist
+                    time_next_point = timestamp
+
+            current_delta = time_now - time_next_point
+            current_delta = round(current_delta, 3)
+
+            if current_delta < 0 and self.laps_driven > 1:
+                current_delta = str(current_delta)
+                current_delta = "^2" + current_delta
+                self.game_object.send_button(113, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 100, 12, 5, current_delta)
+            elif current_delta > 0 and self.laps_driven > 1:
+                current_delta = str(current_delta)
+                current_delta = "^1+" + current_delta
+                self.game_object.send_button(113, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 100, 12, 5, current_delta)
+            elif self.laps_driven > 1:
+                current_delta = "^7-0.000"
+                self.game_object.send_button(113, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 100, 12, 5, current_delta)
+            else:
+                current_delta = "Calc..."
+                self.game_object.send_button(113, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 100, 12, 5, current_delta)
+        else:
+            current_delta = "Await flying lap"
+            self.game_object.send_button(113, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 5, 100, 12, 5, current_delta)

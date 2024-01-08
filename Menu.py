@@ -25,7 +25,18 @@ def change_mode(game_object):
     mode += 1
     if mode > 3:
         mode = 0
+
     game_object.settings.pact_mode = mode
+    if mode == 3:
+        game_object.INTERVAL = 100
+        game_object.send_button(110, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 0, 88, 12, 5,
+                                "Diff Last")
+        game_object.send_button(111, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 0, 100, 12, 5,
+                                "Diff Best")
+    else:
+        game_object.INTERVAL = 200
+        for i in range(110, 121):
+            game_object.del_button(i)
     send_mode(game_object)
 
 
