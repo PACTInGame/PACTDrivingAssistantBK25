@@ -3,7 +3,7 @@ from threading import Thread
 import time
 
 import pydirectinput
-
+import keyboard as kb
 import pyinsim
 
 
@@ -44,9 +44,10 @@ class Gearbox:
             t.start()
 
     def press(self, keys):
-        tim = time.perf_counter()
-        for key in keys:
-            pydirectinput.press(key)
+        shift = get_shift_buttons()
+        if not shift:
+            for key in keys:
+                pydirectinput.press(key)
 
     def get_gearbox_data_from_file(self, cname):
         cname = str(cname)
@@ -98,14 +99,13 @@ class Gearbox:
             self.game_object.del_button(120 + i)
 
     def calculate_gear(self):
-        # TODO And add support for different setups per car
         # TODO only 10 settings per car saveable
         self.update_data()
         if self.make_selection:
             self.game_object.send_button(120, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 50, 87, 26, 5,
                                          "Select gearbox settings")
             for i in range(len(self.gears_and_max_speed)):
-                if i > 10: # TODO check if this is right
+                if i > 10:  # TODO check if this is right
                     break
                 self.game_object.send_button(121 + i, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 55 + 5 * i, 87, 26, 5,
                                              self.gears_and_max_speed[i][2])
@@ -138,14 +138,14 @@ class Gearbox:
                 shift_action = find_index - self.gear
             else:
                 shift_action = 0
-            if self.cornering > 500 or self.cornering < -500:
+            if self.cornering > 500 or self.cornering < -500 or self.gear <= 1:
                 shift_action = 0
 
             ign = self.game_object.settings.IGNITION_KEY
             up = self.game_object.settings.SHIFT_UP_KEY
             down = self.game_object.settings.SHIFT_DOWN_KEY
 
-            if not self.game_object.text_entry: # TODO check also if on track and not shift held down
+            if not self.game_object.text_entry:  # TODO check also if on track and not shift held down
                 if shift_action >= 1:
                     self.send([ign, up, ign])
 
@@ -157,3 +157,10 @@ class Gearbox:
 
                 elif shift_action <= -3:
                     self.send([ign, down, down, down, ign])
+
+
+def get_shift_buttons():
+    try:
+        return kb.is_pressed("shift")
+    except:
+        return "Error detecting Keyboard inputs"

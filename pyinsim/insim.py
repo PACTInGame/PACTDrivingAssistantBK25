@@ -127,7 +127,8 @@ SMALL_STP = 5
 SMALL_RTP = 6
 SMALL_NLI = 7
 SMALL_ALC = 8
-SMALL_LCS = 9
+SMALL_LCS = 9 #switches
+SMALL_LCL = 10 #lights
 
 # Fourth byte of IS_TTC
 TTC_NONE = 0
@@ -419,6 +420,20 @@ LCS_Mask_Headlights = 0x0800    # bit	11    (Switches & 0x0800) - Headlights
 LCS_Mask_Horn = 0x070000        # bits  16-18 (Switches & 0x070000) - Horn    (0 off / 1 to 5 horn type)
 LCS_Mask_Siren = 0x300000       # bits  20-21 (Switches & 0x300000) - Siren   (0 off / 1 fast / 2 slow)
 
+# SMALL_LCL Flags
+LCL_SET_SIGNALS = 1		# bit 0
+LCL_SPARE_2 = 2		# bit 1
+LCL_SET_LIGHTS = 4	# bit 2
+LCL_SPARE_8 = 8		# bit 3
+LCL_SET_FOG_REAR = 0x10	# bit 4
+LCL_SET_FOG_FRONT = 0x20	# bit 5
+LCL_SET_EXTRA = 0x40		# bit 6
+
+LCL_Mask_Signals = 0x00030000       # bits  16-17 (0 off / 1 left / 2 right / 3 hazard)
+LCL_Mask_Lights = 0x000C0000        # bits  18-19 (0 off / 1 side / 2 low / 3 high)
+LCL_Mask_FogRear = 0x00100000       # bit   20    (0 off / 1 on)
+LCL_Mask_FogFront = 0x00200000      # bit   21    (0 off / 1 on)
+LCL_Mask_Extra = 0x00400000         # bit   22    (0 off / 1 on)
 
 def _eat_null_chars(str_):
     return str_.rstrip(b'\x00')

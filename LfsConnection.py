@@ -818,6 +818,9 @@ class LFSConnection:
                 self.last_tip_time = time.perf_counter()
                 tip = Tips.get_tip(self.settings.language)
                 self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
+
+            if COP:
+                pass
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()
             self.RaceAssist.check_live_delta_previous_lap()
