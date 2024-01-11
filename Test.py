@@ -24,8 +24,10 @@ LCS_Mask_Horn = 0x070000        # bits  16-18 (Switches & 0x070000) - Horn    (0
 LCS_Mask_Siren = 0x300000       # bits  20-21 (Switches & 0x300000) - Siren   (0 off / 1 fast / 2 slow)
 
     '''
+    # turn on
     insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL, UVal=pyinsim.LCL_SET_EXTRA | pyinsim.LCL_Mask_Extra)
-
+    # turn off
+    insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL, UVal=pyinsim.LCL_SET_EXTRA)
 
 # Init new InSim object.
 insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'')

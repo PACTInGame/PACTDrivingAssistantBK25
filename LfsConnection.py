@@ -23,6 +23,7 @@ from AdaptiveBrakeLight import AdaptiveBrakeLight
 from BlindSpotWarning import check_blindspots_ref
 from BusHQ import BusHQ
 from BusSimulation import BusSimulation
+from CopAssist import CopAssist
 from Language import Language
 from OwnVehicle import OwnVehicle
 from PSC import PSC
@@ -80,6 +81,7 @@ class LFSConnection:
         self.controller_inputs = GetControllerInput.ControllerInput(self)
         self.AdaptiveBrakeLight = AdaptiveBrakeLight(self)
         self.RaceAssist = RaceAssist(self)
+        self.CopAssist = CopAssist(self)
 
         self.outgauge = None
         self.outsim = None
@@ -820,7 +822,8 @@ class LFSConnection:
                 self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
 
             if COP:
-                pass
+                self.CopAssist.run()
+
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()
             self.RaceAssist.check_live_delta_previous_lap()

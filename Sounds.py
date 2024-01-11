@@ -35,6 +35,7 @@ def yield_sound():
 
 
 def playsound_indicator_on():
+    print("indicator on")
     mixer.music.load('data\\sounds\\indicatorOn.wav')
     mixer.music.play()
 

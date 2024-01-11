@@ -430,6 +430,8 @@ LCL_SET_FOG_FRONT = 0x20	# bit 5
 LCL_SET_EXTRA = 0x40		# bit 6
 
 LCL_Mask_Signals = 0x00030000       # bits  16-17 (0 off / 1 left / 2 right / 3 hazard)
+LCL_Mask_Right = 0x00020000
+LCL_Mask_Left = 0x00010000
 LCL_Mask_Lights = 0x000C0000        # bits  18-19 (0 off / 1 side / 2 low / 3 high)
 LCL_Mask_FogRear = 0x00100000       # bit   20    (0 off / 1 on)
 LCL_Mask_FogFront = 0x00200000      # bit   21    (0 off / 1 on)
