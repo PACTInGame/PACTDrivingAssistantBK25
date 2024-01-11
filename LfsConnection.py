@@ -151,12 +151,14 @@ class LFSConnection:
         self.own_vehicle.indicator_right = pyinsim.DL_SIGNAL_R & packet.ShowLights
         self.own_vehicle.hazard_lights = self.own_vehicle.indicator_left and self.own_vehicle.indicator_right
         self.own_vehicle.full_beam_light = pyinsim.DL_FULLBEAM & packet.ShowLights > 0
+        self.own_vehicle.low_beam_light = pyinsim.DL_DIPPED & packet.ShowLights > 0
         self.own_vehicle.tc_light = pyinsim.DL_TC & packet.ShowLights > 0
         self.own_vehicle.abs_light = pyinsim.DL_ABS & packet.ShowLights > 0
         self.own_vehicle.handbrake_light = pyinsim.DL_HANDBRAKE & packet.ShowLights > 0
         self.own_vehicle.battery_light = pyinsim.DL_BATTERY & packet.ShowLights > 0
         self.own_vehicle.oil_light = pyinsim.DL_OILWARN & packet.ShowLights > 0
-        self.own_vehicle.eng_light = pyinsim.DL_SPARE & packet.ShowLights > 0
+        self.own_vehicle.eng_light = pyinsim.DL_ENGINE & packet.ShowLights > 0
+
 
         if self.own_vehicle.cname != packet.Car:
             self.own_vehicle.cname = packet.Car
@@ -823,6 +825,11 @@ class LFSConnection:
 
             if COP:
                 self.CopAssist.run()
+            else:
+                if self.settings.light_assist:
+                    if not self.own_vehicle.low_beam_light:
+                        self.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
+                                                    UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_LowBeam)
 
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()

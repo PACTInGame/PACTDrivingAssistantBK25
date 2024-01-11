@@ -432,7 +432,9 @@ LCL_SET_EXTRA = 0x40		# bit 6
 LCL_Mask_Signals = 0x00030000       # bits  16-17 (0 off / 1 left / 2 right / 3 hazard)
 LCL_Mask_Right = 0x00020000
 LCL_Mask_Left = 0x00010000
-LCL_Mask_Lights = 0x000C0000        # bits  18-19 (0 off / 1 side / 2 low / 3 high)
+LCL_Mask_HighBeam = 0x000C0000        # bits  18-19 (0 off / 1 side / 2 low / 3 high)
+LCL_Mask_LowBeam = 0x00080000
+LCL_Mask_SideLight = 0x00040000
 LCL_Mask_FogRear = 0x00100000       # bit   20    (0 off / 1 on)
 LCL_Mask_FogFront = 0x00200000      # bit   21    (0 off / 1 on)
 LCL_Mask_Extra = 0x00400000         # bit   22    (0 off / 1 on)
@@ -1700,8 +1702,15 @@ DL_SIGNAL_ANY = 128
 DL_OILWARN = 256
 DL_BATTERY = 512
 DL_ABS = 1024
-DL_SPARE = 2048
-DL_NUM= 4096
+DL_ENGINE = 2048
+DL_FOG_REAR = 4096
+DL_FOG_FRONT = 8192
+DL_DIPPED = 16384
+DL_FUELWARN = 32768
+DL_SIDELIGHTS = 65536
+DL_NEUTRAL = 131072
+
+DLF_ENGINE_SEVERE = 0x10000000
 
 class OutGaugePack(object):
     pack_s = struct.Struct('I3sxH2B7f2I3f15sx15sx')

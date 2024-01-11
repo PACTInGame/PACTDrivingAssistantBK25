@@ -39,6 +39,7 @@ class OwnVehicle:
         self.tc_light = False
         self.full_beam_light = False
         self.engine_light = False
+        self.low_beam_light = False
 
         self.player_name = ""
         self.cname = ""
@@ -46,7 +47,7 @@ class OwnVehicle:
         self.eng_type = "combutstion"  # combustion, electric
 
         self.acc_active = False
-        self.siren_active = False
+        self.siren_active = False # TODO Maybe exclude and put to copassist
         self.siren_fast = False
 
         self.is_bus = False
