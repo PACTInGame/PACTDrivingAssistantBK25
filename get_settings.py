@@ -115,16 +115,17 @@ def get_acc_settings_from_file():
 
 
 def get_controls_from_file():
-    change_set = ["s", "x", "i", "2", "3", "1", "6", "down", "up", "q", "m", "k"]
+    change_set = ["s", "x", "i", "2", "3", "1", "6", "down", "up", "q", "m", "k", "13"]
     try:
         with open("controls.txt") as fp:
             for i, line in enumerate(fp):
                 if 1 <= i <= 10:
                     line = line.split()
                     change_set[i - 1] = line[0]
-                elif 12 <= i <= 13:
+                elif 12 <= i <= 14:
                     line = line.split()
                     change_set[i - 2] = line[0]
+
         print("Controls loaded successfully")
         return change_set
 

@@ -99,6 +99,7 @@ class Gearbox:
             self.game_object.del_button(120 + i)
 
     def calculate_gear(self):
+        # TODO only in sequential mode
         # TODO only 10 settings per car saveable
         self.update_data()
         if self.make_selection:

@@ -9,7 +9,6 @@ class Setting:
     def __init__(self, game_obj):
         self.game_obj = game_obj
 
-
         self.bus_simulation = True
         self.bus_door_sound = True
         self.bus_route_sound = True
@@ -17,11 +16,9 @@ class Setting:
         self.bus_sound_effects = True
         self.bus_offline_sim = False
 
-
-
         # TODO MAKE MORE SETTINGS PERSISTENT
         set_def = get_settings.get_settings_from_file()
-        
+
         self.head_up_display = set_def[0]
         self.forward_collision_warning = set_def[1]
         self.blind_spot_warning = set_def[2]
@@ -70,6 +67,7 @@ class Setting:
         self.HANDBRAKE_KEY = cont_def[9]
         self.SPARE_KEY_1 = cont_def[10]
         self.SPARE_KEY_2 = cont_def[11]
+        self.CLUTCH_AXIS = int(cont_def[12])
         self.controller_throttle, self.controller_brake, self.controller_steer, self.num_joystick = get_settings.get_acc_settings_from_file()
 
     def change_language(self):
@@ -98,3 +96,38 @@ class Setting:
     def change(self, var):
         var = not var
 
+    def save_controls(self):
+        print(self.SHIFT_UP_KEY)
+        file_string = ("Important: Only change inside LFS!\n" 
+                       "{}  <-change you Shift Up key here.      ------------------ ALL USERS\n" 
+                       "{}  <-change you Shift Down key here. ------------------ ALL USERS\n" 
+                       "{}  <-change you Ignition key here.       ------------------ ALL USERS\n" 
+                       "{}  <-specify your throttle axis (OPTIONS -> CONTROLS -> AXES/FF), if you have a controller\n" 
+                       "{}  <-specify your brake axis, if you have a controller\n" 
+                       "{}  <-specify your steering axis, if you have a controller\n" 
+                       "{} <-specify the first vjoy axis, if you have a controller\n" 
+                       "{}  <-specify the brake key, if you use keyboard or mouse (can also be mousel, mouser)\n" 
+                       "{} <-specify the accelerator key, if you use keyboard\n" 
+                       "{} <-specify the handbrake key           ------------------ ALL USERS\n" 
+                       "C:\\Program Files\\vJoy\\x64\\vJoyInterface.dll <-change Path to vJoy folder here, depends on where you've installed it.\n" 
+                       "{} <-a spare key without any function\n" 
+                       "{} <-a spare key without any function\n"
+                       "{} <- specify your clutch axis, if you have a controller)\n".format(str(self.SHIFT_UP_KEY),
+                                                                                            str(self.SHIFT_DOWN_KEY),
+                                                                                          str(self.IGNITION_KEY),
+                                                                                          str(self.THROTTLE_AXIS),
+                                                                                          str(self.BRAKE_AXIS),
+                                                                                          str(self.STEER_AXIS),
+                                                                                          str(self.VJOY_AXIS),
+                                                                                          str(self.BRAKE_KEY),
+                                                                                          str(self.ACC_KEY),
+                                                                                          str(self.HANDBRAKE_KEY),
+                                                                                          str(self.SPARE_KEY_1),
+                                                                                          str(self.SPARE_KEY_2),
+                                                                                          str(self.CLUTCH_AXIS)))
+        try:
+            with open('controls.txt', 'w') as file:
+                file.write(file_string)
+            print("Controls saved successfully")
+        except:
+            print("An Error has occurred during saving. Make sure controls.txt exists.")

@@ -1,4 +1,4 @@
-Important: Only change the letter in the at the beginning. For example if your shift up key is "a". Change s to a. Do not rearrange this layout.
+Important: Only change inside LFS!
 s  <-change you Shift Up key here.      ------------------ ALL USERS
 x  <-change you Shift Down key here. ------------------ ALL USERS
 i  <-change you Ignition key here.       ------------------ ALL USERS
@@ -9,6 +9,7 @@ i  <-change you Ignition key here.       ------------------ ALL USERS
 down  <-specify the brake key, if you use keyboard or mouse (can also be mousel, mouser)
 up <-specify the accelerator key, if you use keyboard
 q <-specify the handbrake key           ------------------ ALL USERS
-C:\\Program Files\\vJoy\\x64\\vJoyInterface.dll <-change Path to vJoy folder here, depends on where you've installed it.
+C:\Program Files\vJoy\x64\vJoyInterface.dll <-change Path to vJoy folder here, depends on where you've installed it.
 m <-a spare key without any function
 l <-a spare key without any function
+13 <- specify your clutch axis, if you have a controller)

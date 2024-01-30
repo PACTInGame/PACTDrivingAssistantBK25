@@ -469,11 +469,36 @@ class LFSConnection:
                 if not btc.ClickID == 40:
                     Menu.open_general_menu(self)
 
-            elif self.current_menu == 6:
+            elif self.current_menu == 6: # Keys Menu
+                if btc.ClickID == 22:
+                    Menu.listen_for_key(self, "shift_up")
+                elif btc.ClickID == 24:
+                    Menu.listen_for_key(self, "shift_down")
+                elif btc.ClickID == 26:
+                    Menu.listen_for_key(self, "ignition")
+                elif btc.ClickID == 28:
+                    Menu.listen_for_key(self, "handbrake")
+                if self.own_vehicle.control_mode == 2:
+                    if btc.ClickID == 30:
+                        Menu.listen_for_key(self, "throttle_axis")
+                    elif btc.ClickID == 32:
+                        Menu.listen_for_key(self, "brake_axis")
+                    elif btc.ClickID == 34:
+                        Menu.listen_for_key(self, "steer_axis")
+                    elif btc.ClickID == 36:
+                        Menu.listen_for_key(self, "clutch_axis")
+                else:
+                    if btc.ClickID == 30:
+                        Menu.listen_for_key(self, "throttle_key")
+                    elif btc.ClickID == 32:
+                        Menu.listen_for_key(self, "brake_key")
+                    elif btc.ClickID == 34:
+                        Menu.listen_for_key(self, "spare_key1")
+                    elif btc.ClickID == 36:
+                        Menu.listen_for_key(self, "spare_key2")
                 if btc.ClickID == 40:
                     Menu.close_menu(self)
-                if not btc.ClickID == 40:
-                    Menu.open_general_menu(self)
+
         else:
             click_actions = {
                 100: Menu.ask,

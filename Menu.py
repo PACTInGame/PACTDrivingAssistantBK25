@@ -1,6 +1,9 @@
 import webbrowser
 
+import keyboard
+
 import Language
+import Menu
 import get_settings
 import pyinsim
 
@@ -67,11 +70,49 @@ def open_menu(game_object):
                             game_object.language.translation(lang, "Close"))
 
 
+def listen_for_key(game_object, key):
+    def use_new_key(event):
+        new_key = event.name
+        game_object.notifications.append(["^2New key: " + new_key, 1])
+        if key == "shift_up":
+            print("new:" + new_key)
+            game_object.settings.SHIFT_UP_KEY = new_key
+        elif key == "shift_down":
+            game_object.settings.SHIFT_DOWN_KEY = new_key
+        elif key == "ignition":
+            game_object.settings.IGNITION_KEY = new_key
+        elif key == "handbrake":
+            game_object.settings.HANDBRAKE_KEY = new_key
+        elif key == "throttle":
+            game_object.settings.THROTTLE_KEY = new_key
+        elif key == "brake":
+            game_object.settings.BRAKE_KEY = new_key
+        elif key == "spare_1":
+            game_object.settings.SPARE_KEY_1 = new_key
+        elif key == "spare_2":
+            game_object.settings.SPARE_KEY_2 = new_key
+        elif key == "throttle_axis":
+            game_object.settings.THROTTLE_AXIS = new_key
+        elif key == "brake_axis":
+            game_object.settings.BRAKE_AXIS = new_key
+        elif key == "steer_axis":
+            game_object.settings.STEER_AXIS = new_key
+        keyboard.unhook(use_new_key)
+        game_object.settings.save_controls()
+        open_keys_menu(game_object)
+        return False
+    # Listen for a key event
+    game_object.notifications.append(["^3Listening for Key!", 1])
+    keyboard.hook(use_new_key)
+
+
+
+
 def open_keys_menu(game_object):
     # TODO : menu and btcs not finished
     lang = game_object.settings.language
     game_object.current_menu = 6
-    game_object.notifications.append(["^1Not yet implemented.", 3])
+    game_object.notifications.append(["^1Caution, axes not yet supported!", 2])
     top = 80
     for i in range(21, 41):
         game_object.del_button(i)
@@ -91,7 +132,7 @@ def open_keys_menu(game_object):
     game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
                             game_object.language.translation(lang, "Handbrake"))
     game_object.send_button(29, pyinsim.ISB_LIGHT, top + 20, 20, 5, 5,
-                            game_object.settings.IGNITION_KEY)
+                            game_object.settings.HANDBRAKE_KEY)
     if game_object.own_vehicle.control_mode == 2:
         game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                                 game_object.language.translation(lang, "Throttle_Axis"))
@@ -105,6 +146,10 @@ def open_keys_menu(game_object):
                                 game_object.language.translation(lang, "Steer_Axis"))
         game_object.send_button(35, pyinsim.ISB_LIGHT, top + 35, 20, 5, 5,
                                 str(game_object.settings.STEER_AXIS))
+        game_object.send_button(36, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 40, 0, 20, 5,
+                                game_object.language.translation(lang, "Clutch_Axis"))
+        game_object.send_button(37, pyinsim.ISB_LIGHT, top + 40, 20, 5, 5,
+                                str(game_object.settings.CLUTCH_AXIS))
     else:
         game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                                 game_object.language.translation(lang, "Throttle_Key"))
@@ -123,7 +168,7 @@ def open_keys_menu(game_object):
         game_object.send_button(37, pyinsim.ISB_LIGHT, top + 40, 20, 5, 5,
                                 game_object.settings.SPARE_KEY_2)
     game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK,
-                            top + 40 if game_object.own_vehicle.control_mode == 2 else top + 45, 0, 20, 5,
+                            top + 45, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 
