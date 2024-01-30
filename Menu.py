@@ -109,7 +109,7 @@ def listen_for_key(game_object, key):
 
 
 def open_keys_menu(game_object):
-    # TODO : menu and btcs not finished
+    # TODO : axes(multiple keys not yet supported)
     lang = game_object.settings.language
     game_object.current_menu = 6
     game_object.notifications.append(["^1Caution, axes not yet supported!", 2])
