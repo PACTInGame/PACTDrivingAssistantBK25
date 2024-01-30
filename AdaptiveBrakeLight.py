@@ -12,7 +12,6 @@ class AdaptiveBrakeLight:
         self.brake = self.game_obj.own_vehicle.brake
 
     def update(self):
-        # TODO use LCL packet instead of mst commands
         self.setting = self.game_obj.settings.adaptive_brake_light_style
         self.speed = self.game_obj.own_vehicle.speed
         self.brake = self.game_obj.own_vehicle.brake
@@ -52,7 +51,7 @@ class AdaptiveBrakeLight:
             if self.cycle == 0:
                 self.cycle = 1
                 self.game_obj.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
-                                         UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_Lights)
+                                         UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_LowBeam)
             else:
                 self.cycle = 0
                 self.game_obj.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,

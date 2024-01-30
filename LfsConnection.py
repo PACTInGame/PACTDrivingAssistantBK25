@@ -222,8 +222,12 @@ class LFSConnection:
                         Sounds.playsound_indicator_off()
 
     def message_handling(self, insim, mso):
-        message = mso.Msg.decode()
-        messagehandling.handle_commands(message, self)
+        try:
+            message = mso.Msg.decode()
+            messagehandling.handle_commands(message, self)
+        except:
+            pass
+    # TODO implement realistic clutch
 
     def insim_state(self, insim, sta):
         """
@@ -818,7 +822,7 @@ class LFSConnection:
             if self.notifications:
                 check_notifications()
 
-            if self.last_tip_time < time.perf_counter() - 60:
+            if self.last_tip_time < time.perf_counter() - 120 and self.settings.pact_mode == 0:
                 self.last_tip_time = time.perf_counter()
                 tip = Tips.get_tip(self.settings.language)
                 self.insim.send(pyinsim.ISP_MSL, Msg=tip.encode())
@@ -827,7 +831,7 @@ class LFSConnection:
                 self.CopAssist.run()
             else:
                 if self.settings.light_assist:
-                    if not self.own_vehicle.low_beam_light:
+                    if not self.own_vehicle.low_beam_light and not self.AdaptiveBrakeLight.braking:
                         self.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
                                                     UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_LowBeam)
 

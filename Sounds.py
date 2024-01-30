@@ -19,7 +19,6 @@ def pdc_front():
 
 
 def pdc_rear():
-    print("rear")
     mixer.music.load('data\\sounds\\beep_rear.wav')
     mixer.music.play()
 
@@ -35,7 +34,6 @@ def yield_sound():
 
 
 def playsound_indicator_on():
-    print("indicator on")
     mixer.music.load('data\\sounds\\indicatorOn.wav')
     mixer.music.play()
 

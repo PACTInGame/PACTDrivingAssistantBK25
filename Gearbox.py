@@ -145,7 +145,7 @@ class Gearbox:
             up = self.game_object.settings.SHIFT_UP_KEY
             down = self.game_object.settings.SHIFT_DOWN_KEY
 
-            if not self.game_object.text_entry:  # TODO check also if on track and not shift held down
+            if not self.game_object.text_entry:
                 if shift_action >= 1:
                     self.send([ign, up, ign])
 

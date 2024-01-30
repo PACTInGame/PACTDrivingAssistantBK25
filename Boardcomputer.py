@@ -32,7 +32,7 @@ class Boardcomputer:
         self.distance_driven_meters += add_distance
         self.distance_since_reset += add_distance
         self.percent_fuel_burned_since_reset = abs(self.percent_fuel_at_reset - fuel)
-        if self.distance_since_reset > 200:  # TODO increase to 1000 for release
+        if self.distance_since_reset > 500:
             fuel_percent_per_km = self.percent_fuel_burned_since_reset / self.distance_since_reset * 1000
             self.range_km = fuel / fuel_percent_per_km if fuel_percent_per_km > 0 else -1
         fuel_diff = abs(self.last_fuel - fuel)
