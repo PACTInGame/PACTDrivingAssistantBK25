@@ -38,12 +38,17 @@ class Boardcomputer:
         fuel_diff = abs(self.last_fuel - fuel)
         if fuel_diff > 0.001 or self.percent_fuel_at_reset == 0:
             self.reset()
-        if self.range_km < 20 and not self.notified_low_fuel and not self.range_km == -1:
+        if self.range_km < 50 and not self.notified_low_fuel and not self.range_km == -1 and self.game_obj.own_vehicle.roleplay == "cop":
+            self.game_obj.notifications.append(["^3Refuel for Patrol. Range.", 5])
+            self.notified_low_fuel = True
+        elif self.range_km < 20 and not self.notified_low_fuel and not self.range_km == -1:
             self.game_obj.notifications.append(["^3Refuel soon. Range.", 5])
             self.notified_low_fuel = True
-        if self.range_km < 5 and not self.notified_critical_fuel and not self.range_km == -1:
+        if self.range_km < (15 if self.game_obj.own_vehicle.roleplay == "cop" else 5) and not self.notified_critical_fuel and not self.range_km == -1:
             self.game_obj.notifications.append(["^1Refuel immediately. Range.", 5])
             self.notified_critical_fuel = True
+
+
         self.last_fuel = fuel
 
 

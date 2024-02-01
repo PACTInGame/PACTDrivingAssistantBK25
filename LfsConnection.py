@@ -89,7 +89,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, 139, 140}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, *range(132, 141)}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -130,6 +130,7 @@ class LFSConnection:
         self.beep_thread_started = False
 
         self.last_tip_time = time.perf_counter()
+        self.manual_mode_change = False
 
     def outgauge_packet(self, outgauge, packet):
         """
@@ -322,17 +323,20 @@ class LFSConnection:
 
             if b"[COP]" in npl.PName:
                 self.own_vehicle.roleplay = "cop"
-
-                self.settings.pact_mode = 2
+                if not self.manual_mode_change:
+                    self.settings.pact_mode = 2
             elif b"[MED]" in npl.PName or b"[RES]" in npl.PName:
                 self.own_vehicle.roleplay = "res"
-                self.settings.pact_mode = 2
+                if not self.manual_mode_change:
+                    self.settings.pact_mode = 2
             elif b"[TOW]" in npl.PName:
                 self.own_vehicle.roleplay = "tow"
-                self.settings.pact_mode = 2
+                if not self.manual_mode_change:
+                    self.settings.pact_mode = 2
             else:
                 self.own_vehicle.roleplay = "civil"
-                self.settings.pact_mode = 0
+                if not self.manual_mode_change:
+                    self.settings.pact_mode = 0
             Menu.send_mode(self)
 
             if len(flags) >= 4 and flags[-4] == 1:
@@ -521,6 +525,8 @@ class LFSConnection:
                 self.settings.suspect_tracker = not self.settings.suspect_tracker
             elif btc.ClickID == 138:
                 Menu.close_cop_menu(self)
+            if not btc.ClickID == 138:
+                Menu.open_cop_menu(self)
 
         else:
             click_actions = {

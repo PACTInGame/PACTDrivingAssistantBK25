@@ -10,6 +10,7 @@ import pyinsim
 
 def send_mode(game_object):
     if game_object.current_menu == 0:
+        game_object.del_button(131)
         if game_object.settings.pact_mode == 0:
             game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
                                     game_object.language.translation(game_object.lang, "All_on"))
@@ -34,26 +35,29 @@ def open_cop_menu(game_object):
     game_object.del_button(103)
     game_object.del_button(131)
     game_object.current_menu = 7
-    game_object.send_button(132, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
+    game_object.send_button(21, pyinsim.ISB_DARK, 90, 0, 20, 5,
+                            game_object.language.translation(game_object.lang, "Cop_Menu"))
+    game_object.send_button(132, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Automatic_Siren"))
-    game_object.send_button(133, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5,
+    game_object.send_button(133, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Use_Indicators"))
-    game_object.send_button(134, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+    game_object.send_button(134, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Use_Lights"))
-    game_object.send_button(135, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 110, 0, 12, 5,
+    game_object.send_button(135, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 110, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Use_Extra_Light"))
-    game_object.send_button(136, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 115, 0, 12, 5,
+    game_object.send_button(136, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 115, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Use_Fog_Light"))
-    game_object.send_button(137, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 0, 12, 5,
+    game_object.send_button(137, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Track_Suspect"))
-    game_object.send_button(138, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 125, 0, 12, 5,
+    game_object.send_button(138, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 125, 0, 20, 5,
                             game_object.language.translation(game_object.lang, "Close"))
 
 
 def change_mode(game_object):
+    game_object.manual_mode_change = True
     mode = game_object.settings.pact_mode
     mode += 1
-    if mode > 3:
+    if mode > 2:
         mode = 0
 
     game_object.settings.pact_mode = mode

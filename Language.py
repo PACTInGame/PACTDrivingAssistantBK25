@@ -65,10 +65,10 @@ class Language:
                 'Siren': 'Siren',
                 'Automatic_Siren': f'{"^2" if self.game_obj.settings.automatic_siren else "^1"}Automatic Siren',
                 'Use_Indicators': f'{"^2" if self.game_obj.settings.use_indicators else "^1"}Use Indicators',
-                'Use_Light': f'{"^2" if self.game_obj.settings.use_light else "^1"}Use Light',
+                'Use_Lights': f'{"^2" if self.game_obj.settings.use_light else "^1"}Use Light',
                 'Use_Extra_Light': f'{"^2" if self.game_obj.settings.use_extra_light else "^1"}Use Extra Light',
                 'Use_Fog_Light': f'{"^2" if self.game_obj.settings.use_fog_light else "^1"}Use Fog Lights',
-                'Suspect_Tracker': f'{"^2" if self.game_obj.settings.suspect_tracker else "^1"}Suspect Tracker',
+                'Track_Suspect': f'{"^2" if self.game_obj.settings.suspect_tracker else "^1"}Suspect Tracker',
                 'Shift_Up': 'Shift Up',
                 'Shift_Down': 'Shift Down',
                 'Ignition': 'Ignition',
@@ -81,6 +81,7 @@ class Language:
                 'Brake_Key': 'Brake Key',
                 'Spare_Key1': 'Spare Key 1',
                 'Spare_Key2': 'Spare Key 2',
+                'Cop_Menu': 'Cop Menu',
 
 
             },
