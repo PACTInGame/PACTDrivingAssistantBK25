@@ -659,9 +659,9 @@ class LFSConnection:
 
         def send_siren_button():
             self.send_button(139, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 119 + x, 84 + y, 6, 4,
-                             ('^7' if not self.CopAssist.siren else '^4') + 'Siren')
+                             ('^7' if not self.CopAssist.siren else '^4') + self.language.translation(self.lang, 'Siren'))
             self.send_button(140, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 123 + x, 84 + y, 6, 4,
-                             ('^7' if not self.CopAssist.strobe else '^4') + 'Strobe')
+                             ('^7' if not self.CopAssist.strobe else '^4') + self.language.translation(self.lang, 'Strobe'))
 
         def send_outside_hud():
             # TODO create outside hud at the bottom of the screen
