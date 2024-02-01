@@ -45,7 +45,8 @@ from Vehicle import Vehicle
 # 103 Mode change (All on, All off, Cop, Race)
 # 110 - 120 RaceAssist
 # 121 - 130 Gearbox selection
-# 131 - 140 CopAssist
+# 131 - 138 CopAssist Menu
+# 139 - 141 CopAssist HUD
 class LFSConnection:
     def __init__(self):
         """
@@ -88,7 +89,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, 139, 140}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -160,7 +161,6 @@ class LFSConnection:
         self.own_vehicle.oil_light = pyinsim.DL_OILWARN & packet.ShowLights > 0
         self.own_vehicle.eng_light = pyinsim.DL_ENGINE & packet.ShowLights > 0
 
-
         if self.own_vehicle.cname != packet.Car:
             self.own_vehicle.cname = packet.Car
             if b"Batt" in packet.Display1:
@@ -228,6 +228,7 @@ class LFSConnection:
             messagehandling.handle_commands(message, self)
         except:
             pass
+
     # TODO implement realistic clutch
 
     def insim_state(self, insim, sta):
@@ -476,7 +477,7 @@ class LFSConnection:
                 if not btc.ClickID == 40:
                     Menu.open_general_menu(self)
 
-            elif self.current_menu == 6: # Keys Menu
+            elif self.current_menu == 6:  # Keys Menu
                 if btc.ClickID == 22:
                     Menu.listen_for_key(self, "shift_up")
                 elif btc.ClickID == 24:
@@ -505,7 +506,7 @@ class LFSConnection:
                         Menu.listen_for_key(self, "spare_key2")
                 if btc.ClickID == 40:
                     Menu.close_menu(self)
-        elif self.current_menu == 7: # Cop Menu
+        elif self.current_menu == 7:  # Cop Menu
             if btc.ClickID == 132:
                 self.settings.automatic_siren = not self.settings.automatic_siren
             elif btc.ClickID == 133:
@@ -539,6 +540,9 @@ class LFSConnection:
                 129: self.gearbox.gearbox_select,
                 130: self.gearbox.gearbox_select,
                 131: Menu.open_cop_menu,
+                139: self.CopAssist.toggle_siren,
+                140: self.CopAssist.toggle_strobe,
+
 
             }
             click_action = True
@@ -653,9 +657,17 @@ class LFSConnection:
         def send_gear_button(gear_mode):
             self.send_button(5, pyinsim.ISB_DARK, 123 + x, 116 + y, 4, 4, '^7' + gear_mode)
 
+        def send_siren_button():
+            self.send_button(139, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 119 + x, 84 + y, 6, 4,
+                             ('^7' if not self.CopAssist.siren else '^4') + 'Siren')
+            self.send_button(140, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 123 + x, 84 + y, 6, 4,
+                             ('^7' if not self.CopAssist.strobe else '^4') + 'Strobe')
+
         def send_outside_hud():
             # TODO create outside hud at the bottom of the screen
             for i in range(1, 10):
+                self.del_button(i)
+            for i in range(139, 142):
                 self.del_button(i)
 
         if self.settings.head_up_display:
@@ -680,6 +692,9 @@ class LFSConnection:
                     else:
                         send_speed_button('^7', 'mph', self.own_vehicle.speed * 0.621371)
                     send_rpm_button('^7', self.own_vehicle.rpm)
+
+                if self.settings.pact_mode == 2:
+                    send_siren_button()
                 send_extra_info_button()
                 send_notifications()
             elif self.in_game_cam in [0, 1, 2, 4]:
@@ -687,8 +702,12 @@ class LFSConnection:
             else:
                 for i in range(1, 10):
                     self.del_button(i)
+                for i in range(139, 142):
+                    self.del_button(i)
         else:
             for i in range(1, 10):
+                self.del_button(i)
+            for i in range(139, 142):
                 self.del_button(i)
 
     def timers_decr(self):
@@ -881,7 +900,7 @@ class LFSConnection:
                 if self.settings.light_assist:
                     if not self.own_vehicle.low_beam_light and not self.AdaptiveBrakeLight.braking:
                         self.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
-                                                    UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_LowBeam)
+                                        UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_LowBeam)
 
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()
