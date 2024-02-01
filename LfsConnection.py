@@ -47,6 +47,7 @@ from Vehicle import Vehicle
 # 121 - 130 Gearbox selection
 # 131 - 138 CopAssist Menu
 # 139 - 141 CopAssist HUD
+# 142 - 150 Gearbox Setup
 class LFSConnection:
     def __init__(self):
         """
@@ -115,6 +116,7 @@ class LFSConnection:
         self.collision_warning_sound_played = False
         self.cross_traffic_warning_sound_played = False
         self.side_collision_warning_sound_played = time.perf_counter()
+        self.obtain_PLID = True
 
         self.holding_brake = False
         self.lang = self.settings.language
@@ -144,7 +146,9 @@ class LFSConnection:
         self.own_vehicle.speed = packet.Speed * 3.6
         self.own_vehicle.rpm = packet.RPM
         self.own_vehicle.gear = packet.Gear
-        self.own_vehicle.player_id = packet.PLID
+        if self.obtain_PLID and self.on_track:
+            self.own_vehicle.player_id = packet.PLID
+            self.obtain_PLID = False
         self.own_vehicle.brake = packet.Brake
         self.own_vehicle.throttle = packet.Throttle
         self.own_vehicle.clutch = packet.Clutch
@@ -270,11 +274,12 @@ class LFSConnection:
         def start_menu_insim():
             self.time_menu_open = time.time()
             self.on_track = False
-            self.in_pits = False
             insim.unbind(pyinsim.ISP_MCI, self.get_car_data)
             [self.del_button(i) for i in range(200)]
             self.send_button(3, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
                              "Waiting for you to hit the road.")
+            if self.in_pits:
+                self.gearbox.set_up_screen()
 
         flags = [int(i) for i in str("{0:b}".format(sta.Flags))]
         self.in_game_cam = sta.InGameCam
@@ -318,7 +323,9 @@ class LFSConnection:
             if npl.PLID == car.player_id:
                 if car.cname != npl.CName:
                     car.update_cname(npl.CName)
+
         if npl.PLID == self.own_vehicle.player_id:
+            self.obtain_PLID = True
             flags = [int(i) for i in bin(npl.Flags)[2:]]
 
             if b"[COP]" in npl.PName:
@@ -356,9 +363,16 @@ class LFSConnection:
                 self.cars_on_track.remove(car)
 
     def player_pits(self, insim, plp):
+
         for car in self.cars_on_track:
             if car.player_id == plp.PLID:
+                print(plp.PLID, car.player_id)
                 self.cars_on_track.remove(car)
+        if self.own_vehicle.player_id == plp.PLID:
+            self.in_pits = True
+
+
+
 
     # Player Handling ends here -------------------------------------------------------
 
@@ -527,7 +541,8 @@ class LFSConnection:
                 Menu.close_cop_menu(self)
             if not btc.ClickID == 138:
                 Menu.open_cop_menu(self)
-
+        elif 143 <= btc.ClickID <= 150:  # Gearbox Setup
+            self.gearbox.set_up_gear(btc.ClickID - 143)
         else:
             click_actions = {
                 100: Menu.ask,
@@ -569,7 +584,7 @@ class LFSConnection:
         """
         pass
 
-    def send_button(self, click_id, style, t, l, w, h, text):
+    def send_button(self, click_id, style, t, l, w, h, text, inst=0, typeIn=0):
         """
         This method checks if a button is already on the screen and if not, it sends a new button to LFS.
         It makes sending buttons easier than always sending the entire thing to lfs.
@@ -583,11 +598,13 @@ class LFSConnection:
                 ReqI=255,
                 ClickID=click_id,
                 BStyle=style | 3,
+                Inst=inst,
                 T=t,
                 L=l,
                 W=w,
                 H=h,
-                Text=text)
+                Text=text,
+                TypeIn=typeIn)
 
     def del_button(self, click_id):
         if self.buttons_on_screen[click_id] == 1:
@@ -733,7 +750,7 @@ class LFSConnection:
         This method is called every 200ms to start all driver assistance functions.
         """
         self.get_relevant_cars()
-
+        print(self.in_pits)
         def brake_emergency():
             self.brake_intervention_was_active = True
             if self.settings.automatic_emergency_braking and ALL_ON:
