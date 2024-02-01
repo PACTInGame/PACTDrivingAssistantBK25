@@ -16,7 +16,6 @@ class Setting:
         self.bus_sound_effects = True
         self.bus_offline_sim = False
 
-        # TODO MAKE MORE SETTINGS PERSISTENT
         set_def = get_settings.get_settings_from_file()
 
         self.head_up_display = set_def[0]
@@ -51,6 +50,13 @@ class Setting:
         self.adaptive_brake_light = set_def[28]
         self.adaptive_brake_light_style = set_def[29]
         self.pact_mode = set_def[30]  # 0 = all on, 1 = all off, 2 = cop, 3 = race
+        # TODO MAKE MORE SETTINGS PERSISTENT
+        self.automatic_siren = True
+        self.use_indicators = True
+        self.use_light = True
+        self.use_extra_light = True
+        self.use_fog_light = True
+        self.suspect_tracker = True
 
         cont_def = get_settings.get_controls_from_file()
         self.SHIFT_UP_KEY = cont_def[0]

@@ -47,8 +47,6 @@ class OwnVehicle:
         self.eng_type = "combutstion"  # combustion, electric
 
         self.acc_active = False
-        self.siren_active = False # TODO Maybe exclude and put to copassist
-        self.siren_fast = False
 
         self.is_bus = False
 

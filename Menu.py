@@ -9,18 +9,45 @@ import pyinsim
 
 
 def send_mode(game_object):
-    if game_object.settings.pact_mode == 0:
-        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
-                                game_object.language.translation(game_object.lang, "All_on"))
-    elif game_object.settings.pact_mode == 1:
-        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
-                                game_object.language.translation(game_object.lang, "All_off"))
-    elif game_object.settings.pact_mode == 2:
-        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
-                                game_object.language.translation(game_object.lang, "Cop_Mode"))
-    else:
-        game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
-                                game_object.language.translation(game_object.lang, "Race_Mode"))
+    if game_object.current_menu == 0:
+        if game_object.settings.pact_mode == 0:
+            game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                    game_object.language.translation(game_object.lang, "All_on"))
+        elif game_object.settings.pact_mode == 1:
+            game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                    game_object.language.translation(game_object.lang, "All_off"))
+        elif game_object.settings.pact_mode == 2:
+            game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                    game_object.language.translation(game_object.lang, "Cop_Mode"))
+
+            game_object.send_button(131, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 110, 0, 12, 5,
+                                    game_object.language.translation(game_object.lang, "Cop_Menu"))
+        else:
+            game_object.send_button(103, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                                    game_object.language.translation(game_object.lang, "Race_Mode"))
+
+
+def open_cop_menu(game_object):
+    game_object.del_button(21)
+    game_object.del_button(100)
+    game_object.del_button(103)
+    game_object.del_button(103)
+    game_object.del_button(131)
+    game_object.current_menu = 7
+    game_object.send_button(132, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 95, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Automatic_Siren"))
+    game_object.send_button(133, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 100, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Use_Indicators"))
+    game_object.send_button(134, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 105, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Use_Lights"))
+    game_object.send_button(135, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 110, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Use_Extra_Light"))
+    game_object.send_button(136, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 115, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Use_Fog_Light"))
+    game_object.send_button(137, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 120, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Track_Suspect"))
+    game_object.send_button(138, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 125, 0, 12, 5,
+                            game_object.language.translation(game_object.lang, "Close"))
 
 
 def change_mode(game_object):
@@ -51,6 +78,7 @@ def open_menu(game_object):
     game_object.del_button(21)
     game_object.del_button(100)
     game_object.del_button(103)
+    game_object.del_button(131)
 
     game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "Menu"))
     game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
@@ -101,11 +129,10 @@ def listen_for_key(game_object, key):
         game_object.settings.save_controls()
         open_keys_menu(game_object)
         return False
+
     # Listen for a key event
     game_object.notifications.append(["^3Listening for Key!", 1])
     keyboard.hook(use_new_key)
-
-
 
 
 def open_keys_menu(game_object):
@@ -288,7 +315,6 @@ def open_park_menu(game_object):
 
 
 def close_menu(game_object):
-    print("close menu")
     game_object.current_menu = 0
     for i in range(21, 41):
         game_object.del_button(i)
@@ -300,6 +326,12 @@ def close_menu(game_object):
 
     get_settings.write_settings(game_object)
     send_mode(game_object)
+
+
+def close_cop_menu(game_object):
+    for i in range(131, 141):
+        game_object.del_button(i)
+    close_menu(game_object)
 
 
 def ask(game_obj):

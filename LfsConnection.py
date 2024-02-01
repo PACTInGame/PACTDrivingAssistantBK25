@@ -45,6 +45,7 @@ from Vehicle import Vehicle
 # 103 Mode change (All on, All off, Cop, Race)
 # 110 - 120 RaceAssist
 # 121 - 130 Gearbox selection
+# 131 - 140 CopAssist
 class LFSConnection:
     def __init__(self):
         """
@@ -65,7 +66,7 @@ class LFSConnection:
         self.players = {}
         self.cars_on_track = []
         self.cars_relevant = []
-        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu, 5 = General Menu, 6 = Keys Menu
+        self.current_menu = 0  # 0 = None, 1 = Main Menu, 2 = Driving Menu, 3 = Parking Menu, 4 = Bus Menu, 5 = General Menu, 6 = Keys Menu, 7 = Cop Menu
 
         self.own_vehicle = OwnVehicle()
         self.settings = Setting(self)
@@ -206,7 +207,7 @@ class LFSConnection:
             print("Failed to connect to OutSim. Maybe it was still active.")
 
     def sound_effects(self):
-        if self.own_vehicle.roleplay == "civil":
+        if self.own_vehicle.roleplay == "civil" and self.settings.pact_mode == 0:
             if self.settings.indicator_sound and not self.AdaptiveBrakeLight.braking:
                 if self.own_vehicle.indicator_right != self.indicator_right_sound:
                     self.indicator_right_sound = self.own_vehicle.indicator_right
@@ -320,12 +321,18 @@ class LFSConnection:
 
             if b"[COP]" in npl.PName:
                 self.own_vehicle.roleplay = "cop"
+
+                self.settings.pact_mode = 2
             elif b"[MED]" in npl.PName or b"[RES]" in npl.PName:
                 self.own_vehicle.roleplay = "res"
+                self.settings.pact_mode = 2
             elif b"[TOW]" in npl.PName:
                 self.own_vehicle.roleplay = "tow"
+                self.settings.pact_mode = 2
             else:
                 self.own_vehicle.roleplay = "civil"
+                self.settings.pact_mode = 0
+            Menu.send_mode(self)
 
             if len(flags) >= 4 and flags[-4] == 1:
                 self.own_vehicle.gearbox_mode = 0  # automatic
@@ -498,6 +505,21 @@ class LFSConnection:
                         Menu.listen_for_key(self, "spare_key2")
                 if btc.ClickID == 40:
                     Menu.close_menu(self)
+        elif self.current_menu == 7: # Cop Menu
+            if btc.ClickID == 132:
+                self.settings.automatic_siren = not self.settings.automatic_siren
+            elif btc.ClickID == 133:
+                self.settings.use_indicators = not self.settings.use_indicators
+            elif btc.ClickID == 134:
+                self.settings.use_light = not self.settings.use_light
+            elif btc.ClickID == 135:
+                self.settings.use_extra_light = not self.settings.use_extra_light
+            elif btc.ClickID == 136:
+                self.settings.use_fog_light = not self.settings.use_fog_light
+            elif btc.ClickID == 137:
+                self.settings.suspect_tracker = not self.settings.suspect_tracker
+            elif btc.ClickID == 138:
+                Menu.close_cop_menu(self)
 
         else:
             click_actions = {
@@ -516,6 +538,7 @@ class LFSConnection:
                 128: self.gearbox.gearbox_select,
                 129: self.gearbox.gearbox_select,
                 130: self.gearbox.gearbox_select,
+                131: Menu.open_cop_menu,
 
             }
             click_action = True
@@ -881,13 +904,15 @@ class LFSConnection:
         relevant_cars = sorted(relevant_cars, key=lambda x: Calculations.get_distance(x))
 
         many_cars = False
-        while len(relevant_cars) > 8:
+        while len(relevant_cars) > 6:
             del relevant_cars[-1]
-            if self.own_vehicle.siren_active and not self.own_vehicle.siren_fast and self.settings.cop_aid_system:
+            if self.CopAssist.siren and not self.CopAssist.siren_fast and self.settings.automatic_siren:
+                self.CopAssist.siren_fast = True
                 self.insim.send(pyinsim.ISP_MST, Msg=b"/siren fast")
             many_cars = True
 
-        if self.own_vehicle.siren_active and not many_cars and self.own_vehicle.siren_fast and self.settings.cop_aid_system:
+        if self.CopAssist.siren and not many_cars and self.CopAssist.siren_fast and self.settings.automatic_siren:
+            self.CopAssist.siren_fast = False
             self.insim.send(pyinsim.ISP_MST, Msg=b"/siren slow")
 
         self.cars_relevant = relevant_cars

@@ -5,32 +5,28 @@ class CopAssist:
     def __init__(self, game_object):
         self.game_object = game_object
         self.siren = False
+        self.siren_fast = False
         self.strobe = True
-
-        self.use_indicators = True
-        self.use_light = True
-        self.use_extra_light = True
-        self.use_fog_light = True
 
         self.strobe_cycle = 0
 
     def strobe_func(self):
         if self.strobe_cycle == 0:
             self.strobe_cycle = 1
-            if self.use_extra_light:
+            if self.game_object.settings.use_extra_light:
                 self.game_object.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
                                             UVal=pyinsim.LCL_SET_EXTRA | pyinsim.LCL_Mask_Extra)
-            if self.use_indicators:
+            if self.game_object.settings.use_indicators:
                 self.game_object.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
                                             UVal=pyinsim.LCL_SET_SIGNALS | pyinsim.LCL_Mask_Left)
-            if self.use_light:
+            if self.game_object.settings.use_light:
                 self.game_object.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL, UVal=pyinsim.LCL_SET_LIGHTS)
         elif self.strobe_cycle == 1:
             self.strobe_cycle = 2
-            if self.use_indicators:
+            if self.game_object.settings.use_indicators:
                 self.game_object.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
                                             UVal=pyinsim.LCL_SET_SIGNALS | pyinsim.LCL_Mask_Right)
-            if self.use_fog_light:
+            if self.game_object.settings.use_fog_light:
                 self.game_object.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
                                             UVal=pyinsim.LCL_SET_FOG_REAR | pyinsim.LCL_Mask_FogRear)
                 self.game_object.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
