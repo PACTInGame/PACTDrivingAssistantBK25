@@ -103,9 +103,10 @@ class LFSConnection:
         # Game Infos
         self.text_entry = False
         self.on_track = False
-        self.in_pits = False
         self.track = ""
         self.in_game_cam = 0  # 0 = Follow, 1 = Heli, 2 = TV, 3 = Driver, 4 = Custom, 255 = Another
+        self.in_game_interface = 0  # 0 = Game, 1 = Options, 2 = Host_Options, 3 = Garage, 4 = Car_select, 5 = Track_select,  6 = ShiftU
+        self.submode_interface = 0
 
         # for checking the previous state
         self.indicator_right_sound = False
@@ -255,7 +256,6 @@ class LFSConnection:
                             Msg=b"/axis %.1i brake" % self.settings.BRAKE_AXIS)
             self.insim.send(pyinsim.ISP_MST,
                             Msg=b"/axis %.1i throttle" % self.settings.THROTTLE_AXIS)
-            self.in_pits = False
             self.gearbox.delete_gearbox_builder()
             if time.time() - self.time_menu_open >= 30:
                 self.start_outgauge()
@@ -279,8 +279,7 @@ class LFSConnection:
             [self.del_button(i) for i in range(200)]
             self.send_button(3, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
                              "Waiting for you to hit the road.")
-            if self.in_pits:
-                self.gearbox.set_up_screen()
+
 
         flags = [int(i) for i in str("{0:b}".format(sta.Flags))]
         self.in_game_cam = sta.InGameCam
@@ -368,11 +367,6 @@ class LFSConnection:
         for car in self.cars_on_track:
             if car.player_id == plp.PLID:
                 self.cars_on_track.remove(car)
-        if self.own_vehicle.player_id == plp.PLID:
-            self.in_pits = True
-
-
-
 
     # Player Handling ends here -------------------------------------------------------
 
@@ -567,7 +561,6 @@ class LFSConnection:
                 139: self.CopAssist.toggle_siren,
                 140: self.CopAssist.toggle_strobe,
 
-
             }
             click_action = True
         if click_action:
@@ -685,9 +678,11 @@ class LFSConnection:
 
         def send_siren_button():
             self.send_button(139, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 119 + x, 84 + y, 6, 4,
-                             ('^7' if not self.CopAssist.siren else '^4') + self.language.translation(self.lang, 'Siren'))
+                             ('^7' if not self.CopAssist.siren else '^4') + self.language.translation(self.lang,
+                                                                                                      'Siren'))
             self.send_button(140, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 123 + x, 84 + y, 6, 4,
-                             ('^7' if not self.CopAssist.strobe else '^4') + self.language.translation(self.lang, 'Strobe'))
+                             ('^7' if not self.CopAssist.strobe else '^4') + self.language.translation(self.lang,
+                                                                                                       'Strobe'))
 
         def send_outside_hud():
             # TODO create outside hud at the bottom of the screen
@@ -699,7 +694,8 @@ class LFSConnection:
         if self.settings.head_up_display:
             if self.in_game_cam == 3:  # Drivers View
                 if self.own_vehicle.gear > 1:
-                    if self.own_vehicle.gearbox_mode == 0 or (self.settings.automatic_gearbox and self.own_vehicle.gearbox_mode == 2 and self.gearbox.car_supported):
+                    if self.own_vehicle.gearbox_mode == 0 or (
+                            self.settings.automatic_gearbox and self.own_vehicle.gearbox_mode == 2 and self.gearbox.car_supported):
                         send_gear_button('D%.i' % (self.own_vehicle.gear - 1))
                     else:
                         send_gear_button('%.i' % (self.own_vehicle.gear - 1))
@@ -754,6 +750,7 @@ class LFSConnection:
         This method is called every 200ms to start all driver assistance functions.
         """
         self.get_relevant_cars()
+
         def brake_emergency():
             self.brake_intervention_was_active = True
             if self.settings.automatic_emergency_braking and ALL_ON:
@@ -1027,7 +1024,15 @@ class LFSConnection:
             self.RaceAssist.update_split_times(spx.Split, spx.STime)
             self.RaceAssist.update_total_time(spx.ETime)
 
+    def get_interface_mode(self, insim, cim):
+        self.in_game_interface = cim.Mode
+        self.submode_interface = cim.SubMode
+        print(self.in_game_interface, self.submode_interface)
+        if self.in_game_interface == 3 and self.submode_interface == pyinsim.GRG_DRIVE:
+            self.gearbox.set_up_screen()
+
     def run(self):
+        self.insim.bind(pyinsim.ISP_CIM, self.get_interface_mode)
         self.insim.bind(pyinsim.ISP_MCI, self.get_car_data)
         self.insim.bind(pyinsim.ISP_MSO, self.message_handling)
         self.insim.bind(pyinsim.ISP_STA, self.insim_state)

@@ -23,11 +23,11 @@ metric <-- unit
 -3 <-- HUD width offset
 on <-- automatic indicator turnoff
 on <-- park emergency brake
-en <-- language
+de <-- language
 on <-- audible parking aid
 on <-- visual parking aid
 on <-- side collision prevention
 on <-- Indicator Sounds
 on <-- Adaptive Brake Lights
 on <-- Adaptive Brake Lights Style
-0 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)
+2 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)
