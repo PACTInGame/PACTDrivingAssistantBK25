@@ -5,6 +5,7 @@ class Language:
         # Add more languages and translations as needed
 
     def get_states(self):
+        # TODO check translations outside the menu, bc they seem to be just german lol
         translations = {
             'en': {
                 'Menu': 'Menu',

@@ -256,7 +256,6 @@ class LFSConnection:
                             Msg=b"/axis %.1i brake" % self.settings.BRAKE_AXIS)
             self.insim.send(pyinsim.ISP_MST,
                             Msg=b"/axis %.1i throttle" % self.settings.THROTTLE_AXIS)
-            self.gearbox.delete_gearbox_builder()
             if time.time() - self.time_menu_open >= 30:
                 self.start_outgauge()
             insim.bind(pyinsim.ISP_MCI, self.get_car_data)
@@ -276,7 +275,8 @@ class LFSConnection:
             self.time_menu_open = time.time()
             self.on_track = False
             insim.unbind(pyinsim.ISP_MCI, self.get_car_data)
-            [self.del_button(i) for i in range(200)]
+            [self.del_button(i) for i in range(143)]
+            [self.del_button(i) for i in range(152,200)]
             self.send_button(3, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
                              "Waiting for you to hit the road.")
 
@@ -1030,6 +1030,8 @@ class LFSConnection:
         print(self.in_game_interface, self.submode_interface)
         if self.in_game_interface == 3 and self.submode_interface == pyinsim.GRG_DRIVE:
             self.gearbox.set_up_screen()
+        else:
+            self.gearbox.delete_gearbox_builder()
 
     def run(self):
         self.insim.bind(pyinsim.ISP_CIM, self.get_interface_mode)

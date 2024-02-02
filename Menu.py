@@ -1,9 +1,5 @@
 import webbrowser
-
 import keyboard
-
-import Language
-import Menu
 import get_settings
 import pyinsim
 
