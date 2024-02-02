@@ -29,7 +29,11 @@ class Gearbox:
         self.filtered_percentages = []
         self.speed_builder = ""
         self.double_input = False
-        self.gearbox_builder = [0,0,0,0,0,0,0]
+        self.gearbox_builder = [0, 0, 0, 0, 0, 0, 0]
+        self.building_gear = 0
+        self.building_active = False
+        self.use_just_built_gears = False
+        self.user_sequential_notification_sent = False
 
     def update_data(self):
         self.accelerator_pedal_position = self.game_object.own_vehicle.throttle
@@ -92,14 +96,15 @@ class Gearbox:
             else:
                 self.make_selection = False
                 self.gears_and_max_speed = gears_and_max_speed_list[0][1]
+        elif self.use_just_built_gears:
+            self.car_supported = True
+            # TODO save new gears to file
         else:
             self.car_supported = False
             self.game_object.notifications.append(["^3Gearbox not set up.", 3])
 
     def set_up_screen(self):
-        # TODO finish the setup with a ok button, esc and enter throw you out of pits
-
-        self.game_object.send_button(143, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133, 50, 16, 5,
+        self.game_object.send_button(143, pyinsim.ISB_LIGHT, 133, 50, 16, 5,
                                      self.game_object.language.translation(self.game_object.lang, "Gearbox_setup"),
                                      inst=128)
         self.game_object.send_button(144, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133, 69, 11, 5,
@@ -123,26 +128,57 @@ class Gearbox:
         self.game_object.send_button(150, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133, 153, 11, 5,
                                      "Speed Gear 7",
                                      inst=128)
+        self.game_object.send_button(151, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133, 36, 11, 5,
+                                     "^3Apply",
+                                     inst=128)
 
-    def listen_for_key(self, gear):
-        self.speed_builder = ""
+    def create_dict_from_builder(self):
+        # get length depending on first 0 value
+        length_of_gears = 7
+        for i in range(len(self.gearbox_builder)):
+            if self.gearbox_builder[i] == 0:
+                length_of_gears = i
+                break
+        self.gears_and_max_speed = {i: self.gearbox_builder[i - 1] for i in range(1, length_of_gears + 1)}
+        self.use_just_built_gears = True
+        self.game_object.send_button(151, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133, 36, 11, 5,
+                                     "^2Applied",
+                                     inst=128)
 
-        def use_new_key(event):
-            new_key = event.name
-            if new_key == "esc" or new_key == "enter":
-                keyboard.unhook(use_new_key)
-                self.gearbox_builder[gear] = int(self.speed_builder)
+    def stop_key_listener(self):
+        if self.building_active:
+            self.building_active = False
+            keyboard.unhook(self.use_new_key)
+            self.create_dict_from_builder()
 
-            else:
-                self.double_input = not self.double_input
-                if not self.double_input:
-                    self.speed_builder = self.speed_builder + new_key
-                    print(self.speed_builder)
-        # Listen for a key event
-        keyboard.hook(use_new_key)
+    def use_new_key(self, event):
+        new_key = event.name
+
+        if new_key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]:
+            self.double_input = not self.double_input
+            if not self.double_input:
+                self.speed_builder = self.speed_builder + new_key
+                self.gearbox_builder[self.building_gear - 1] = int(self.speed_builder)
+                self.game_object.send_button(143 + self.building_gear, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133,
+                                             69 + 14 * (self.building_gear - 1), 11, 5,
+                                             self.speed_builder,
+                                             inst=128)
 
     def set_up_gear(self, gear):
-        self.listen_for_key(gear)
+        self.building_gear = gear
+        self.speed_builder = ""
+        self.game_object.send_button(143 + self.building_gear, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 133,
+                                     69 + 14 * (self.building_gear - 1), 11, 5,
+                                     self.speed_builder,
+                                     inst=128)
+        # Listen for a key event
+        if not self.building_active:
+            self.building_active = True
+            keyboard.hook(self.use_new_key)
+
+    def delete_gearbox_builder(self):
+        for i in range(9):
+            self.game_object.del_button(143 + i)
 
     def gearbox_select(self, number):
         self.gears_and_max_speed = self.gears_and_max_speed[number][1]
@@ -150,9 +186,15 @@ class Gearbox:
         for i in range(11):
             self.game_object.del_button(120 + i)
 
+    def notify_user_sequential(self):
+        if not self.user_sequential_notification_sent:
+            self.user_sequential_notification_sent = True
+            self.game_object.notifications.append(["^3Gearbox only in", 3])
+            self.game_object.notifications.append(["^3'sequential' mode!", 3])
+
     def calculate_gear(self):
-        # TODO only in sequential mode
         # TODO only 10 settings per car saveable
+        self.user_sequential_notification_sent = False
         self.update_data()
         if self.make_selection:
             self.game_object.send_button(120, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 50, 87, 26, 5,

@@ -47,7 +47,7 @@ from Vehicle import Vehicle
 # 121 - 130 Gearbox selection
 # 131 - 138 CopAssist Menu
 # 139 - 141 CopAssist HUD
-# 142 - 150 Gearbox Setup
+# 142 - 151 Gearbox Setup
 class LFSConnection:
     def __init__(self):
         """
@@ -90,7 +90,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, *range(132, 141)}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, *range(132, 152)}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -256,6 +256,7 @@ class LFSConnection:
             self.insim.send(pyinsim.ISP_MST,
                             Msg=b"/axis %.1i throttle" % self.settings.THROTTLE_AXIS)
             self.in_pits = False
+            self.gearbox.delete_gearbox_builder()
             if time.time() - self.time_menu_open >= 30:
                 self.start_outgauge()
             insim.bind(pyinsim.ISP_MCI, self.get_car_data)
@@ -366,7 +367,6 @@ class LFSConnection:
 
         for car in self.cars_on_track:
             if car.player_id == plp.PLID:
-                print(plp.PLID, car.player_id)
                 self.cars_on_track.remove(car)
         if self.own_vehicle.player_id == plp.PLID:
             self.in_pits = True
@@ -543,6 +543,9 @@ class LFSConnection:
                 Menu.open_cop_menu(self)
         elif 143 <= btc.ClickID <= 150:  # Gearbox Setup
             self.gearbox.set_up_gear(btc.ClickID - 143)
+        elif btc.ClickID == 151:
+            self.gearbox.stop_key_listener()
+
         else:
             click_actions = {
                 100: Menu.ask,
@@ -696,10 +699,11 @@ class LFSConnection:
         if self.settings.head_up_display:
             if self.in_game_cam == 3:  # Drivers View
                 if self.own_vehicle.gear > 1:
-                    if self.own_vehicle.gearbox_mode > 0 and not self.settings.automatic_gearbox:
-                        send_gear_button('%.i' % (self.own_vehicle.gear - 1))
-                    else:
+                    if self.own_vehicle.gearbox_mode == 0 or (self.settings.automatic_gearbox and self.own_vehicle.gearbox_mode == 2 and self.gearbox.car_supported):
                         send_gear_button('D%.i' % (self.own_vehicle.gear - 1))
+                    else:
+                        send_gear_button('%.i' % (self.own_vehicle.gear - 1))
+
                 elif self.own_vehicle.gear == 1:
                     send_gear_button('n')
                 elif self.own_vehicle.gear == 0:
@@ -750,7 +754,6 @@ class LFSConnection:
         This method is called every 200ms to start all driver assistance functions.
         """
         self.get_relevant_cars()
-        print(self.in_pits)
         def brake_emergency():
             self.brake_intervention_was_active = True
             if self.settings.automatic_emergency_braking and ALL_ON:
@@ -876,7 +879,10 @@ class LFSConnection:
                 start_collision_warning()
 
             if self.settings.automatic_gearbox:
-                self.gearbox.calculate_gear()
+                if self.own_vehicle.gearbox_mode == 2:
+                    self.gearbox.calculate_gear()
+                else:
+                    self.gearbox.notify_user_sequential()
 
             if self.settings.PSC and not COP:
                 self.controller_inputs.check_controller_input()
