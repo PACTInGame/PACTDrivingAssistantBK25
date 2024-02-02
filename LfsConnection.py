@@ -718,6 +718,9 @@ class LFSConnection:
 
                 if self.settings.pact_mode == 2:
                     send_siren_button()
+                else:
+                    self.del_button(139)
+                    self.del_button(140)
                 send_extra_info_button()
                 send_notifications()
             elif self.in_game_cam in [0, 1, 2, 4]:
