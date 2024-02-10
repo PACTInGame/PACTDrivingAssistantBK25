@@ -74,6 +74,7 @@ class CopAssist:
             self.stop_siren()
         else:
             self.start_siren()
+            self.strobe = True
 
     def toggle_strobe(self):
         self.strobe = not self.strobe

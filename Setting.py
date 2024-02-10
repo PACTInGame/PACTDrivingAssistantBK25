@@ -50,6 +50,9 @@ class Setting:
         self.adaptive_brake_light = set_def[28]
         self.adaptive_brake_light_style = set_def[29]
         self.pact_mode = set_def[30]  # 0 = all on, 1 = all off, 2 = cop, 3 = race
+        self.stall_protection = set_def[31]
+        self.realistic_clutch = set_def[32]
+
         # TODO MAKE MORE SETTINGS PERSISTENT
         self.automatic_siren = True
         self.use_indicators = True

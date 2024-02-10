@@ -57,8 +57,7 @@ class PSC:
             oversteer = True
         if understeer or oversteer:
             self.sent_slip = True
-            # TODO display slip only in cockpit view
-            if self.game_object.settings.head_up_display:
+            if self.game_object.settings.head_up_display and self.game_object.in_game_cam == 3:
                 self.game_object.send_button(41, pyinsim.ISB_DARK, 113 + x, 103 + y, 13, 6, "^3SLIP")
 
         elif self.sent_slip:

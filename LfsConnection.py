@@ -276,10 +276,9 @@ class LFSConnection:
             self.on_track = False
             insim.unbind(pyinsim.ISP_MCI, self.get_car_data)
             [self.del_button(i) for i in range(143)]
-            [self.del_button(i) for i in range(152,200)]
+            [self.del_button(i) for i in range(152, 200)]
             self.send_button(3, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 180, 0, 25, 5,
                              "Waiting for you to hit the road.")
-
 
         flags = [int(i) for i in str("{0:b}".format(sta.Flags))]
         self.in_game_cam = sta.InGameCam
@@ -657,6 +656,7 @@ class LFSConnection:
                                      26, 6, notification[0])
                     num_notifications += 1
 
+        # TODO SEND FEEDBACK BUTTON
         def send_cross_button(intensity):
             if intensity[0] == 1:
                 if intensity[1] > 180:
@@ -685,10 +685,18 @@ class LFSConnection:
                                                                                                        'Strobe'))
 
         def send_outside_hud():
-            # TODO create outside hud at the bottom of the screen
+            if self.settings.pact_mode == 2 and self.current_menu == 0:
+                self.send_button(139, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 119, 0, 6, 4,
+                                 ('^7' if not self.CopAssist.siren else '^4') + self.language.translation(self.lang,
+                                                                                                          'Siren'))
+                self.send_button(140, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, 123, 0, 6, 4,
+                                 ('^7' if not self.CopAssist.strobe else '^4') + self.language.translation(self.lang,
+                                                                                                           'Strobe'))
+            else:
+                self.del_button(139)
+                self.del_button(140)
+            # TODO create more options for outside hud
             for i in range(1, 10):
-                self.del_button(i)
-            for i in range(139, 142):
                 self.del_button(i)
 
         if self.settings.head_up_display:
