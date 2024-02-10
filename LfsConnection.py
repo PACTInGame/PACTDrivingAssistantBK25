@@ -2,6 +2,7 @@ import sys
 import time
 from threading import Thread
 
+import ACC_Setup
 import Boardcomputer
 import Calculations
 import CarDataBase
@@ -48,6 +49,7 @@ from Vehicle import Vehicle
 # 131 - 138 CopAssist Menu
 # 139 - 141 CopAssist HUD
 # 142 - 151 Gearbox Setup
+# 152, 153 Controller Setup
 class LFSConnection:
     def __init__(self):
         """
@@ -90,7 +92,7 @@ class LFSConnection:
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
-        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, *range(132, 152)}
+        self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, *range(132, 154)}
         self.collision_warning_intensity = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
@@ -397,6 +399,7 @@ class LFSConnection:
                     25: self.settings.change_language,
                     26: Menu.open_general_menu,
                     27: Menu.open_keys_menu,
+                    28: ACC_Setup.set_up,
                     40: Menu.close_menu,
                 }
 
@@ -509,6 +512,8 @@ class LFSConnection:
                         Menu.listen_for_key(self, "steer_axis")
                     elif btc.ClickID == 36:
                         Menu.listen_for_key(self, "clutch_axis")
+                    elif btc.ClickID == 38:
+                        ACC_Setup.set_up(self)
                 else:
                     if btc.ClickID == 30:
                         Menu.listen_for_key(self, "throttle_key")
@@ -765,6 +770,7 @@ class LFSConnection:
         This method is called every 200ms to start all driver assistance functions.
         """
         self.get_relevant_cars()
+
 
         def anti_stall():
             if self.own_vehicle.eng_type == "combustion" and self.own_vehicle.rpm < 200 and self.controller_inputs.accelerator > 0.1:

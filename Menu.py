@@ -80,7 +80,9 @@ def open_menu(game_object):
     game_object.del_button(100)
     game_object.del_button(103)
     game_object.del_button(131)
-
+    if game_object.own_vehicle.control_mode == 2 and game_object.settings.controller_throttle == -1:
+        game_object.send_button(28, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + -5, 0, 20, 5,
+                                "^1Set up controller support")
     game_object.send_button(21, pyinsim.ISB_DARK, top, 0, 20, 5, game_object.language.translation(lang, "Menu"))
     game_object.send_button(26, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 5, 0, 20, 5,
                             game_object.language.translation(lang, "General"))
@@ -178,6 +180,8 @@ def open_keys_menu(game_object):
                                 game_object.language.translation(lang, "Clutch_Axis"))
         game_object.send_button(37, pyinsim.ISB_LIGHT, top + 40, 20, 5, 5,
                                 str(game_object.settings.CLUTCH_AXIS))
+        game_object.send_button(38, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top -5, 0, 20, 5,
+                                "^7Reset controller support")
     else:
         game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                                 game_object.language.translation(lang, "Throttle_Key"))
@@ -233,6 +237,7 @@ def open_general_menu(game_object):
                             else game_object.language.translation(lang, "off"))
     game_object.send_button(31, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 20, 0, 20, 5,
                             game_object.language.translation(lang, "Indicator_Sound"))
+
     game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 25, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
