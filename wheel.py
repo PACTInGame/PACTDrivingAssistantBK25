@@ -33,22 +33,21 @@ class WheelSupport:
             setJoy(xPos, yPos, zPos, scale)
             vj.close()
 
-
     def use_wheel_collision_warning(self, game_obj):
         self.brake = -1000
         self.accelerator = 1000
         self.use()
         game_obj.insim.send(pyinsim.ISP_MST,
-                        Msg=b"/axis %.1i brake" % game_obj.settings.VJOY_AXIS1)
+                            Msg=b"/axis %.1i brake" % game_obj.settings.VJOY_AXIS1)
         game_obj.insim.send(pyinsim.ISP_MST,
-                        Msg=b"/axis %.1i throttle" % game_obj.settings.VJOY_AXIS)
+                            Msg=b"/axis %.1i throttle" % game_obj.settings.VJOY_AXIS)
 
     def use_wheel_stop(self, game_obj):
 
         game_obj.insim.send(pyinsim.ISP_MST,
-                        Msg=b"/axis %.1i brake" % game_obj.settings.BRAKE_AXIS)
+                            Msg=b"/axis %.1i brake" % game_obj.settings.BRAKE_AXIS)
         game_obj.insim.send(pyinsim.ISP_MST,
-                        Msg=b"/axis %.1i throttle" % game_obj.settings.THROTTLE_AXIS)
+                            Msg=b"/axis %.1i throttle" % game_obj.settings.THROTTLE_AXIS)
 
     def use_wheel(self, game_obj, accel, brake):
         self.accelerator = accel

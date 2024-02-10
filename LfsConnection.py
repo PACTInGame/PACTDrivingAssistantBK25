@@ -118,6 +118,7 @@ class LFSConnection:
         self.cross_traffic_warning_sound_played = False
         self.side_collision_warning_sound_played = time.perf_counter()
         self.obtain_PLID = True
+        self.anti_stall_timer = 0
 
         self.holding_brake = False
         self.lang = self.settings.language
@@ -763,6 +764,19 @@ class LFSConnection:
         """
         self.get_relevant_cars()
 
+        def anti_stall():
+            if self.own_vehicle.eng_type == "combustion" and self.own_vehicle.rpm < 200 and self.controller_inputs.accelerator > 0.1:
+                if self.own_vehicle.battery_light:
+                    self.gearbox.send([self.settings.IGNITION_KEY, self.settings.IGNITION_KEY])
+                else:
+                    self.gearbox.send([self.settings.IGNITION_KEY])
+                send = True
+                for notes in self.notifications:
+                    if notes[0] == "^3Anti-Stall":
+                        send = False
+                if send:
+                    self.notifications.append(["^3Anti-Stall", 2])
+
         def brake_emergency():
             self.brake_intervention_was_active = True
             if self.settings.automatic_emergency_braking and ALL_ON:
@@ -939,7 +953,8 @@ class LFSConnection:
                     if not self.own_vehicle.low_beam_light and not self.AdaptiveBrakeLight.braking:
                         self.insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL,
                                         UVal=pyinsim.LCL_SET_LIGHTS | pyinsim.LCL_Mask_LowBeam)
-
+            if self.settings.stall_protection:
+                anti_stall()
         if RACE:
             self.RaceAssist.update_coordinates_and_timestamp()
             self.RaceAssist.check_live_delta_previous_lap()

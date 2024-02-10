@@ -92,6 +92,7 @@ def get_settings_from_file():
         print("Error loading settings. Make sure settings.txt exists in Folder.")
 
 
+# SETUP ACC AXIS FROM MENU!
 def get_acc_settings_from_file():
     throttle = -1
     brake = -1

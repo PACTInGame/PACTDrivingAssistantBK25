@@ -53,7 +53,6 @@ class Gearbox:
 
     def press(self, keys):
         shift = get_shift_buttons()
-        print(self.game_object.on_track)
         if not shift and self.game_object.on_track:
             for key in keys:
                 pydirectinput.press(key)
