@@ -83,6 +83,7 @@ class Language:
                 'Spare_Key1': 'Spare Key 1',
                 'Spare_Key2': 'Spare Key 2',
                 'Cop_Menu': 'Cop Menu',
+                'Gearbox_Menu': 'Gearbox Menu',
 
 
             },
@@ -162,6 +163,7 @@ class Language:
                 'Spare_Key1': 'Leere Taste 1',
                 'Spare_Key2': 'Leere Taste 2',
                 'Cop_Menu': b'Cop Men\xfc',
+                'Gearbox_Menu': b'Getriebe Men\xfc',
 
                 # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },
@@ -239,6 +241,7 @@ class Language:
                 'Spare_Key1': 'Touches libres 1',
                 'Spare_Key2': 'Touches libres 2',
                 'Cop_Menu': 'Menu de police',
+                'Gearbox_Menu': b'Menu de la bo\xeete de vitesses',
 
 
             },
@@ -316,6 +319,7 @@ class Language:
                 'Spare_Key1': b'Tecla de repuesto 1',
                 'Spare_Key2': b'Tecla de repuesto 2',
                 'Cop_Menu': b'Men\xfa de polic\xeda',
+                'Gearbox_Menu': b'Men\xfa de la caja de cambios',
 
 
             },

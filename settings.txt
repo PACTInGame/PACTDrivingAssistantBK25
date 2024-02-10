@@ -30,6 +30,6 @@ on <-- side collision prevention
 on <-- Indicator Sounds
 on <-- Adaptive Brake Lights
 on <-- Adaptive Brake Lights Style
-0 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)
+1 <-- Mode (0 = all on, 1 = all off, 2 = cop, 3 = race)
 off <-- Stall-Protection
 off <-- Realistic Clutch

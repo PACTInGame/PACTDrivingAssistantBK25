@@ -65,10 +65,11 @@ def change_mode(game_object):
                                 "Diff Best")
     else:
         game_object.INTERVAL = 200
-        for i in range(110, 121):
+        for i in range(0, 199):
             game_object.del_button(i)
     send_mode(game_object)
     get_settings.write_settings(game_object)
+    close_menu(game_object)
 
 
 def open_menu(game_object):

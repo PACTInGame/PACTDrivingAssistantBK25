@@ -53,14 +53,14 @@ class Gearbox:
 
     def press(self, keys):
         shift = get_shift_buttons()
-        if not shift:
+        print(self.game_object.on_track)
+        if not shift and self.game_object.on_track:
             for key in keys:
                 pydirectinput.press(key)
 
     def get_gearbox_data_from_file(self, cname):
         cname = str(cname)
         cname = cname[2:-1]
-        print(cname)
         text_file = open("data/gearbox.txt", "r").read()
         # Parse the text file and store the data in a dictionary of dictionaries
         data_dict = {}

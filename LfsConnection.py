@@ -729,8 +729,9 @@ class LFSConnection:
                 else:
                     self.del_button(139)
                     self.del_button(140)
-                send_extra_info_button()
-                send_notifications()
+                if self.settings.pact_mode != 1:
+                    send_extra_info_button()
+                    send_notifications()
             elif self.in_game_cam in [0, 1, 2, 4]:
                 send_outside_hud()
             else:

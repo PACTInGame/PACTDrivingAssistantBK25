@@ -82,7 +82,6 @@ class Setting:
     def change_language(self):
         languages = ['en', 'de', 'fr', 'es', 'it', 'tr']
         for i in range(len(languages)):
-            print(i)
             if i == len(languages) - 1:
                 self.language = languages[0]
                 Menu.open_menu(self.game_obj)
@@ -91,6 +90,7 @@ class Setting:
                 self.language = languages[i + 1]
                 Menu.open_menu(self.game_obj)
                 break
+        self.game_obj.lang = self.language
 
     def activate_bus_offline(self):
         self.bus_offline_sim = not self.bus_offline_sim
@@ -107,33 +107,33 @@ class Setting:
 
     def save_controls(self):
         print(self.SHIFT_UP_KEY)
-        file_string = ("Important: Only change inside LFS!\n" 
-                       "{}  <-change you Shift Up key here.      ------------------ ALL USERS\n" 
-                       "{}  <-change you Shift Down key here. ------------------ ALL USERS\n" 
-                       "{}  <-change you Ignition key here.       ------------------ ALL USERS\n" 
-                       "{}  <-specify your throttle axis (OPTIONS -> CONTROLS -> AXES/FF), if you have a controller\n" 
-                       "{}  <-specify your brake axis, if you have a controller\n" 
-                       "{}  <-specify your steering axis, if you have a controller\n" 
-                       "{} <-specify the first vjoy axis, if you have a controller\n" 
-                       "{}  <-specify the brake key, if you use keyboard or mouse (can also be mousel, mouser)\n" 
-                       "{} <-specify the accelerator key, if you use keyboard\n" 
-                       "{} <-specify the handbrake key           ------------------ ALL USERS\n" 
-                       "C:\\Program Files\\vJoy\\x64\\vJoyInterface.dll <-change Path to vJoy folder here, depends on where you've installed it.\n" 
-                       "{} <-a spare key without any function\n" 
+        file_string = ("Important: Only change inside LFS!\n"
+                       "{}  <-change you Shift Up key here.      ------------------ ALL USERS\n"
+                       "{}  <-change you Shift Down key here. ------------------ ALL USERS\n"
+                       "{}  <-change you Ignition key here.       ------------------ ALL USERS\n"
+                       "{}  <-specify your throttle axis (OPTIONS -> CONTROLS -> AXES/FF), if you have a controller\n"
+                       "{}  <-specify your brake axis, if you have a controller\n"
+                       "{}  <-specify your steering axis, if you have a controller\n"
+                       "{} <-specify the first vjoy axis, if you have a controller\n"
+                       "{}  <-specify the brake key, if you use keyboard or mouse (can also be mousel, mouser)\n"
+                       "{} <-specify the accelerator key, if you use keyboard\n"
+                       "{} <-specify the handbrake key           ------------------ ALL USERS\n"
+                       "C:\\Program Files\\vJoy\\x64\\vJoyInterface.dll <-change Path to vJoy folder here, depends on where you've installed it.\n"
+                       "{} <-a spare key without any function\n"
                        "{} <-a spare key without any function\n"
                        "{} <- specify your clutch axis, if you have a controller)\n".format(str(self.SHIFT_UP_KEY),
                                                                                             str(self.SHIFT_DOWN_KEY),
-                                                                                          str(self.IGNITION_KEY),
-                                                                                          str(self.THROTTLE_AXIS),
-                                                                                          str(self.BRAKE_AXIS),
-                                                                                          str(self.STEER_AXIS),
-                                                                                          str(self.VJOY_AXIS),
-                                                                                          str(self.BRAKE_KEY),
-                                                                                          str(self.ACC_KEY),
-                                                                                          str(self.HANDBRAKE_KEY),
-                                                                                          str(self.SPARE_KEY_1),
-                                                                                          str(self.SPARE_KEY_2),
-                                                                                          str(self.CLUTCH_AXIS)))
+                                                                                            str(self.IGNITION_KEY),
+                                                                                            str(self.THROTTLE_AXIS),
+                                                                                            str(self.BRAKE_AXIS),
+                                                                                            str(self.STEER_AXIS),
+                                                                                            str(self.VJOY_AXIS),
+                                                                                            str(self.BRAKE_KEY),
+                                                                                            str(self.ACC_KEY),
+                                                                                            str(self.HANDBRAKE_KEY),
+                                                                                            str(self.SPARE_KEY_1),
+                                                                                            str(self.SPARE_KEY_2),
+                                                                                            str(self.CLUTCH_AXIS)))
         try:
             with open('controls.txt', 'w') as file:
                 file.write(file_string)
