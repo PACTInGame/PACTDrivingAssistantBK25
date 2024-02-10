@@ -22,7 +22,6 @@ def get_current_version(current_version):
     file_path = 'version.txt'
 
     version = get_github_version(owner, repo, file_path)
-
     if version:
         version = str(version)
         version = version.split('= ')[1]
