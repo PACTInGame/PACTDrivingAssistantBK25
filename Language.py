@@ -84,6 +84,7 @@ class Language:
                 'Spare_Key2': 'Spare Key 2',
                 'Cop_Menu': 'Cop Menu',
                 'Gearbox_Menu': 'Gearbox Menu',
+                'Stall_Protection': '^2Stall Protection' if self.game_obj.settings.stall_protection else '^1Stall Protection',
 
 
             },
@@ -164,6 +165,7 @@ class Language:
                 'Spare_Key2': 'Leere Taste 2',
                 'Cop_Menu': b'Cop Men\xfc',
                 'Gearbox_Menu': b'Getriebe Men\xfc',
+                'Stall_Protection': b'^2Abw\xfcrg Schutz' if self.game_obj.settings.stall_protection else b'^1Abw\xfcrg Schutz',
 
                 # TODO FIX OTHER LANGUAGES WITH SONDERZEICHEN
             },
@@ -242,6 +244,7 @@ class Language:
                 'Spare_Key2': 'Touches libres 2',
                 'Cop_Menu': 'Menu de police',
                 'Gearbox_Menu': b'Menu de la bo\xeete de vitesses',
+                'Stall_Protection': b'^2Protection contre le calage' if self.game_obj.settings.stall_protection else b'^1Protection contre le calage',
 
 
             },
@@ -320,6 +323,7 @@ class Language:
                 'Spare_Key2': b'Tecla de repuesto 2',
                 'Cop_Menu': b'Men\xfa de polic\xeda',
                 'Gearbox_Menu': b'Men\xfa de la caja de cambios',
+                'Stall_Protection': b'^2Protecci\xf3n contra calado' if self.game_obj.settings.stall_protection else b'^1Protecci\xf3n contra calado',
 
 
             },

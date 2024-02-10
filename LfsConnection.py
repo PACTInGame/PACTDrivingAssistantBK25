@@ -426,6 +426,8 @@ class LFSConnection:
                     self.settings.adaptive_brake_light = not self.settings.adaptive_brake_light
                 elif btc.ClickID == 34:
                     self.settings.adaptive_brake_light_style = not self.settings.adaptive_brake_light_style
+                elif btc.ClickID == 35:
+                    self.settings.stall_protection = not self.settings.stall_protection
                 elif btc.ClickID == 40:
                     Menu.close_menu(self)
                 if not btc.ClickID == 40:

@@ -292,7 +292,9 @@ def open_drive_menu(game_object):
                             game_object.language.translation(lang, "Automatic_Indicator_Turnoff"))
     game_object.send_button(30, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 45, 0, 20, 5,
                             game_object.language.translation(lang, "Gearbox"))
-    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 50, 0, 20, 5,
+    game_object.send_button(35, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 50, 0, 20, 5,
+                            game_object.language.translation(lang, "Stall_Protection"))
+    game_object.send_button(40, pyinsim.ISB_DARK | pyinsim.ISB_CLICK, top + 55, 0, 20, 5,
                             game_object.language.translation(lang, "Close"))
 
 
