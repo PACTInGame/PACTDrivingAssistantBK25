@@ -100,6 +100,7 @@ class CopAssist:
         if not self.started:
             self.started = True
             self.send_buttons()
+            self.insim.send(pyinsim.ISP_MSL, Msg=b"Type '/o siren' or '/o strobe' to toggle siren or strobe.")
 
         if self.strobe:
             self.strobe_func()
@@ -130,9 +131,18 @@ class CopAssist:
             Text=text,
             TypeIn=typeIn)
 
+    def message_handling(self, insim, mso):
+        print(mso.Msg)
+        if mso.Msg == b'siren':
+            self.toggle_siren()
+        elif mso.Msg == b'strobe':
+            self.toggle_strobe()
+
     def run(self):
         self.insim.bind(pyinsim.ISP_MCI, self.get_car_data)
         self.insim.bind(pyinsim.ISP_BTC, self.button_click)
+        self.insim.bind(pyinsim.ISP_MSO, self.message_handling)
+
         pyinsim.run()
         # Example in Test.py
 
