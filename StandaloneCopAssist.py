@@ -132,7 +132,6 @@ class CopAssist:
             TypeIn=typeIn)
 
     def message_handling(self, insim, mso):
-        print(mso.Msg)
         if mso.Msg == b'siren':
             self.toggle_siren()
         elif mso.Msg == b'strobe':
