@@ -10,7 +10,7 @@ off <-- Emergency assist
 off <-- Lane assist
 off <-- Cop aid system
 on <-- Automatic Emergency Braking
-0 <-- Collision Warning Distance (early, medium, late)
+1 <-- Collision Warning Distance (early, medium, late)
 off <-- Automatic Gearbox (when sequential Gearbox is set in LFS)
 early <-- Lane departure warning intensity (early, normal, reduced)
 off <-- Head-up display with images
@@ -26,7 +26,7 @@ on <-- park emergency brake
 de <-- language
 on <-- audible parking aid
 on <-- visual parking aid
-on <-- side collision prevention
+off <-- side collision prevention
 on <-- Indicator Sounds
 on <-- Adaptive Brake Lights
 on <-- Adaptive Brake Lights Style
