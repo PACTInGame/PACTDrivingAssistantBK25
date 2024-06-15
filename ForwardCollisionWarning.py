@@ -30,7 +30,6 @@ def calc_necessary_braking(abstand, relative_geschwindigkeit, verzoegerung_B):
     :return: Die notwendige Verzögerung des folgenden Fahrzeugs in Metern pro Sekunde zum Quadrat (m/s^2)
     """
     verzoegerung_B = -verzoegerung_B
-    print("Verzögerung B: ", verzoegerung_B)
     # Die Zeit bis zur Kollision berechnen (ohne Verzögerung)
     if relative_geschwindigkeit <= 0:
         return 0  # Wenn relative Geschwindigkeit <= 0, ist keine Verzögerung notwendig
@@ -41,7 +40,6 @@ def calc_necessary_braking(abstand, relative_geschwindigkeit, verzoegerung_B):
     strecke_B = 0.5 * verzoegerung_B * zeit_bis_kollision ** 2
     # Die notwendige Verzögerung für Fahrzeug A berechnen, um vor der Kollision zum Stillstand zu kommen
     notwendige_verzoegerung = (relative_geschwindigkeit ** 2) / (2 * (abstand - strecke_B))
-    print("Notwendige Verzögerung: ", notwendige_verzoegerung)
     return -notwendige_verzoegerung
 
 
