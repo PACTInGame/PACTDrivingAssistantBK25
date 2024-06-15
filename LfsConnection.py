@@ -60,7 +60,7 @@ class LFSConnection:
             print("Waiting for LFS to start.")
             time.sleep(3)
 
-        self.version = "0.0.2"
+        self.version = "0.0.3"
         self.update_available = Version.get_current_version(self.version)
         self.INTERVAL = 200  # TODO doesnt make sense bc Interval will not be updated if changed here
         self.insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'', Prefix=b"$",
@@ -520,9 +520,9 @@ class LFSConnection:
                     elif btc.ClickID == 32:
                         Menu.listen_for_key(self, "brake_key")
                     elif btc.ClickID == 34:
-                        Menu.listen_for_key(self, "spare_key1")
+                        Menu.listen_for_key(self, "spare_key_1")
                     elif btc.ClickID == 36:
-                        Menu.listen_for_key(self, "spare_key2")
+                        Menu.listen_for_key(self, "spare_key_2")
                 if btc.ClickID == 40:
                     Menu.close_menu(self)
         elif self.current_menu == 7:  # Cop Menu

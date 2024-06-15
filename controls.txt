@@ -6,8 +6,8 @@ i  <-change you Ignition key here.       ------------------ ALL USERS
 12  <-specify your brake axis, if you have a controller
 8  <-specify your steering axis, if you have a controller
 15 <-specify the first vjoy axis, if you have a controller
-down  <-specify the brake key, if you use keyboard or mouse (can also be mousel, mouser)
-up <-specify the accelerator key, if you use keyboard
+mouser  <-specify the brake key, if you use keyboard or mouse (can also be mousel, mouser)
+mousel <-specify the accelerator key, if you use keyboard
 q <-specify the handbrake key           ------------------ ALL USERS
 C:\Program Files\vJoy\x64\vJoyInterface.dll <-change Path to vJoy folder here, depends on where you've installed it.
 m <-a spare key without any function

@@ -77,6 +77,7 @@ class Setting:
         self.SPARE_KEY_1 = cont_def[10]
         self.SPARE_KEY_2 = cont_def[11]
         self.CLUTCH_AXIS = int(cont_def[12])
+        self.TGROTTLE_KEY = "mousel"
         self.controller_throttle, self.controller_brake, self.controller_steer, self.num_joystick = get_settings.get_acc_settings_from_file()
 
     def change_language(self):
