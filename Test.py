@@ -1,41 +1,56 @@
+def berechne_notwendige_verzoegerung(abstand, relative_geschwindigkeit, verzoegerung_B):
+    """
+    Berechnet die notwendige Verzögerung, um eine Kollision zu vermeiden.
 
-import pyinsim
+    :param abstand: Der Abstand zwischen den Fahrzeugen in Metern (m)
+    :param relative_geschwindigkeit: Die relative Geschwindigkeit der Fahrzeuge in Metern pro Sekunde (m/s)
+    :param verzoegerung_B: Die Verzögerung des vorausfahrenden Fahrzeugs in Metern pro Sekunde zum Quadrat (m/s^2)
+    :return: Die notwendige Verzögerung des folgenden Fahrzeugs in Metern pro Sekunde zum Quadrat (m/s^2)
+    """
+    # Die Zeit bis zur Kollision berechnen (ohne Verzögerung)
+    if relative_geschwindigkeit <= 0:
+        return 0  # Wenn relative Geschwindigkeit <= 0, ist keine Verzögerung notwendig
+
+    zeit_bis_kollision = abstand / relative_geschwindigkeit
+
+    # Die Strecke berechnen, die Fahrzeug B in dieser Zeit zurücklegt
+    strecke_B = 0.5 * verzoegerung_B * zeit_bis_kollision ** 2
+
+    # Die notwendige Verzögerung für Fahrzeug A berechnen, um vor der Kollision zum Stillstand zu kommen
+    notwendige_verzoegerung = (relative_geschwindigkeit ** 2) / (2 * (abstand - strecke_B))
+
+    return -notwendige_verzoegerung
 
 
-def message_out(insim, mso):
-    # Print out the MSO message.
-    # Note: ^L means Latin character, ^J japanese etc... ^0-^9 refer to colors.
-    print(mso.Msg)
+# Beispielanwendung
+abstand = 15  # Meter
+relative_geschwindigkeit = 15  # m/s
+verzoegerung_B = 0  # m/s^2 (angenommene Verzögerung des vorausfahrenden Fahrzeugs)
+
+notwendige_verzoegerung = berechne_notwendige_verzoegerung(abstand, relative_geschwindigkeit, verzoegerung_B)
+print(f"Notwendige Verzögerung: {notwendige_verzoegerung:.2f} m/s^2")
 
 
-def insim_state(insim, sta):
-    '''
-    # SMALL_LCS Flags
-LCS_SET_SIGNALS = 1		# bit 0
-LCS_SET_FLASH = 2		# bit 1
-LCS_SET_HEADLIGHTS = 4	# bit 2
-LCS_SET_HORN = 8		# bit 3
-LCS_SET_SIREN = 0x10	# bit 4
+def berechne_beschleunigung(v1, v2, zeit):
+    """
+    Berechnet die Beschleunigung bzw. Verzögerung in m/s^2.
 
-LCS_Mask_Signals = 0x0300       # bits  8-9   (Switches & 0x0300) - Signal    (0 off / 1 left / 2 right / 3 hazard)
-LCS_Mask_Flash = 0x0400         # bit   10    (Switches & 0x0400) - Flash
-LCS_Mask_Headlights = 0x0800    # bit	11    (Switches & 0x0800) - Headlights
-LCS_Mask_Horn = 0x070000        # bits  16-18 (Switches & 0x070000) - Horn    (0 off / 1 to 5 horn type)
-LCS_Mask_Siren = 0x300000       # bits  20-21 (Switches & 0x300000) - Siren   (0 off / 1 fast / 2 slow)
+    :param v1: Anfangsgeschwindigkeit in m/s
+    :param v2: Endgeschwindigkeit in m/s
+    :param zeit: Zeitspanne in Sekunden
+    :return: Beschleunigung bzw. Verzögerung in m/s^2
+    """
+    if zeit == 0:
+        raise ValueError("Die Zeitspanne darf nicht null sein.")
 
-    '''
-    # turn on
-    insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL, UVal=pyinsim.LCL_SET_EXTRA | pyinsim.LCL_Mask_Extra)
-    # turn off
-    insim.send(pyinsim.ISP_SMALL, SubT=pyinsim.SMALL_LCL, UVal=pyinsim.LCL_SET_EXTRA)
+    beschleunigung = (v2 - v1) / zeit
+    return beschleunigung
 
-# Init new InSim object.
-insim = pyinsim.insim(b'127.0.0.1', 29999, Admin=b'')
 
-# Bind ISP_MSO packet to message out method.
-insim.bind(pyinsim.ISP_MSO, message_out)
-# Bind ISP_STA packet to insim state method.
-insim.bind(pyinsim.ISP_STA, insim_state)
+# Beispielanwendung
+v1 = 20  # Anfangsgeschwindigkeit in m/s
+v2 = 10  # Endgeschwindigkeit in m/s
+zeit = 2  # Zeitspanne in Sekunden
 
-# Start pyinsim.
-pyinsim.run()
+beschleunigung = berechne_beschleunigung(v1, v2, zeit)
+print(f"Beschleunigung/Verzögerung: {beschleunigung:.2f} m/s^2")

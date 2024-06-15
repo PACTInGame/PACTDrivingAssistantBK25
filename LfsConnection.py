@@ -87,13 +87,14 @@ class LFSConnection:
         self.AdaptiveBrakeLight = AdaptiveBrakeLight(self)
         self.RaceAssist = RaceAssist(self)
         self.CopAssist = CopAssist(self)
-
+        # TODO calculate maximum braking power, and then add that to collision warning distance
         self.outgauge = None
         self.outsim = None
         self.game_time = 0
         self.buttons_on_screen = [0] * 255
         self.valid_ids = {*range(1, 41), *range(48, 55), 101, 103, 112, 113, *range(132, 154)}
         self.collision_warning_intensity = 0
+        self.collision_warning_brake_force = 0
         # two separate variables for cross traffic warning
         # as braking is not directly connected to warning logic
         self.cross_traffic_braking = False
@@ -181,6 +182,8 @@ class LFSConnection:
             self.own_vehicle.redline = CarDataBase.get_vehicle_redline(self.own_vehicle.cname)
             self.own_vehicle.collision_warning_multiplier = CarDataBase.get_vehicle_length(self.own_vehicle.cname)
             self.own_vehicle.max_gears = CarDataBase.get_max_gears(self.own_vehicle.cname)
+            self.own_vehicle.length = CarDataBase.get_size(self.own_vehicle.cname)[0]
+
             self.gearbox.get_gears_and_max_speed()
         # Function calls
         if self.on_track:
@@ -318,13 +321,15 @@ class LFSConnection:
 
         cars_already_known = [car.player_id for car in self.cars_on_track]
 
-        if npl.PLID not in cars_already_known:
-            self.cars_on_track.append(Vehicle(0, 0, 0, 0, 0, 0, 0, npl.PLID, 0, 0, npl.CName))
+        if (npl.PLID not in cars_already_known):
+            self.cars_on_track.append(Vehicle(0, 0, 0, 0, 0, 0, 0, npl.PLID, 0, 0, ""))
+
 
         for car in self.cars_on_track:
             if npl.PLID == car.player_id:
                 if car.cname != npl.CName:
                     car.update_cname(npl.CName)
+                    car.length = CarDataBase.get_size(car.cname)[0]
 
         if npl.PLID == self.own_vehicle.player_id:
             self.obtain_PLID = True
@@ -1020,24 +1025,11 @@ class LFSConnection:
          for data
          in MCI.Info for car in self.cars_on_track if car.player_id == data.PLID]
         [updated_this_packet.append(data.PLID) for data in MCI.Info]
-
-        self.cars_previous_speed = self.cars_previous_speed_buffer
-        self.cars_previous_speed_buffer = []
-
         for i, j in enumerate(self.cars_on_track):
             if j.player_id == self.own_vehicle.player_id:
-                self.own_vehicle.speed_mci = j.speed
-                self.own_vehicle.x = j.x
-                self.own_vehicle.y = j.y
-                self.own_vehicle.z = j.z
-                self.own_vehicle.heading = j.heading
-                self.own_vehicle.direction = j.direction
-                self.own_vehicle.steer_forces = j.steer_forces
-            self.cars_previous_speed_buffer.append((j.speed, j.player_id))
+                self.own_vehicle.update_data(j.x, j.y, j.z, j.heading, j.direction, j.steer_forces, j.speed)
 
-        [car.update_dynamic(speed[0] - car.speed) for speed in self.cars_previous_speed for car in
-         self.cars_on_track if
-         speed[1] == car.player_id and speed[0] - car.speed != 0.0]
+
 
         [car.update_distance(self.own_vehicle.x, self.own_vehicle.y, self.own_vehicle.z) for car in
          self.cars_on_track]

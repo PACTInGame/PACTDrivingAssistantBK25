@@ -12,6 +12,7 @@ class WheelSupport:
         self.accelerator = 1000
         self.brake = 1000
         self.steer = 0
+        self.wanted_brake = -800
         try:
             vj.open()
             vj.close()
@@ -34,7 +35,7 @@ class WheelSupport:
             vj.close()
 
     def use_wheel_collision_warning(self, game_obj):
-        self.brake = -1000
+        self.brake = 200*game_obj.collision_warning_brake_force + 1000
         self.accelerator = 1000
         self.use()
         game_obj.insim.send(pyinsim.ISP_MST,

@@ -28,8 +28,7 @@ class Setting:
         self.lane_assist = set_def[7]
         self.cop_aid_system = set_def[8]
         self.automatic_emergency_braking = set_def[9]
-        dist = set_def[10]
-        self.collision_warning_distance = 0 if dist == "close" else 1 if dist == "medium" else 2 if dist == "far" else 1
+        self.collision_warning_distance = int(set_def[10])
         self.automatic_gearbox = set_def[11]
         self.lane_dep_intensity = set_def[12]
         self.image_hud = set_def[13]

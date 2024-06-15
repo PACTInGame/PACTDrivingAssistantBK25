@@ -1,4 +1,5 @@
 import math
+import time
 
 
 class Vehicle:
@@ -13,7 +14,10 @@ class Vehicle:
         self.player_id = player_id
         self.distance = distance
         self.dynamic = dynamic
+        self.last_speed = 0
+        self.last_dynamic_change = time.perf_counter()
         self.cname = cname
+        self.length = 0
 
     def update_dynamic(self, dynamic):
         self.dynamic = dynamic
@@ -32,7 +36,20 @@ class Vehicle:
         self.direction = direction
         self.steer_forces = steer_forces
         self.speed = speed
+        self.calculate_acceleration()
         self.player_id = player_id
 
     def update_cname(self, cn):
         self.cname = cn
+
+    def calculate_acceleration(self):
+        zeit = time.perf_counter() - self.last_dynamic_change
+        if zeit == 0:
+            raise ValueError("Die Zeitspanne darf nicht null sein.")
+        speed = self.speed/3.6
+        acceleration = (speed - self.last_speed) / zeit
+        self.last_speed = speed
+        self.last_dynamic_change = time.perf_counter()
+        if acceleration == 0.0 and self.speed < 0.5 or acceleration != 0.0:
+            self.dynamic = acceleration
+        #print(f"Beschleunigung/Verzögerung Veh2: {self.dynamic:.2f} m/s^2")

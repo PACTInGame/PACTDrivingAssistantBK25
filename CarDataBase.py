@@ -147,11 +147,23 @@ def get_size(cn):
         b'\xb6i\xbd': (5.1, 2),  # Luxury sedan
         b'UF1': (3.1, 1.6),
         b'XFG': (3.7, 1.7),
-        b'RB4': (4.5, 1.8),
+        b'XRG': (4.5, 1.8),
+        b'LX4': (4.5, 1.8),
+        b'LX6': (4.5, 1.9),
+        b'RB4': (4.5, 1.9),
+        b'FXO': (4.5, 1.9),
+        b'XRT': (4.5, 1.9),
+        b'RAC': (5.0, 1.9),
+        b'FZ5': (5.0, 1.9),
+        b'UFR': (3.7, 1.8),
+        b'XFR': (4.2, 1.9),
+        b'FXR': (5.0, 1.9),
+        b'XRR': (5.0, 1.9),
+        b'FZR': (5.0, 1.9),
         b'>\x8c\x88': (5.2, 1.9),  # bumer 7
         b'K\xd2c': (5.2, 2.2),  # Uf Pickup
         b'\xa4\xc2\xf3': (7.6, 2.3),  # Line Runner
         b'\xe3\x94\xf4': (13.5, 2.5),  # SCAMA K460
     }
 
-    return size_map.get(cn, (4.6, 2))
+    return size_map.get(cn, (4.8, 2))

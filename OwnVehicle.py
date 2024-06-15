@@ -1,4 +1,5 @@
 import math
+import time
 
 
 class OwnVehicle:
@@ -27,6 +28,9 @@ class OwnVehicle:
         self.fuel_capacity = -1
         self.redline = -1
         self.max_gears = -1
+        self.last_speed_change = time.perf_counter()
+        self.last_speed = 0
+
 
         self.indicator_left = False
         self.indicator_right = False
@@ -43,6 +47,7 @@ class OwnVehicle:
 
         self.player_name = ""
         self.cname = ""
+        self.length = 0
         self.roleplay = "civil"
         self.eng_type = "combutstion"  # combustion, electric
 
@@ -59,7 +64,7 @@ class OwnVehicle:
         self.distance = (math.sqrt(
             (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]) + (b[2] - a[2]) * (b[2] - a[2])) / 65536)
 
-    def update_data(self, x, y, z, heading, direction, steer_forces, speed, player_id):
+    def update_data(self, x, y, z, heading, direction, steer_forces, speed):
         self.x = x
         self.y = y
         self.z = z
@@ -67,7 +72,18 @@ class OwnVehicle:
         self.direction = direction
         self.steer_forces = steer_forces
         self.speed_mci = speed
-        self.player_id = player_id
+        self.calculate_acceleration(speed/3.6)
 
     def update_cname(self, cn):
         self.cname = cn
+
+    def calculate_acceleration(self, v1):
+        zeit = time.perf_counter() - self.last_speed_change
+        if zeit == 0:
+            raise ValueError("Die Zeitspanne darf nicht null sein.")
+
+        acceleration = (v1 - self.last_speed) / zeit
+        self.last_speed = v1
+        self.last_speed_change = time.perf_counter()
+        if acceleration == 0.0 and self.speed < 0.5 or acceleration != 0.0:
+            self.dynamic = acceleration
